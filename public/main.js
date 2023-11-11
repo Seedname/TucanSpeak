@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
       utterance.volume = 1;
       utterance.rate = 1;
       utterance.pitch = 1;
-      utterance.voice = window.speechSynthesis.getVoices()[8];
+      utterance.voice = window.speechSynthesis.getVoices()[10];
       window.speechSynthesis.speak(utterance);
     }
 

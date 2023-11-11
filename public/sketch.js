@@ -14,8 +14,9 @@ class Toucan {
         this.scaleAngles = [...angles]
     }
 
-    turn() {
-        let dir = mouseX - width/2;
+    turn(vel) {
+        // let dir = x - width/2;/
+        let dir = vel.x;
 
         if (dir > 0 || this.turnAngle < 0) {
             this.turnAngle += 10;
@@ -98,11 +99,9 @@ class Mover {
     }
 }
 
-let size = 200;
+let size = 300;
 
-var camera, canvas, sc, flying;
-
-
+var camera, canvas, sc, flying, x, y, keys, speed;
 
 function setup() {
     canvas = createCanvas(size, size);
@@ -123,29 +122,50 @@ function setup() {
     sc = width/500;
 
     toucan = new Toucan(
-        [backWing, toucanTail, bottomBeak, topBeak,  toucanBody, leftClaw, rightClaw, frontWing], // images
-        [[100,-100], [110,65],  [80,-21],   [5,-79],  [100,-80],  [122,145], [170,140],  [120,-20]],  // position offsets
-        [-30,        0,         -10,          0,      0,          0,        0,        -12],  // angle offsets
-        [1,          1,          1,           1,      1,          1,        1,         1], // scale offsets
-        [[1,-1.25], [1,1],      [2,1],       [1,1],    [1,1],     [1,1],     [1,1],    [1,-0.5]] // origin locations
+        [backWing, leftClaw, toucanTail, bottomBeak, topBeak,  toucanBody, rightClaw, frontWing], // images
+        [[120,-100], [122,145], [110,65],  [80,-17],   [-34,-77],  [100,-80],   [170,140],  [125,-25]],  // position offsets
+        [-30,        0,         0,          0,      0,          0,        0,        -12],  // angle offsets
+        [1,          1,          1,         1,      1,          1,        1,         1], // scale offsets
+        [[1,-1.25],  [1,1],   [1,1],      [2,1],       [1,1],    [1,1],          [1,1],    [1,-0.5]] // origin locations
     );
     camera = new Mover();
 
     flying = true;
 
-    document.addEventListener('mousemove', (event) => {
-        camera.moveTo(event.clientX, event.clientY)
-    });
+    // document.addEventListener('mousemove', (event) => {
+    //     camera.moveTo(event.clientX, event.clientY)
+    // });
 
-
+    x = 0;
+    y = 0;
+    keys = {};
+    speed = 10;
 }
 
 function draw() {
     clear ();
     // background(255);
+
+    if (keys['w'] || keys['ArrowUp']) {
+        y -= speed;
+    }
+    if (keys['a'] || keys['ArrowLeft']) {
+        x -= speed;
+    }
+    if (keys['s'] || keys['ArrowDown']) {
+        y += speed;
+    }
+    if (keys['d'] || keys["ArrowRight"]) {
+        x += speed;
+    }
+
+    x = constrain(x, 0, windowWidth);
+    y = constrain(y, 0, window.innerHeight);
+
     push();
         translate(0, height/4);
         scale(sc);
+        camera.moveTo(x, y);
 
         if (flying) { 
             toucan.turn(camera.vel);
@@ -154,11 +174,13 @@ function draw() {
             
             toucan.oscillate(0, 0.7, 0.1, 1, 20);
             toucan.oscillate(1, 10, -0.1, 0);
-            toucan.oscillate(5, 20, -0.1, 0);
-            toucan.oscillate(6, 20, -0.1, 0);
+            // toucan.oscillate(5, 20, 0.1, 0);
+            // toucan.oscillate(6, 20, 0.1, 0);
             toucan.oscillate(7, 0.7, 0.1, 1, 20);
 
-            toucan.oscillate(radians(20) * sin(frameCount * 0.1) - radians(30));
+            toucan.oscillate(0.2 *sin(frameCount * 0.1) - radians(30));
+            // toucan.oscillate(5*radians(frameCount))
+            // toucan.angle = -20*radians(camera.vel.y);
         }
 
         if (talking) {
@@ -168,12 +190,17 @@ function draw() {
         
         toucan.display();
         
-
-        
     pop();
 }
 
 function mousePressed() {
-        // flying = false;
+    // flying = false;
+}
 
+function keyPressed() {
+    keys[key] = true;
+}
+
+function keyReleased() {
+    keys[key] = false;
 }
