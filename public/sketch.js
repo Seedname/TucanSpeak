@@ -87,7 +87,7 @@ class Mover {
         this.target.set(x-width/2, y-height/2);
     } 
 
-    apply(canvas) {
+    apply(canvas, elements, offsets) {
         this.vel.set(p5.Vector.div(p5.Vector.sub(this.target, this.pos), 30));
         
         this.vel.limit(9);
@@ -96,13 +96,20 @@ class Mover {
         this.pos.x = constrain(this.pos.x, 0, windowWidth-width);
         this.pos.y = constrain(this.pos.y, 0, window.innerHeight-height);
         canvas.position(this.pos.x, this.pos.y);
+
+        if (elements) {
+            for (let i = 0; i < elements.length; i++) {
+                // console.log(elements[i])
+                elements[i].style.left = `${this.pos.x + offsets[i][0]}px`;
+                elements[i].style.top =  `${this.pos.y + offsets[i][1]}px`;
+            }        
+        }
     }
 }
 
 let size = 300;
 
-var camera, canvas, sc, flying, x, y, keys, speed;
-
+var camera, canvas, sc, flying, x, y, keys, speed, bubble;
 function setup() {
     canvas = createCanvas(size, size);
 
@@ -141,10 +148,16 @@ function setup() {
     y = 0;
     keys = {};
     speed = 10;
+    bubble = document.getElementById("response");
 }
 
 function draw() {
     clear ();
+    if (bubble.textContent === "") {
+        bubble.style.display = "none";
+    } else {
+        bubble.style.display = "block";
+    }
     // background(255);
 
     if (keys['w'] || keys['ArrowUp']) {
@@ -171,7 +184,7 @@ function draw() {
 
         if (flying) { 
             toucan.turn(camera.vel);
-            camera.apply(canvas);
+            camera.apply(canvas, [bubble], [[230, -100]]);
 
             
             toucan.oscillate(0, 0.7, 0.1, 1, 20);
@@ -186,7 +199,6 @@ function draw() {
         }
 
         if (talking) {
-            console.log(true);
             toucan.oscillate(3, 5,  -0.2, 0);
             toucan.oscillate(4, 5,  0.2, 0);
         } else {

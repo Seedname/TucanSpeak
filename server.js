@@ -8,18 +8,29 @@ import { config } from 'dotenv';
 import fs from 'fs';
 
 config();
-const useHTTPS = false;
+const useHTTPS = true;
 
 const app = express();
 let server;
 
 if (useHTTPS) {
-  server = https.createServer({
-    key: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8'), 
-    cert: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/fullchain.pem', 'utf8')
-  }, app);
+  // server = https.createServer({
+  //   key: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8'), 
+  //   cert: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/fullchain.pem', 'utf8')
+  // }, app);
 
-  app.listen(80);
+  // app.listen(80);
+  // server.listen(443);
+  const privateKey = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/privkey.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/cert.pem', 'utf8');
+  const ca = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/chain.pem', 'utf8');
+  
+  const credentials = {
+    key: privateKey,
+    cert: certificate,
+    ca: ca
+  };
+  server = https.createServer(credentials, app);
   server.listen(443);
 } else {
   server = http.createServer(app);
