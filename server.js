@@ -15,11 +15,11 @@ let server;
 
 if (useHTTPS) {
   server = https.createServer({
-    cert: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8'), 
-    key: fs.readFileSync('/etc/letsencryp;t/live/tucanspeak.ddns.net/fullchain.pem', 'utf8')
+    key: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8'), 
+    cert: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/fullchain.pem', 'utf8')
   }, app);
 
-  server.listen(80);
+  app.listen(80);
   server.listen(443);
 } else {
   server = http.createServer(app);
