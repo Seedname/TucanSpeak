@@ -34,7 +34,7 @@ class Toucan {
     }
 
     oscillate(part, amplitude, frequency, type, offset) {
-        if (!amplitude) {
+        if (amplitude ==  undefined) {
             this.angle = part;
         } else {
             switch (type) {
@@ -119,14 +119,14 @@ function setup() {
     const rightClaw = loadImage('toucan/claw_right.png');
     // const toucanRest = loadImage('toucanRest.png');
 
-    sc = width/500;
+    sc = width/450;
 
     toucan = new Toucan(
         [backWing, leftClaw, toucanTail, bottomBeak, topBeak,  toucanBody, rightClaw, frontWing], // images
-        [[120,-100], [122,145], [110,65],  [80,-17],   [-34,-77],  [100,-80],   [170,140],  [125,-25]],  // position offsets
-        [-30,        0,         0,          0,      0,          0,        0,        -12],  // angle offsets
-        [1,          1,          1,         1,      1,          1,        1,         1], // scale offsets
-        [[1,-1.25],  [1,1],   [1,1],      [2,1],       [1,1],    [1,1],          [1,1],    [1,-0.5]] // origin locations
+        [[120,-100], [122,145], [110,65],  [80,-17],   [58 ,-77],  [100,-80],   [170,140],  [125,-25]],  // position offsets
+        [-30,        0,         0,          -10,      0,          0,        0,        -12],  // angle offsets
+        [1,          1,          1,         1,        1,          1,        1,         1], // scale offsets
+        [[1,-1.25],  [1,1],   [1,1],      [2,1],     [2,1],    [1,1],          [1,1],    [1,-0.5]] // origin locations
     );
     camera = new Mover();
 
@@ -134,6 +134,7 @@ function setup() {
 
     // document.addEventListener('mousemove', (event) => {
     //     camera.moveTo(event.clientX, event.clientY)
+    //     console.log(true);
     // });
 
     x = 0;
@@ -162,10 +163,11 @@ function draw() {
     x = constrain(x, 0, windowWidth);
     y = constrain(y, 0, window.innerHeight);
 
+    camera.moveTo(x, y);
+
     push();
         translate(0, height/4);
         scale(sc);
-        camera.moveTo(x, y);
 
         if (flying) { 
             toucan.turn(camera.vel);
@@ -184,10 +186,14 @@ function draw() {
         }
 
         if (talking) {
-            // toucan.oscillate(1, 5,  0.4);
-            toucan.oscillate(2, 5,  -0.4);
+            console.log(true);
+            toucan.oscillate(3, 5,  -0.2, 0);
+            toucan.oscillate(4, 5,  0.2, 0);
+        } else {
+            toucan.angles[3] = 0;
+            toucan.angles[4] = 0;
         }
-        
+
         toucan.display();
         
     pop();
