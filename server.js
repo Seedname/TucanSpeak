@@ -1,14 +1,20 @@
 import express from 'express';
-import http from 'http';
+import https from 'https';
 import { WebSocketServer } from 'ws';
 import OpenAI from 'openai';
 import bodyParser from 'body-parser';
 import { config } from 'dotenv';
+import fs from 'fs';
+
+const privateKey  = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/fullchain.pem', 'utf8');
+const credentials = {cert: certificate, key: privateKey};
 
 config();
 
 const app = express();
-const server = http.createServer(app);
+app.listen(80);
+const server = https.createServer(credentials, app).listen(443);
 const wss = new WebSocketServer({ server });
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -22,8 +28,6 @@ app.get('/', (req, res) => {
 
 const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help people who come to you learn English or Spanish."
 
-server.listen(80);
-
 const old = false;
 
 // WebSocket handling
@@ -36,14 +40,14 @@ wss.on('connection', (ws) => {
             { role: 'system', content: system },
             { role: 'user', content: searchTerm },
           ];
-          
+
           ws.send(JSON.stringify({ type: 'start' }));
-          
+
           if (old) {
               openai.completions.create({
                 model: 'text-davinci-003',
                 prompt: searchTerm,
-                stream: true 
+                stream: true
               }) .then(async (completion) => {
                   for await (const chunk of completion) {
                     if (chunk.choices[0].finish_reason !== 'stop') {
@@ -78,6 +82,5 @@ wss.on('connection', (ws) => {
     });
 
     ws.on('close', () => {
-      
-    });
+   });
 });
