@@ -101,7 +101,9 @@ class Mover {
             for (let i = 0; i < elements.length; i++) {
                 // console.log(elements[i])
                 elements[i].style.left = `${this.pos.x + offsets[i][0]}px`;
-                elements[i].style.top =  `${this.pos.y + offsets[i][1]}px`;
+                elements[i].style.top =  `${this.pos.y + offsets[i][1] - elements[i].offsetHeight}px`;
+                // console.log(elements[i].style.minHeight);
+                // console.log(parseInt(window.getComputedStyle(elements[i]).fontSize, 10));
             }        
         }
     }
@@ -151,6 +153,7 @@ function setup() {
     bubble = document.getElementById("response");
 }
 
+// let test = "hello, how are you doing? I am doing wellasdfasdfiasudfhoa8wefhq8wefh q9w8eyfgq w9ey8fgq we9fyqgw efyg ";
 function draw() {
     clear ();
     if (bubble.textContent === "") {
@@ -184,7 +187,7 @@ function draw() {
 
         if (flying) { 
             toucan.turn(camera.vel);
-            camera.apply(canvas, [bubble], [[230, -100]]);
+            camera.apply(canvas, [bubble], [[230, 0]]);
 
             
             toucan.oscillate(0, 0.7, 0.1, 1, 20);
@@ -209,6 +212,16 @@ function draw() {
         toucan.display();
         
     pop();
+    // document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
+    // talking = true;
+    // let w = bubble.style.width.substring(0, bubble.style.width.length-2)
+    // if (bubble.offsetHeight > 100 && w < 800) {
+    //     console.log(true);
+        
+    //     if (!w) {w = 200;}
+    //     bubble.style.width = `${parseInt(w, 10) + 1}px`;
+    // }
+    
 }
 
 function mousePressed() {

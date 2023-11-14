@@ -23,19 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
       ws = new WebSocket(`ws://${window.location.host}:80`);
     }
   
-  
-    // let recognition = new webkitSpeechRecognition();
-    // recognition.continuous = true;
-  
     const startRecordingButton = document.getElementById('startRecording');
     const stopRecordingButton = document.getElementById('stopRecording');
   
     startRecordingButton.addEventListener('click', startRecording);
     stopRecordingButton.addEventListener('click', stopRecording);
   
-    // recognition.onresult = (event) => {
     function onresult(transcript) {
-      // const transcript = event.results[event.results.length - 1][0].transcript;
       outputDiv.textContent = transcript;
       ws.send(JSON.stringify({type: "start", "content": transcript}));
     };
@@ -118,15 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     utterance.onend = function() {
-        talking = false;
-        if (speechQueue[0]) {
-          let sentence = speechQueue[0];
-          speechQueue.shift();
-          speak(sentence);
-        }
-        if (speechQueue.length === 0) {
-          canDo = true;
-        }
+      talking = false;
+      if (speechQueue[0]) {
+        let sentence = speechQueue[0];
+        speechQueue.shift();
+        speak(sentence);
+      }
+      if (speechQueue.length === 0) {
+        canDo = true;
+      }
     };
   
     window.addEventListener('beforeunload', () => {

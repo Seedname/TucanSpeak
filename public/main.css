@@ -6,8 +6,8 @@ body {
 
 p.bubble {
 	position: absolute;
-	width: 300px;
-	text-align: center;
+	width: 400px;
+	text-align: left;
 	line-height: 1.4em;
 	margin: 40px auto;
 	background-color: #fff;
@@ -17,6 +17,7 @@ p.bubble {
 	padding: 20px;
 	font-size: large;
     z-index: 2;
+    display: none;
 }
 
 p.thought {
