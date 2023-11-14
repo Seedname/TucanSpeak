@@ -16,12 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const responseElement = document.getElementById('response');
     const outputDiv = document.getElementById('output');
-    // let ws;
-    // if (useHTTPS) {
-    //   ws = new WebSocket(`wss://${window.location.host}:443`);
-    // } else {
-    //   ws = new WebSocket(`ws://${window.location.host}:80`);
-    // }
+    let ws;
+    if (useHTTPS) {
+      ws = new WebSocket(`wss://${window.location.host}:443`);
+    } else {
+      ws = new WebSocket(`ws://${window.location.host}:80`);
+    }
   
   
     // let recognition = new webkitSpeechRecognition();
@@ -70,48 +70,48 @@ document.addEventListener('DOMContentLoaded', () => {
     var punctuation = [".", "!", "?"];
     let canDo = true;
 
-    // ws.addEventListener('message', (event) => {
-    //   const data = JSON.parse(event.data);
+    ws.addEventListener('message', (event) => {
+      const data = JSON.parse(event.data);
   
-    //   switch (data.type) {
-    //     case 'start':
-    //         responseElement.innerText = "";
-    //         break;
-    //     case 'update':
-    //         let normal = true;
-    //         for (let i = 0; i < punctuation.length; i++) {
-    //           let index = data.content.indexOf(punctuation[i]);
-    //           if (index >= 0) {
-    //             speechQueue.push(differential + data.content.substring(0, index+1));
-    //             let rest = data.content.substring(index+1);
-    //             differential = rest;
-    //             normal = false;
-    //             break;
-    //           }
-    //         }
+      switch (data.type) {
+        case 'start':
+            responseElement.innerText = "";
+            break;
+        case 'update':
+            let normal = true;
+            for (let i = 0; i < punctuation.length; i++) {
+              let index = data.content.indexOf(punctuation[i]);
+              if (index >= 0) {
+                speechQueue.push(differential + data.content.substring(0, index+1));
+                let rest = data.content.substring(index+1);
+                differential = rest;
+                normal = false;
+                break;
+              }
+            }
             
-    //         if (normal) {
-    //           differential += data.content;
-    //         }
+            if (normal) {
+              differential += data.content;
+            }
 
-    //         if (!talking && speechQueue[0] && canDo) {
-    //           let sentence = speechQueue[0];
-    //           speechQueue.shift();
-    //           speak(sentence);
-    //           canDo = false;
-    //         }
+            if (!talking && speechQueue[0] && canDo) {
+              let sentence = speechQueue[0];
+              speechQueue.shift();
+              speak(sentence);
+              canDo = false;
+            }
 
-    //         responseElement.innerText += data.content;
-    //         break;
-    //     case 'end':
-    //         if (!talking && speechQueue.length === 0) {
-    //           speak(responseElement.innerText);
-    //         }
-    //         break;
-    //     default:
-    //         break;
-    //   }
-    // });
+            responseElement.innerText += data.content;
+            break;
+        case 'end':
+            if (!talking && speechQueue.length === 0) {
+              speak(responseElement.innerText);
+            }
+            break;
+        default:
+            break;
+      }
+    });
 
     utterance.onstart = function() {
       talking = true;
