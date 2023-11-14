@@ -1,20 +1,30 @@
 import express from 'express';
 import https from 'https';
+import http from 'http';
 import { WebSocketServer } from 'ws';
 import OpenAI from 'openai';
 import bodyParser from 'body-parser';
 import { config } from 'dotenv';
 import fs from 'fs';
 
-const privateKey  = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/fullchain.pem', 'utf8');
-const credentials = {cert: certificate, key: privateKey};
-
 config();
+const useHTTPS = false;
 
 const app = express();
-app.listen(80);
-const server = https.createServer(credentials, app).listen(443);
+let server;
+
+if (useHTTPS) {
+  server = https.createServer({
+    cert: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8'), 
+    key: fs.readFileSync('/etc/letsencryp;t/live/tucanspeak.ddns.net/fullchain.pem', 'utf8')
+  }, app);
+
+  server.listen(80);
+  server.listen(443);
+} else {
+  server = http.createServer(app);
+  server.listen(80);
+}
 const wss = new WebSocketServer({ server });
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

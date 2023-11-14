@@ -1,6 +1,7 @@
 var talking = false;
 const utterance = new SpeechSynthesisUtterance();
-    
+const useHTTPS = false;
+
 function speak(text) {
   utterance.text = text;
   utterance.volume = 1;
@@ -15,7 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const responseElement = document.getElementById('response');
     const outputDiv = document.getElementById('output');
-    const ws = new WebSocket(`ws://${window.location.host}:80`);
+    let ws;
+    if (useHTTPS) {
+      ws = new WebSocket(`wss://${window.location.host}:443`);
+    } else {
+      ws = new WebSocket(`ws://${window.location.host}:80`);
+    }
   
   
     // let recognition = new webkitSpeechRecognition();
@@ -39,20 +45,22 @@ document.addEventListener('DOMContentLoaded', () => {
         'tilly *tag': onresult
       });
     
-      annyang.start();
-      annyang.pause();
+      // annyang.start();
+      // annyang.pause();
     }
 
     function startRecording() {
-      annyang.resume();
+      annyang.start();
+      // annyang.resume();
       // recognition.start();
       startRecordingButton.disabled = true;
       stopRecordingButton.disabled = false;
     }
   
     function stopRecording() {
+      annyang.abort();
       // recognition.stop();
-      annyang.pause();
+      // annyang.pause();
       startRecordingButton.disabled = false;
       stopRecordingButton.disabled = true;
     }
