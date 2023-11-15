@@ -153,7 +153,7 @@ function setup() {
     bubble = document.getElementById("response");
 }
 
-let test = "hello, how are you doing? I am doing wellasdfasdfiasudfhoa8wefhq8wefh q9w8eyfgq w9ey8fgq we9fyqgw efyg ";
+// let test = "hello, how are you doing? I am doing wellasdfasdfiasudfhoa8wefhq8wefh q9w8eyfgq w9ey8fgq we9fyqgw efyg ";
 function draw() {
     clear ();
     if (bubble.textContent === "") {
@@ -212,7 +212,7 @@ function draw() {
         toucan.display();
         
     pop();
-    document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
+    // document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
     // talking = true;
     // let w = bubble.style.width.substring(0, bubble.style.width.length-2)
     // if (bubble.offsetHeight > 100 && w < 800) {
