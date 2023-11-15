@@ -14,16 +14,9 @@ const app = express();
 let server;
 
 if (useHTTPS) {
-  // server = https.createServer({
-  //   key: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8'), 
-  //   cert: fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/fullchain.pem', 'utf8')
-  // }, app);
-
-  // app.listen(80);
-  // server.listen(443);
-  const privateKey = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/privkey.pem', 'utf8');
-  const certificate = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/cert.pem', 'utf8');
-  const ca = fs.readFileSync('/etc/letsencrypt/live/yourdomain.com/chain.pem', 'utf8');
+  const privateKey = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/cert.pem', 'utf8');
+  const ca = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/chain.pem', 'utf8');
   
   const credentials = {
     key: privateKey,
@@ -48,6 +41,7 @@ app.get('/', (req, res) => {
 });
 
 const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help people who come to you learn English or Spanish."
+// const system = fs.readFileSync('./system_message.txt', 'utf-8');
 
 const old = false;
 
@@ -83,7 +77,7 @@ wss.on('connection', (ws) => {
                 });
           } else {
               openai.chat.completions.create({
-                model: 'gpt-3.5-turbo-1106',
+                model: 'gpt-3.5-turbo-0613',
                 messages: conversation,
                 stream: true
               }) .then(async (completion) => {
