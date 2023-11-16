@@ -50,6 +50,8 @@ class Toucan {
 
     reset() {
         this.angles = [...this.originals];
+        this.scaleAngles = [...this.originals];
+        this.turnAngle = 180;
     }
 
     display() {
@@ -77,8 +79,8 @@ class Toucan {
 }
 
 class Mover {
-    constructor() {
-        this.pos = createVector(0, 0);
+    constructor(x, y) {
+        this.pos = createVector(x, y);
         this.vel = createVector(0, 0);
         this.target = createVector(0, 0);
     }
@@ -87,20 +89,22 @@ class Mover {
         this.target.set(x-width/2, y-height/2);
     } 
 
-    apply(canvas, elements, offsets) {
-        this.vel.set(p5.Vector.div(p5.Vector.sub(this.target, this.pos), 30));
-        
-        this.vel.limit(9);
-        this.pos.add(this.vel);
-        this.pos.y += 3*cos(frameCount*0.1);
-        this.pos.x = constrain(this.pos.x, 0, windowWidth-width);
-        this.pos.y = constrain(this.pos.y, 0, window.innerHeight-height);
-        canvas.position(this.pos.x, this.pos.y);
-
+    apply(canvas, elements, offsets, really) {
+        if (really) {
+            this.vel.set(p5.Vector.div(p5.Vector.sub(this.target, this.pos), 30));
+            
+            this.vel.limit(9);
+            this.pos.add(this.vel);
+            this.pos.y += 3*cos(frameCount*0.1);
+            // this.pos.x = constrain(this.pos.x, 0, windowWidth-width);
+            this.pos.y = constrain(this.pos.y, 0, innerHeight-height);
+            canvas.position( window.outerWidth/2-width/2, this.pos.y);
+        }
         if (elements) {
             for (let i = 0; i < elements.length; i++) {
                 // console.log(elements[i])
-                elements[i].style.left = `${this.pos.x + offsets[i][0]}px`;
+                // elements[i].style.left = `${this.pos.x + offsets[i][0]}px`;
+                elements[i].style.left = `${windowWidth/2-width/2 + offsets[i][0]}px`;
                 elements[i].style.top =  `${this.pos.y + offsets[i][1] - elements[i].offsetHeight}px`;
                 // console.log(elements[i].style.minHeight);
                 // console.log(parseInt(window.getComputedStyle(elements[i]).fontSize, 10));
@@ -111,7 +115,7 @@ class Mover {
 
 let size = 300;
 
-var camera, canvas, sc, flying, x, y, keys, speed, bubble;
+var camera, canvas, sc, flying, x, y, keys, speed, bubble, backgrounds, input, button;
 function setup() {
     canvas = createCanvas(size, size);
 
@@ -131,29 +135,48 @@ function setup() {
     sc = width/450;
 
     toucan = new Toucan(
-        [backWing, leftClaw, toucanTail, bottomBeak, topBeak,  toucanBody, rightClaw, frontWing], // images
-        [[120,-100], [122,145], [110,65],  [80,-17],   [58 ,-77],  [100,-80],   [170,140],  [125,-25]],  // position offsets
-        [-30,        0,         0,          -10,      0,          0,        0,        -12],  // angle offsets
-        [1,          1,          1,         1,        1,          1,        1,         1], // scale offsets
-        [[1,-1.25],  [1,1],   [1,1],      [2,1],     [2,1],    [1,1],          [1,1],    [1,-0.5]] // origin locations
+        [backWing,   leftClaw, toucanTail, bottomBeak, topBeak,   toucanBody,   rightClaw, frontWing],   // images
+        [[120,-100], [122,145], [110,65],   [80,-17], [58 ,-77],  [100,-80],    [170,140],  [125,-25]],  // position offsets
+        [-30,        0,         0,          -10,      0,          0,            0,          -12],        // angle offsets
+        [1,          1,         1,          1,        1,          1,            1,          1],          // scale offsets
+        [[1,-1.25],  [1,1],     [1,1],      [2,1],    [2,1],      [1,1],        [1,1],      [1,-0.5]]    // origin locations
     );
-    camera = new Mover();
+    camera = new Mover(windowWidth/2-width/2, innerHeight/3-height/2);
 
     flying = true;
-
     // document.addEventListener('mousemove', (event) => {
     //     camera.moveTo(event.clientX, event.clientY)
     //     console.log(true);
     // });
 
-    x = 0;
-    y = 0;
+    x = windowWidth/2;
+    y = innerHeight/3;
     keys = {};
     speed = 10;
     bubble = document.getElementById("response");
+    backgrounds = document.querySelectorAll(".bg");
+    input = document.getElementById("message");
+    button = document.getElementById("ask");
+
+    for (let i = 0; i < backgrounds.length; i++) {
+        const bg = backgrounds.item(i);
+        bg.style.top = `${0}px`;
+        bg.style.height = `100%`;
+    }
+    
+    input.style.left = `${windowWidth/2-400/2}px`;
+    input.style.top = "80%";
+    button.style.left = `${windowWidth/2+400/2+30}px`;
+    button.style.top = "80%";
+
+    input.onfocus=function(){flyDown=true;};
+    input.onblur =function(){
+        if (!flydownLock) {
+            flyDown=false;
+        }
+    };
 }
 
-// let test = "hello, how are you doing? I am doing wellasdfasdfiasudfhoa8wefhq8wefh q9w8eyfgq w9ey8fgq we9fyqgw efyg ";
 function draw() {
     clear ();
     if (bubble.textContent === "") {
@@ -163,23 +186,39 @@ function draw() {
     }
     // background(255);
 
-    if (keys['w'] || keys['ArrowUp']) {
-        y -= speed;
-    }
-    if (keys['a'] || keys['ArrowLeft']) {
-        x -= speed;
-    }
-    if (keys['s'] || keys['ArrowDown']) {
-        y += speed;
-    }
-    if (keys['d'] || keys["ArrowRight"]) {
-        x += speed;
+    if (!flyDown) {
+        if (keys['w'] || keys['ArrowUp']) {
+            y -= speed;
+        }
+        if (keys['a'] || keys['ArrowLeft']) {
+            x -= speed;
+        }
+        if (keys['s'] || keys['ArrowDown']) {
+            y += speed;
+        }
+        if (keys['d'] || keys["ArrowRight"]) {
+            x += speed;
+        }
+        flying = true;
+        y = constrain(y, 0, window.innerHeight-0.22*innerHeight-height/2);
+        camera.moveTo(x, y);
+        if (frameCount % 300 === 0) {
+            x = random(-windowWidth, windowWidth);
+            y = random(150, innerHeight);
+        }
+        
+    } else {
+        camera.moveTo(x, 0.8*innerHeight-height/4);
+        camera.vel.x = .1;
+        if (camera.vel.mag() < 1 && camera.pos.dist(camera.target) < 10) {
+            flying =  false;
+            // toucan.reset();
+        }
     }
 
-    x = constrain(x, 0, windowWidth);
-    y = constrain(y, 0, window.innerHeight);
+    // x = constrain(x, 0, windowWidth);
+    
 
-    camera.moveTo(x, y);
 
     push();
         translate(0, height/4);
@@ -187,18 +226,25 @@ function draw() {
 
         if (flying) { 
             toucan.turn(camera.vel);
-            camera.apply(canvas, [bubble], [[230, 0]]);
+            camera.apply(canvas, [bubble], [[230, 0]], true);
 
             
             toucan.oscillate(0, 0.7, 0.1, 1, 20);
-            toucan.oscillate(1, 10, -0.1, 0);
+            toucan.oscillate(2, 10, -0.1, 0);
             // toucan.oscillate(5, 20, 0.1, 0);
             // toucan.oscillate(6, 20, 0.1, 0);
             toucan.oscillate(7, 0.7, 0.1, 1, 20);
 
             toucan.oscillate(0.2 *sin(frameCount * 0.1) - radians(30));
             // toucan.oscillate(5*radians(frameCount))
-            // toucan.angle = -20*radians(camera.vel.y);
+            
+        } else {
+            camera.apply(canvas, [bubble], [[230, 0]], false);
+
+            // toucan.oscillate(0, 0.1, 0.1, 1, 20);
+            // toucan.oscillate(2, 10, -0.1, 0);
+            // toucan.oscillate(7, 0.1, 0.1, 1, 20);
+
         }
 
         if (talking) {
@@ -212,16 +258,28 @@ function draw() {
         toucan.display();
         
     pop();
+    if (!talking && talkingCooldown > 0) {
+        talkingCooldown --;
+    } else if (!talking) {
+        bubble.textContent = "Ask me anything about NeoCity! Say \"Tilly\" or type your question in the box below."
+    }
     // document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
     // talking = true;
-    // let w = bubble.style.width.substring(0, bubble.style.width.length-2)
-    // if (bubble.offsetHeight > 100 && w < 800) {
-    //     console.log(true);
+    let w = bubble.style.width.substring(0, bubble.style.width.length-2)
+    if (bubble.offsetHeight > 500 && w < 500) {
         
-    //     if (!w) {w = 200;}
-    //     bubble.style.width = `${parseInt(w, 10) + 1}px`;
-    // }
-    
+        if (!w) {w = 400;}
+        bubble.style.width = `${parseInt(w, 10) + 1}px`;
+    }
+    let x1 = camera.pos.x;
+    for (let i = 0; i < backgrounds.length; i++) {
+        const bg = backgrounds.item(i);
+        // bg.style.left = `${-frameCount*5+bg.width*i}px`;
+
+        bg.style.left = `${-x1-bg.width*(i-ceil(x1/bg.width))}px`
+        bg.style.top = `${0}px`;
+        bg.style.height = `100%`;
+    }
 }
 
 function mousePressed() {

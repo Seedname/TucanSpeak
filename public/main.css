@@ -1,9 +1,3 @@
-body {
-    background-color: green;
-}
-
-
-
 p.bubble {
 	position: absolute;
 	width: 400px;
@@ -18,12 +12,6 @@ p.bubble {
 	font-size: large;
     z-index: 2;
     display: none;
-}
-
-p.thought {
-	width: 300px;
-	border-radius: 200px;
-	padding: 30px;	
 }
 
 p.bubble:before,
@@ -48,25 +36,112 @@ p.speech:after {
 	border-color: #fff transparent transparent #fff;
 }
 
-p.thought:before,
-p.thought:after {
-	left: 10px;
-	bottom: -30px;
-	width: 40px;
-	height: 40px;
-	background-color: #fff;
-	border: 8px solid #333;
-	-webkit-border-radius: 28px;
-	-moz-border-radius: 28px;
-	border-radius: 28px;
+body, html {
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+.bg {
+	position: absolute;
+	z-index: -2;
+  }
+
+#message {
+	position: absolute;
+	width: 400px;
+	z-index: 3;
 }
 
-p.thought:after {
-	width: 20px;
-	height: 20px;
-	left: 5px;
-	bottom: -40px;
-	-webkit-border-radius: 18px;
-	-moz-border-radius: 18px;
-	border-radius: 18px;
+#ask {
+	position: absolute;	
+}
+input[type="text"] {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	outline: none;
+	font-size: 16px;
+  }
+  
+  /* Hover effect */
+  input[type="text"]:hover {
+	border-color: #555;
+  }
+  
+  /* Focus effect */
+  input[type="text"]:focus {
+	border-color: #007bff;
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Placeholder text style */
+  input[type="text"]::placeholder {
+	color: #aaa;
+  }
+  
+  /* Disabled state */
+  input[type="text"]:disabled {
+	background-color: #f8f8f8;
+	color: #888;
+	cursor: not-allowed;
+  }
+
+  button {
+	padding: 10px 20px;
+	font-size: 16px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	background-color: #4caf50; /* Green color */
+	color: #fff;
+	transition: background-color 0.3s ease;
+  }
+
+
+  /* Hover effect */
+  button:hover {
+	background-color: #45a049; /* Darker green on hover */
+  }
+  
+  /* Active (clicked) effect */
+  button:active {
+	background-color: #398439; /* Even darker green on click */
+  }
+  
+  /* Disabled state */
+  button:disabled {
+	background-color: #ccc;
+	color: #666;
+	cursor: not-allowed;
+  }
+
+/* Basic styling for the square image button */
+.image-button {
+	width: 40px; /* Set a fixed width and height */
+	height: 40px;
+	overflow: hidden;
+	border: none;
+	cursor: pointer;
+	transition: transform 0.3s ease;
+	padding:2px;
+}
+
+/* Hover effect */
+.image-button:hover {
+	transform: scale(1.1); /* Scale up on hover */
+}
+
+/* Disabled state */
+.image-button:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+/* Use object-fit to control the image size and maintain aspect ratio */
+.image-button img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain; /* Ensure the entire image is visible without cropping */
+	border: none;
 }
