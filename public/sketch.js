@@ -267,13 +267,12 @@ function draw() {
     if (!talking && talkingCooldown > 0) {
         talkingCooldown --;
     } else if (!talking) {
-        bubble.textContent = "Ask me anything about NeoCity! Say \"Tilly\" or type your question in the box below."
+        bubble.textContent = "Ask me anything about NeoCity! Say \"Toucan\" or type your question in the box below."
     }
     // document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
     // talking = true;
     let w = bubble.style.width.substring(0, bubble.style.width.length-2)
     if (bubble.offsetHeight > 500 && w < 1000) {
-        
         if (!w) {w = 400;}
         bubble.style.width = `${parseInt(w, 10) + 1}px`;
     }
@@ -298,4 +297,12 @@ function keyPressed() {
 
 function keyReleased() {
     keys[key] = false;
+    if (key === "Enter") {
+        const messageBox = document.getElementById("message");
+        if (messageBox.value !== "") {
+            ws.send(JSON.stringify({type: "start", "content": messageBox.value}));
+            flydownLock = true;
+            flyDown = true;
+        }
+    }
 }

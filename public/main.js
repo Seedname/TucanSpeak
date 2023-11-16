@@ -3,18 +3,24 @@ var talkingCooldown = 0;
 var flyDown = false;
 var flydownLock = false;
 const utterance = new SpeechSynthesisUtterance();
-const useHTTPS = true;
+const useHTTPS = false;
 var speechQueue = [];
 
+
 function speak(text) {
-  talking = true;
   utterance.text = text;
   utterance.volume = 1;
   utterance.rate = 1.5;
   utterance.pitch = 1;
-  utterance.voice = window.speechSynthesis.getVoices()[1];
+  utterance.voice = window.speechSynthesis.getVoices()[2];
   window.speechSynthesis.speak(utterance);
 }
+
+function isNumeric(str) {
+  if (typeof str != "string") return false 
+  return !isNaN(str) && !isNaN(parseInt(str, 10))
+}
+
 let ws;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,20 +50,17 @@ document.addEventListener('DOMContentLoaded', () => {
       flyDown = true;
     })
 
-    function called() {
-      flyDown = true;
-      flydownLock = true;
-    }
-
-    function onresult(transcript) {
-      messageBox.value = transcript;
-      ws.send(JSON.stringify({type: "start", "content": transcript}));
-    };
 
     if (annyang) {
       annyang.addCommands({
-        'tilly': called,
-        'tilly *tag': onresult
+        'toucan': function() {
+          flyDown = true;
+          flydownLock = true;
+        },
+        'toucan *tag': function(transcript) {
+          messageBox.value = transcript;
+          ws.send(JSON.stringify({type: "start", "content": transcript}));
+        }
       });
     
       annyang.start();
@@ -83,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var differential = "";
     var punctuation = [".", "!", "?"];
     var numbers = "0123456789"
-    let canDo = true;
+    let switched = false;
 
     ws.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
@@ -94,17 +97,26 @@ document.addEventListener('DOMContentLoaded', () => {
             talkingCooldown = Infinity;
             flyDown = true;
             flydownLock = true;
+            switched = false;
             break;
         case 'update':
-            const m =  data.content;
-            if (numbers.indexOf(m) >= 0 && numbers.indexOf(differential.charAt(differential.length-1)) < 0) {
-              differential += " ";
+            let m =  data.content;
+            if (m == undefined) {break;}
+            // console.log(numbers.indexOf(m), numbers.indexOf(differential.charAt(differential.length-1)) );
+            if (isNumeric(m) && !isNumeric(differential.charAt(differential.length-1))) {
+              m = " " + m;
             }
+            // if (numbers.indexOf(m) >= 0 && numbers.indexOf(differential.charAt(differential.length-1)) < 0) {
+            //   m = " " + m;
+            //   console.log(true);
+            // }
             differential += m;
             for (let i = 0; i < punctuation.length; i++) {
               if (m == punctuation[i]) {
-                speechQueue.push(differential)
+                speechQueue.push(differential);
                 differential = "";
+                switched = true;
+                break;
               }
             }
             // let normal = true;
@@ -125,6 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
             responseElement.innerText += m;
             break;
         case 'end':
+            if (!switched) {
+              speechQueue.push(differential);
+              differential = "";
+            }
             // if (!talking && speechQueue.length === 0) {
             //   speak(responseElement.innerText);
             // }
@@ -140,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     utterance.onend = function() {
+      messageBox.value = "";
       talking = false;
       flydownLock = false;
       flying = false;

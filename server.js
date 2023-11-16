@@ -9,7 +9,7 @@ import fs from 'fs';
 
 config();
 
-const useHTTPS = true;
+const useHTTPS = false;
 
 const app = express();
 let server;
