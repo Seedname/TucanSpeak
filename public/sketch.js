@@ -267,7 +267,6 @@ function draw() {
     // talking = true;
     let w = bubble.style.width.substring(0, bubble.style.width.length-2)
     if (bubble.offsetHeight > 500 && w < 500) {
-        console.log(true);
         
         if (!w) {w = 400;}
         bubble.style.width = `${parseInt(w, 10) + 1}px`;
