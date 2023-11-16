@@ -98,7 +98,7 @@ class Mover {
             this.pos.y += 3*cos(frameCount*0.1);
             // this.pos.x = constrain(this.pos.x, 0, windowWidth-width);
             this.pos.y = constrain(this.pos.y, 0, innerHeight-height);
-            canvas.position( window.outerWidth/2-width/2, this.pos.y);
+            canvas.position( windowWidth/2-width/2, this.pos.y);
         }
         if (elements) {
             for (let i = 0; i < elements.length; i++) {
@@ -203,7 +203,7 @@ function draw() {
         y = constrain(y, 0, window.innerHeight-0.22*innerHeight-height/2);
         camera.moveTo(x, y);
         if (frameCount % 300 === 0) {
-            x = random(-windowWidth, windowWidth);
+            x += random(-windowWidth, windowWidth);
             y = random(150, innerHeight);
         }
         
@@ -216,6 +216,12 @@ function draw() {
         }
     }
 
+    
+    if (!talking && speechQueue[0]) {
+        let sentence = speechQueue[0];
+        speechQueue.shift();
+        speak(sentence);
+    }
     // x = constrain(x, 0, windowWidth);
     
 
@@ -266,7 +272,7 @@ function draw() {
     // document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
     // talking = true;
     let w = bubble.style.width.substring(0, bubble.style.width.length-2)
-    if (bubble.offsetHeight > 500 && w < 500) {
+    if (bubble.offsetHeight > 500 && w < 1000) {
         
         if (!w) {w = 400;}
         bubble.style.width = `${parseInt(w, 10) + 1}px`;

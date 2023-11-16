@@ -4,8 +4,10 @@ var flyDown = false;
 var flydownLock = false;
 const utterance = new SpeechSynthesisUtterance();
 const useHTTPS = true;
+var speechQueue = [];
 
 function speak(text) {
+  talking = true;
   utterance.text = text;
   utterance.volume = 1;
   utterance.rate = 1.5;
@@ -79,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     var differential = "";
-    var speechQueue = [];
     var punctuation = [".", "!", "?"];
+    var numbers = "0123456789"
     let canDo = true;
 
     ws.addEventListener('message', (event) => {
@@ -94,35 +96,38 @@ document.addEventListener('DOMContentLoaded', () => {
             flydownLock = true;
             break;
         case 'update':
-            let normal = true;
+            const m =  data.content;
+            if (numbers.indexOf(m) >= 0 && numbers.indexOf(differential.charAt(differential.length-1)) < 0) {
+              differential += " ";
+            }
+            differential += m;
             for (let i = 0; i < punctuation.length; i++) {
-              let index = data.content.indexOf(punctuation[i]);
-              if (index >= 0) {
-                speechQueue.push(differential + data.content.substring(0, index+1));
-                let rest = data.content.substring(index+1);
-                differential = rest;
-                normal = false;
-                break;
+              if (m == punctuation[i]) {
+                speechQueue.push(differential)
+                differential = "";
               }
             }
+            // let normal = true;
+            // for (let i = 0; i < punctuation.length; i++) {
+            //   let index = data.content.indexOf(punctuation[i]);
+            //   if (index >= 0) {
+            //     speechQueue.push(differential + data.content.substring(0, index+1));
+            //     let rest = data.content.substring(index+1);
+            //     differential = rest;
+            //     normal = false;
+            //     break;
+            //   }
+            // }
             
-            if (normal) {
-              differential += data.content;
-            }
-
-            if (!talking && speechQueue[0] && canDo) {
-              let sentence = speechQueue[0];
-              speechQueue.shift();
-              speak(sentence);
-              canDo = false;
-            }
-
-            responseElement.innerText += data.content;
+            // if (normal) {
+            //   differential += data.content;
+            // }
+            responseElement.innerText += m;
             break;
         case 'end':
-            if (!talking && speechQueue.length === 0) {
-              speak(responseElement.innerText);
-            }
+            // if (!talking && speechQueue.length === 0) {
+            //   speak(responseElement.innerText);
+            // }
             break;
         default:
             break;
@@ -138,14 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
       talking = false;
       flydownLock = false;
       flying = false;
-      if (speechQueue[0]) {
-        let sentence = speechQueue[0];
-        speechQueue.shift();
-        speak(sentence);
-      }
-      if (speechQueue.length === 0) {
-        canDo = true;
-      }
+      // if (speechQueue[0]) {
+      //   let sentence = speechQueue[0];
+      //   speechQueue.shift();
+      //   speak(sentence);
+      // }
+      // if (speechQueue.length === 0) {
+      //   canDo = true;
+      // }
     };
   
     window.addEventListener('beforeunload', () => {
