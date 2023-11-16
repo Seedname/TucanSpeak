@@ -1,66 +1,79 @@
 var talking = false;
+var talkingCooldown = 0;
+var flyDown = false;
+var flydownLock = false;
 const utterance = new SpeechSynthesisUtterance();
-const useHTTPS = false;
+const useHTTPS = true;
 
 function speak(text) {
   utterance.text = text;
   utterance.volume = 1;
-  utterance.rate = 1;
+  utterance.rate = 1.5;
   utterance.pitch = 1;
-  utterance.voice = window.speechSynthesis.getVoices()[0];
+  utterance.voice = window.speechSynthesis.getVoices()[1];
   window.speechSynthesis.speak(utterance);
 }
+let ws;
 
 document.addEventListener('DOMContentLoaded', () => {
     speak("");
 
     const responseElement = document.getElementById('response');
     const outputDiv = document.getElementById('output');
-    let ws;
+    
     if (useHTTPS) {
       ws = new WebSocket(`wss://${window.location.host}:443`);
     } else {
       ws = new WebSocket(`ws://${window.location.host}:80`);
     }
   
-  
-    // let recognition = new webkitSpeechRecognition();
-    // recognition.continuous = true;
-  
     const startRecordingButton = document.getElementById('startRecording');
     const stopRecordingButton = document.getElementById('stopRecording');
   
     startRecordingButton.addEventListener('click', startRecording);
     stopRecordingButton.addEventListener('click', stopRecording);
-  
-    // recognition.onresult = (event) => {
+    
+
+    const sendMessage = document.getElementById('ask');
+    const messageBox = document.getElementById("message");
+    sendMessage.addEventListener('click', function() {
+      ws.send(JSON.stringify({type: "start", "content": messageBox.value}));
+      flydownLock = true;
+      flyDown = true;
+    })
+
+    function called() {
+      flyDown = true;
+      flydownLock = true;
+    }
+
     function onresult(transcript) {
-      // const transcript = event.results[event.results.length - 1][0].transcript;
-      outputDiv.textContent = transcript;
+      messageBox.value = transcript;
       ws.send(JSON.stringify({type: "start", "content": transcript}));
     };
 
     if (annyang) {
       annyang.addCommands({
+        'tilly': called,
         'tilly *tag': onresult
       });
     
-      // annyang.start();
-      // annyang.pause();
+      annyang.start();
+      annyang.pause();
     }
 
     function startRecording() {
-      annyang.start();
-      // annyang.resume();
+      // annyang.start();
+      annyang.resume();
       // recognition.start();
       startRecordingButton.disabled = true;
       stopRecordingButton.disabled = false;
     }
   
     function stopRecording() {
-      annyang.abort();
+      // annyang.abort();
       // recognition.stop();
-      // annyang.pause();
+      annyang.pause();
       startRecordingButton.disabled = false;
       stopRecordingButton.disabled = true;
     }
@@ -76,6 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
       switch (data.type) {
         case 'start':
             responseElement.innerText = "";
+            talkingCooldown = Infinity;
+            flyDown = true;
+            flydownLock = true;
             break;
         case 'update':
             let normal = true;
@@ -115,18 +131,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     utterance.onstart = function() {
       talking = true;
+      talkingCooldown = 1000;
     };
     
     utterance.onend = function() {
-        talking = false;
-        if (speechQueue[0]) {
-          let sentence = speechQueue[0];
-          speechQueue.shift();
-          speak(sentence);
-        }
-        if (speechQueue.length === 0) {
-          canDo = true;
-        }
+      talking = false;
+      flydownLock = false;
+      flying = false;
+      if (speechQueue[0]) {
+        let sentence = speechQueue[0];
+        speechQueue.shift();
+        speak(sentence);
+      }
+      if (speechQueue.length === 0) {
+        canDo = true;
+      }
     };
   
     window.addEventListener('beforeunload', () => {
