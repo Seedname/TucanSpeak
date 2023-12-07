@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 
 // const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help people who come to you learn English or Spanish."
 const system = fs.readFileSync('./system_message.txt', 'utf-8');
-const additionalContext = "Keep your answer as consice and accurate as possible while still answering the question completely if possible.";
+const additionalContext = "Keep your answer as consice and accurate as possible while still answering the question completely if possible. If you recieve a prompt that doesn't make sense after this sentence, just respond with 'Could you please repeat that?'.";
 
 wss.on('connection', (ws) => {
     ws.on('message', (data) => {
@@ -55,7 +55,7 @@ wss.on('connection', (ws) => {
           ];
 
           ws.send(JSON.stringify({ type: 'start' }));
-
+          let finalMessage = "";
           openai.chat.completions.create({
             model: 'gpt-3.5-turbo-0613',
             messages: conversation,
@@ -64,12 +64,16 @@ wss.on('connection', (ws) => {
             for await (const chunk of completion) {
               if (chunk.choices[0].finish_reason !== 'stop') {
                 const content = chunk.choices[0].delta.content;
+                finalMessage += content;
                 ws.send(JSON.stringify({ type: 'update', content }));
               }
             }
           }) .catch((error) => {
             console.error(error);
           }) .finally(() => {
+            const d = new Date();
+            const n = d.toLocaleTimeString();
+            fs.appendFile('data.txt', `${n}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
             ws.send(JSON.stringify({ type: 'end' }));
           });
         }

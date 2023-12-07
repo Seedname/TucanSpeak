@@ -10,7 +10,7 @@ var speechQueue = [];
 function speak(text) {
   utterance.text = text;
   utterance.volume = 1;
-  utterance.rate = 1.5;
+  utterance.rate = 1.8;
   utterance.pitch = 1;
   utterance.voice = window.speechSynthesis.getVoices()[2];
   window.speechSynthesis.speak(utterance);
@@ -156,7 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     utterance.onend = function() {
-      messageBox.value = "";
+      if (!flyDown) {
+        messageBox.value = "";
+      }
       talking = false;
       flydownLock = false;
       flying = false;
