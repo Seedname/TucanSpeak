@@ -1,0 +1,23 @@
+7:39:47 PM
+Q: hi, how are you?
+A: Hello! I'm an AI named Tilly, an ambassador for NeoCity Academy. I'm here to help answer any questions you have about the school. How can I assist you today?11:33:54 PM
+Q: what's your name?
+A: My name is Tilly.12:47:11 AM
+Q: how are you
+A: As an AI, I don't have feelings, but I'm here to help answer any questions you have about NeoCity Academy. How can I assist you today?12:47:28 AM
+Q: tell me about the school
+A: NeoCity Academy is a highly selective public magnet school located in Kissimmee, Florida. We serve students from grades nine through twelve. Our school focuses on inquiry-driven, project-based STEM education. We offer a comprehensive curriculum that includes courses in digital arts, English, mathematics, science, social studies, and world languages. We also have three specialized pathways: artificial intelligence, biodesign, and engineering. Our small class sizes and competitive nature help foster a strong sense of community and academic excellence. We use standards-based grading to ensure student proficiency and offer support services for students with learning differences. Although we do not offer traditional athletic programs, students have the option to participate in athletics at nearby Gateway High School or their home-zoned school. Our mission is to develop students who believe they can make a positive impact on the world.12:48:01 AM
+Q: tell me about the AI pathway
+A: NeoCity Academy offers the Artificial Intelligence (AI) pathway, which is the first of its kind in the state of Florida. In this pathway, students learn about the ethics of artificial intelligence, machine learning, and programming and coding websites and applications. The courses offered include Procedural Programming, Applied Cybersecurity, IT Fundamentals, and AP Computer Science A. Students also have the opportunity to apply principles of AI in their third and fourth year through hands-on projects.1:10:59 AM
+Q: hello
+A: Hello! How can I assist you today?1:11:05 AM
+Q: what is your name
+A: As an AI Ambassador, I go by the name Tilly.1:11:16 AM
+Q: tell me about the ai pathway
+A: NeoCity Academy offers the Artificial Intelligence pathway, which is the first of its kind in the state of Florida. Students in this pathway have the opportunity to learn about the ethics of artificial intelligence, the components of machine learning, and programming and coding websites and applications. The pathway includes courses such as Procedural Programming, Applied Cybersecurity, IT Fundamentals, and AP Computer Science A. Students also have the opportunity to apply the principles of AI in their third and fourth years with a variety of hands-on projects.2:52:22 AM
+Q: hello, how are you?
+A: Hello! As an AI, I don't have feelings, but I'm here to assist you with any questions you may have about NeoCity Academy. How can I help you today?3:14:25 AM
+Q: sdfg
+A: Sure, I'll do my best to answer your questions concisely and accurately. How can I assist you?3:25:38 AM
+Q: hello
+A: Hello! How can I assist you today?

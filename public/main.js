@@ -21,7 +21,14 @@ function isNumeric(str) {
   return !isNaN(str) && !isNaN(parseInt(str, 10))
 }
 
-let ws;
+var ws;
+var startTime = 0;
+var startTimer = false;
+function startRound() {
+  ws.send(JSON.stringify({type: 'startRound'}));
+  startTimer = true;
+  startTime = millis();
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     speak("");
@@ -35,53 +42,59 @@ document.addEventListener('DOMContentLoaded', () => {
       ws = new WebSocket(`ws://${window.location.host}:80`);
     }
   
-    const startRecordingButton = document.getElementById('startRecording');
-    const stopRecordingButton = document.getElementById('stopRecording');
+    // const startRecordingButton = document.getElementById('startRecording');
+    // const stopRecordingButton = document.getElementById('stopRecording');
   
-    startRecordingButton.addEventListener('click', startRecording);
-    stopRecordingButton.addEventListener('click', stopRecording);
+    // startRecordingButton.addEventListener('click', startRecording);
+    // stopRecordingButton.addEventListener('click', stopRecording);
     
 
     const sendMessage = document.getElementById('ask');
     const messageBox = document.getElementById("message");
     sendMessage.addEventListener('click', function() {
       ws.send(JSON.stringify({type: "start", "content": messageBox.value}));
-      flydownLock = true;
-      flyDown = true;
+      // flydownLock = true;
+      // flyDown = true;
     })
 
+    document.getElementById("hostGame").addEventListener('click', function() {
+      ws.send(JSON.stringify({type: "hostGame"}));
+      document.getElementById("hostGame").style.display = "none";
+      document.getElementById("joinGame").style.display = "none";
+      document.getElementById("startRound").style.display = "block";
+    });
 
-    if (annyang) {
-      annyang.addCommands({
-        'toucan': function() {
-          flyDown = true;
-          flydownLock = true;
-        },
-        'toucan *tag': function(transcript) {
-          messageBox.value = transcript;
-          ws.send(JSON.stringify({type: "start", "content": transcript}));
-        }
-      });
+    // if (annyang) {
+    //   annyang.addCommands({
+    //     'toucan': function() {
+    //       flyDown = true;
+    //       flydownLock = true;
+    //     },
+    //     'toucan *tag': function(transcript) {
+    //       messageBox.value = transcript;
+    //       ws.send(JSON.stringify({type: "start", "content": transcript}));
+    //     }
+    //   });
     
-      annyang.start();
-      annyang.pause();
-    }
+    //   annyang.start();
+    //   annyang.pause();
+    // }
 
-    function startRecording() {
-      // annyang.start();
-      annyang.resume();
-      // recognition.start();
-      startRecordingButton.disabled = true;
-      stopRecordingButton.disabled = false;
-    }
+    // function startRecording() {
+    //   // annyang.start();
+    //   annyang.resume();
+    //   // recognition.start();
+    //   startRecordingButton.disabled = true;
+    //   stopRecordingButton.disabled = false;
+    // }
   
-    function stopRecording() {
-      // annyang.abort();
-      // recognition.stop();
-      annyang.pause();
-      startRecordingButton.disabled = false;
-      stopRecordingButton.disabled = true;
-    }
+    // function stopRecording() {
+    //   // annyang.abort();
+    //   // recognition.stop();
+    //   annyang.pause();
+    //   startRecordingButton.disabled = false;
+    //   stopRecordingButton.disabled = true;
+    // }
     
     var differential = "";
     var punctuation = [".", "!", "?"];
@@ -95,8 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'start':
             responseElement.innerText = "";
             talkingCooldown = Infinity;
-            flyDown = true;
-            flydownLock = true;
+            // flyDown = true;
+            // flydownLock = true;
             switched = false;
             break;
         case 'update':
@@ -145,6 +158,19 @@ document.addEventListener('DOMContentLoaded', () => {
             //   speak(responseElement.innerText);
             // }
             break;
+        case 'startRound':
+          if (!talking) {
+            responseElement.textContent = data.data;
+            speak(data.data);
+          }
+          break;
+        case 'endRound':
+          startTimer = false;
+          if (!talking) {
+            responseElement.textContent = data.data;
+            speak(data.data);
+          }
+          break;
         default:
             break;
       }
@@ -174,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     window.addEventListener('beforeunload', () => {
       ws.close();
+      talkingCooldown = 1000;
     });
   });
   

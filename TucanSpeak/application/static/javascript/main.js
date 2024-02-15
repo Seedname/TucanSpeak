@@ -21,7 +21,7 @@ function isNumeric(str) {
   return !isNaN(str) && !isNaN(parseInt(str, 10))
 }
 
-// let ws;
+let ws;
 
 document.addEventListener('DOMContentLoaded', () => {
     speak("");
@@ -29,11 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const responseElement = document.getElementById('response');
     const outputDiv = document.getElementById('output');
     
-    // if (useHTTPS) {
-    //   ws = new WebSocket(`wss://${window.location.host}:443`);
-    // } else {
-    //   ws = new WebSocket(`ws://${window.location.host}:80`);
-    // }
+    if (useHTTPS) {
+      ws = new WebSocket(`wss://${window.location.host}:443`);
+    } else {
+      ws = new WebSocket(`ws://${window.location.host}:80`);
+    }
   
     const startRecordingButton = document.getElementById('startRecording');
     const stopRecordingButton = document.getElementById('stopRecording');
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         'toucan *tag': function(transcript) {
           messageBox.value = transcript;
-          // ws.send(JSON.stringify({type: "start", "content": transcript}));
+          ws.send(JSON.stringify({type: "start", "content": transcript}));
         }
       });
     
@@ -172,8 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // }
     };
   
-    // window.addEventListener('beforeunload', () => {
-    //   ws.close();
-    // });
+    window.addEventListener('beforeunload', () => {
+      ws.close();
+    });
   });
   

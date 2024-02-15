@@ -44,7 +44,19 @@ app.get('/', (req, res) => {
 const system = fs.readFileSync('./system_message.txt', 'utf-8');
 const additionalContext = "Keep your answer as consice and accurate as possible while still answering the question completely if possible. If you recieve a prompt that doesn't make sense after this sentence, just respond with 'Could you please repeat that?'.";
 
+let host;
+let players = [];
+
+// const labels = ["Apple", "Baseball", "Bucket", "Bicycle", "Cactus", "Cow", "Computer", "Door", "Eye", "Fish", "Giraffe", "Light Bulb", "Mountain", "Pencil", "Pig", "Scissors", "Rainbow", "Smiley Face", "Sun", "Tree"];
+const labels = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Fish", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Smiley Face", "Sun", "Tree"];
+
+
+function pickLabel() {
+  return labels[Math.floor(Math.random() * labels.length)];
+}
 wss.on('connection', (ws) => {
+    ws.send(JSON.stringify({type: 'connected'}));
+
     ws.on('message', (data) => {
         data = JSON.parse(data);
         if (data.type == "start") {
@@ -57,7 +69,7 @@ wss.on('connection', (ws) => {
           ws.send(JSON.stringify({ type: 'start' }));
           let finalMessage = "";
           openai.chat.completions.create({
-            model: 'gpt-3.5-turbo-0613',
+            model: 'gpt-3.5-turbo',
             messages: conversation,
             stream: true
           }) .then(async (completion) => {
@@ -76,9 +88,55 @@ wss.on('connection', (ws) => {
             fs.appendFile('data.txt', `${n}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
             ws.send(JSON.stringify({ type: 'end' }));
           });
+        } 
+
+        if (data.type == "hostGame") {
+          host = ws;
+        }
+
+        if (data.type == "startRound") {
+          let word =  pickLabel();
+          host.send(JSON.stringify({type: "startRound", data: "Your word is: " + word}));
+          for (let i = 0; i < players.length; i++) {
+            players[i].send(JSON.stringify({type: "startRound", data: word}));
+          }
+        }
+
+        if (data.type == "endRound") {
+          host.send(JSON.stringify({type: "endRound", data: "Tie Game"}));
+          for (let i = 0; i < players.length; i++) {
+            players[i].send(JSON.stringify({type: "endRound", data: "tie"}));
+          }
+        }
+
+        if (data.type == "joinGame") {
+          players.push(ws);
+        }
+
+        if (data.type == "answer") {
+          const index = players.indexOf(ws);
+          host.send(JSON.stringify({type: "endRound", data: "Player " + (index+1) + " wins"}));
+          for (let i = 0; i < players.length; i++) {
+            if (players[i] == ws) {
+              players[i].send(JSON.stringify({type: "endRound", data: "you"}));
+            } else {
+              players[i].send(JSON.stringify({type: "endRound", data: index}));
+            }
+          }
         }
     });
 
+
     ws.on('close', () => {
+      if (ws == host) {
+        for (let i = 0; i < players.length; i++) {
+          players[i].send(JSON.stringify({type: "disconnect"}));
+        }
+      }
+
+      const index = players.indexOf(ws);
+      if (index >= 0) {
+        players.splice(index, 1);
+      }
    });
 });

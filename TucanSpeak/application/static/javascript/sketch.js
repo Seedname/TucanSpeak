@@ -78,6 +78,8 @@ class Toucan {
     }
 }
 
+var flyDown = false;
+
 class Mover {
     constructor(x, y) {
         this.pos = createVector(x, y);

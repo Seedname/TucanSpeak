@@ -6,7 +6,9 @@
         <link rel="stylesheet" href="main.css">
         <meta charset="UTF-8">
 
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
         <script src="main.js" type="text/javascript"></script>
         <script src="sketch.js" type="text/javascript"></script>
@@ -16,14 +18,18 @@
     <body>
         <img class="bg" src="bg.png">
         <img class="bg" src="bg.png">
-
+<!-- 
         <button id="startRecording">Start Recording</button>
-        <button id="stopRecording" disabled>Stop Recording</button>
+        <button id="stopRecording" disabled>Stop Recording</button> -->
         <div id="audio"></div>
         <div id="output"></div>
         <!-- <div id="response"></div> -->
         <input type="text" id="message" placeholder="Ask me anything">
         <button id="ask" class="image-button"><img src="./send.png"></button>
+        <br>
+        <button id="hostGame">Host Game</button>
+        <button id="joinGame" onclick="location.href='game.html'">Join Game</button>
+        <button id="startRound" style="display:none;" onclick="startRound()">Start Round</button>
         <p id="response" class="bubble speech"></p>
     </body>
 </html>
