@@ -69,7 +69,7 @@ let sizes = [15, 30];
 let colors = [0, 255];
 
 function draw() {
-    if (!checked && millis() - startTime >= 4000) {
+    if (!checked && millis() - startTime >= 10000) {
         classifyDrawing();
         checked = true;
     }
@@ -107,7 +107,7 @@ function gotResult(error, results) {
     }
     // The results are in an array ordered by confidence.
     console.log(results[0]);
-    if (results[0].confidence > 0.97) {
+    if (results[0].confidence > 0.98) {
         label = results[0].label;
         document.getElementById('label').textContent = "It looks like \"" + label + '"';
         if (label == predictorWord) {
