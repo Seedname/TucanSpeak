@@ -104,4 +104,6 @@ A: As an AI, I do not have a father.1:06:36 AM
 Q: who is your creator
 A: I was programmed by a NeoCity Academy student named Julian Dominguez.1:06:45 AM
 Q: what are you doing
-A: I am currently guarding NeoCity Academy and answering questions about the school and Artificial Intelligence.
+A: I am currently guarding NeoCity Academy and answering questions about the school and Artificial Intelligence.1:57:49 AM
+Q: tell me about the game
+A: The game involves drawing prompts where users draw a word while a neural network tries to guess it. The first person to get the model to predict their drawing correctly wins.

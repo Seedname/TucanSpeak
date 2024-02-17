@@ -201,10 +201,7 @@ function setup() {
         bg.style.height = `100%`;
     }
     
-    input.style.left = `${windowWidth/2-400/2}px`;
-    input.style.top = "90%";
-    button.style.left = `${windowWidth/2+400/2+30}px`;
-    button.style.top = "90%";
+
 
     // input.onfocus=function(){flyDown=true;};
     // input.onblur =function(){
@@ -215,7 +212,14 @@ function setup() {
 }
 
 function draw() {
-    if (startTimer && (millis() - startTime) >= (20*1000)) {
+
+    // console.log(windowWidth);
+    input.style.left = `${windowWidth/2-400/2}px`;
+    input.style.top = "90%";
+    button.style.left = `${windowWidth/2+400/2+30}px`;
+    button.style.top = "90%";
+
+    if (startTimer && (millis() - startTime) >= (25*1000)) {
         startTimer = false;
         ws.send(JSON.stringify({type: 'endRound'}));
     }
@@ -319,7 +323,9 @@ function draw() {
     }
 
     if (startTimer) {
-        text(20-floor((millis() - startTime)/1000), 50, 50);
+        textSize(25);
+        fill (128);
+        text("Timer: " + (25-floor((millis() - startTime)/1000)), 50, 50);
     }
 }
 
@@ -342,3 +348,4 @@ function keyReleased() {
         }
     }
 }
+

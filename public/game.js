@@ -18,6 +18,7 @@ function preload() {
 
 let roundStart = false;
 let predictorWord = "";
+let checked = false;
 function setup() {
     createCanvas(420*2, 420*2);
     background(255);
@@ -32,11 +33,13 @@ function setup() {
                 ws.send(JSON.stringify({type: "joinGame"}));
                 break;
             case "startRound":
-                document.getElementById("label").textContent = "Guess...";
+                document.getElementById("label").textContent = "Thinking...";
                 document.getElementById("defaultCanvas0").style.display = "block";
-                document.getElementById("word").textContent = "Your word is " + packet.data;
+                document.getElementById("word").textContent = "Draw a " + packet.data;
+                startTime = millis();
                 predictorWord = packet.data;
                 roundStart = true;
+                checked = false;
                 break;
             case "endRound":
                 background(255);
@@ -60,11 +63,17 @@ function setup() {
 var finishedDrawing = false;
 var penSize = 15;
 var penColor = 0
-
+var startTime = 0;
 let tools = ["pen", "eraser"];
-let sizes = [15, 20];
+let sizes = [15, 30];
 let colors = [0, 255];
 
+function draw() {
+    if (!checked && millis() - startTime >= 4000) {
+        classifyDrawing();
+        checked = true;
+    }
+}
 function toolClick(buttonNumber) {
     const buttons = document.querySelectorAll('#button-container > button');
     
@@ -100,7 +109,7 @@ function gotResult(error, results) {
     console.log(results[0]);
     if (results[0].confidence > 0.97) {
         label = results[0].label;
-        document.getElementById('label').textContent = "Looks like: " + label;
+        document.getElementById('label').textContent = "It looks like \"" + label + '"';
         if (label == predictorWord) {
             ws.send(JSON.stringify({type: "answer"}));
         }
@@ -139,6 +148,8 @@ function mouseReleased() {
     endX = mouseX;
     endY = mouseY;
     
-    classifyDrawing();
+    if (checked) {
+        classifyDrawing();
+    }
 }
 

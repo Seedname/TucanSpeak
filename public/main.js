@@ -31,6 +31,7 @@ function startRound() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
     speak("");
 
     const responseElement = document.getElementById('response');
@@ -193,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
       flydownLock = false;
       flying = false;
       if (speechQueue[0]) {
-        let sentence = speechQueue[0];
+        let sentence = String(speechQueue[0]);
         speechQueue.shift();
         speak(sentence);
       }
