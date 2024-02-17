@@ -49,10 +49,16 @@ let players = [];
 
 // const labels = ["Apple", "Baseball", "Bucket", "Bicycle", "Cactus", "Cow", "Computer", "Door", "Eye", "Fish", "Giraffe", "Light Bulb", "Mountain", "Pencil", "Pig", "Scissors", "Rainbow", "Smiley Face", "Sun", "Tree"];
 const labels = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
-
+const bucket = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
 
 function pickLabel() {
-  return labels[Math.floor(Math.random() * labels.length)];
+  let index = Math.floor(Math.random() * bucket.length);
+  let label = String(bucket[index]);
+  delete bucket[index];
+  if (bucket.length == 0) {
+    bucket = [...labels];
+  }
+  return label;
 }
 wss.on('connection', (ws) => {
     ws.send(JSON.stringify({type: 'connected'}));
