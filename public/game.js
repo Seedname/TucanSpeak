@@ -19,6 +19,11 @@ function preload() {
 let roundStart = false;
 let predictorWord = "";
 let checked = false;
+
+function clearScreen() {
+    background(255);
+}
+
 function setup() {
     createCanvas(420*2, 420*2);
     background(255);
