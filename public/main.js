@@ -6,14 +6,23 @@ const utterance = new SpeechSynthesisUtterance();
 const useHTTPS = false;
 var speechQueue = [];
 
+let voice = window.speechSynthesis.getVoices()[0];
 
 function speak(text) {
-  utterance.text = text;
+  const utterance = new SpeechSynthesisUtterance(text);
   utterance.volume = 1;
   utterance.rate = 1.8;
   utterance.pitch = 1;
-  utterance.voice = window.speechSynthesis.getVoices()[0];
+  utterance.voice = voice;
   window.speechSynthesis.speak(utterance);
+  let r = setInterval(() => {
+    console.log(window.speechSynthesis.speaking);
+    if (!window.speechSynthesis.speaking) {
+      clearInterval(r);
+    } else {
+      window.speechSynthesis.resume();
+    }
+  }, 14000);
 }
 
 function isNumeric(str) {
@@ -115,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             break;
         case 'update':
             let m =  data.content;
-            if (m == undefined) {break;}
+            // if (m == undefined) {break;}
             // console.log(numbers.indexOf(m), numbers.indexOf(differential.charAt(differential.length-1)) );
             if (isNumeric(m) && !isNumeric(differential.charAt(differential.length-1))) {
               m = " " + m;
@@ -124,19 +133,19 @@ document.addEventListener('DOMContentLoaded', () => {
             //   m = " " + m;
             //   console.log(true);
             // }
-            differential += m;
-            for (let i = 0; i < punctuation.length; i++) {
-              if (m == punctuation[i]) {
-                if (speechQueue.length === 0 && !talking) {
-                  speak(differential);
-                } else {
-                  speechQueue.push(differential);
-                }
-                differential = "";
-                switched = true;
-                break;
-              }
-            }
+            // differential += m;
+            // for (let i = 0; i < punctuation.length; i++) {
+            //   if (m == punctuation[i]) {
+            //     if (speechQueue.length === 0 && !talking) {
+            //       speak(differential);
+            //     } else {
+            //       speechQueue.push(differential);
+            //     }
+            //     differential = "";
+            //     switched = true;
+            //     break;
+            //   }
+            // }
             // let normal = true;
             // for (let i = 0; i < punctuation.length; i++) {
             //   let index = data.content.indexOf(punctuation[i]);
@@ -155,6 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
             responseElement.innerText += m;
             break;
         case 'end':
+            // speechQueue = responseElement.innerText.split(".");
+            // console.log(speechQueue);
+            // let sentence1 = String(speechQueue[0]);
+            // speechQueue.shift();
+            speak(responseElement.innerText);
+            // console.log(speechQueue);
             // if (!switched) {
             //   speechQueue.push(differential);
             //   differential = "";
@@ -193,14 +208,20 @@ document.addEventListener('DOMContentLoaded', () => {
       talking = false;
       flydownLock = false;
       flying = false;
-      if (speechQueue[0]) {
-        let sentence = String(speechQueue[0]);
-        speechQueue.shift();
-        speak(sentence);
-      }
-      if (speechQueue.length === 0) {
-        canDo = true;
-      }
+
+      // if (speechQueue[0]) {
+      //   let sentence = String(speechQueue[0]);
+      //   if (!sentence) {
+      //     speechQueue = [];
+      //   } else {
+      //     speechQueue.shift();
+      //     speak(sentence);
+      //     console.log(sentence);
+      //   }
+      // }
+      // if (speechQueue.length === 0) {
+      //   canDo = true;
+      // }
     };
   
     window.addEventListener('beforeunload', () => {

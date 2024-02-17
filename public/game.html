@@ -77,7 +77,6 @@
                 border: none;
                 padding: 5px;
                 cursor: pointer;
-
             }
             .image-button img {
                 width: 40px;
@@ -89,6 +88,12 @@
             .image-button.selected {
                 background-color: #5783db;
             }
+            .prevent-select {
+                -webkit-user-select: none; /* Safari */
+                -ms-user-select: none; /* IE 10 and IE 11 */
+                user-select: none; /* Standard syntax */
+            }
+
             body, html {
                 height: 100%;
                 margin: 0;
@@ -105,14 +110,14 @@
 
     <body>
         <img class="bg" src="bg.png">
-        <p id="word" style="margin:auto;font-size:60px;bottom:10px;color:whitesmoke;position:absolute;"></p>
-        <p id="label" style="text-align:center;font-size:60px;margin-top:10px;color:whitesmoke"></p>
+        <p id="word" class="prevent-select" style="margin:auto;font-size:60px;bottom:10px;color:whitesmoke;position:absolute;"></p>
+        <p id="label" class="prevent-select" style="text-align:center;font-size:60px;margin-top:10px;color:whitesmoke"></p>
 
         <div id="button-container">
-            <button class="image-button selected" onclick="toolClick(0)">
+            <button class="image-button selected prevent-select" onclick="toolClick(0)">
                 <img src="brush.png" alt="Brush">
             </button>
-            <button class="image-button" onclick="toolClick(1)">
+            <button class="image-button prevent-select" onclick="toolClick(1)">
                 <img src="eraser.png" alt="Eraser">
             </button>
             <!-- <button class="image-button" onclick="toolClick(2)">

@@ -132,6 +132,7 @@ wss.on('connection', (ws) => {
         for (let i = 0; i < players.length; i++) {
           players[i].send(JSON.stringify({type: "disconnect"}));
         }
+        players = [];
       }
 
       const index = players.indexOf(ws);

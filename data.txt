@@ -106,4 +106,34 @@ A: I was programmed by a NeoCity Academy student named Julian Dominguez.1:06:45 
 Q: what are you doing
 A: I am currently guarding NeoCity Academy and answering questions about the school and Artificial Intelligence.1:57:49 AM
 Q: tell me about the game
-A: The game involves drawing prompts where users draw a word while a neural network tries to guess it. The first person to get the model to predict their drawing correctly wins.
+A: The game involves drawing prompts where users draw a word while a neural network tries to guess it. The first person to get the model to predict their drawing correctly wins.8:09:18 AM
+Q: tell me about the school
+A: NeoCity Academy is a highly selective public magnet school in Kissimmee, Florida, serving students from grades nine through twelve. It offers an inquiry-driven, project-based STEM magnet program, focusing on developing students who believe they can positively change the world. The school follows a holistic approach in the admission process. The current acceptance rate is 36%, and students are engaged in AP coursework. The curriculum includes pathways like Artificial Intelligence, Biodesign, and Engineering. The school is known for its unique approach to grading, focusing on student proficiency. NeoCity Academy also provides learning support services and opportunities for student involvement in various extracurricular activities.8:09:32 AM
+Q: tell me about the school
+A: NeoCity Academy is a highly selective public magnet school in Kissimmee, Florida, serving students from grade nine through grade twelve. Our curriculum is inquiry-driven, project-based, focused on STEM subjects. We offer various pathways, including Engineering, BioDesign, and Artificial Intelligence. We have small class sizes, a selective admission process, and a unique approach to grading. Our mission is to develop students who believe they can positively change the world.8:14:01 AM
+Q: hello
+A: Hello! How can I assist you today?8:14:15 AM
+Q: what's your name
+A: Sir Cuit8:14:21 AM
+Q: how are you
+A: I'm here and ready to answer your questions about NeoCity Academy and Artificial Intelligence. How can I assist you today?8:14:44 AM
+Q: tell me about the school
+A: NeoCity Academy is a highly selective public magnet school in Kissimmee, Florida, serving students from grade nine through grade twelve. The school focuses on inquiry-driven, project-based STEM education. Students engage in a rigorous curriculum with opportunities for enrollment in AP coursework. The school offers pathways in Artificial Intelligence, Biodesign, and Engineering. Additionally, NeoCity has a Learning Support Services program to assist students with learning differences. Admission is based on various requirements, including math and reading placement scores, teacher recommendations, and a video interview. The school also offers various extracurricular activities and a unique approach to grading with Standards Based Grading. If you have any specific questions about the school, feel free to ask.8:15:50 AM
+Q: hi
+A: Hello! How can I assist you today?8:16:03 AM
+Q: tell me about the engineering pathway
+A: The Engineering Pathway at NeoCity Academy offers students a hands-on experience in the field of engineering. Students progress through courses such as Applied Engineering Technology 1, 2, 3, and Advanced Technology Applications. They earn certifications in AutoCad and Fusion 360, preparing them for careers or further education in engineering.8:17:47 AM
+Q: hi
+A: Hello! How can I assist you today?8:17:57 AM
+Q: tell me about the biodesign pathway
+A: The BioDesign pathway at NeoCity Academy focuses on integrating cutting-edge technologies into the healthcare industry. Students engage in a curriculum that teaches scientific concepts and develops laboratory skills needed to create innovative biomedical solutions. Courses offered include Principles of Biomedical Science, Human Body Systems, Medical Interventions, and Biomedical Innovations, with students earning the Biotechnician Assistance Credentialing Exam (BACE) certification.8:18:58 AM
+Q: hello, tell me about the school
+A: Hello! NeoCity Academy is a highly selective public magnet school in Kissimmee, Florida, serving students from grade nine through grade twelve. The school focuses on inquiry-driven, project-based STEM education and offers unique pathways in Artificial Intelligence, Biodesign, and Engineering. Students are selected based on various admission requirements, including teacher recommendations, video interviews, and collaborative team activities. If you have any specific questions, feel free to ask!8:19:24 AM
+Q: tell me about the school
+A: NeoCity Academy is a highly selective public magnet school in Kissimmee, Florida. It serves students from grade nine through grade twelve and focuses on an inquiry-driven, project-based STEM education. The school offers various pathways including Artificial Intelligence, Biodesign, and Engineering. The school promotes standards-based grading and emphasizes student proficiency. The mascot of NeoCity Academy is a Knight.8:21:23 AM
+Q: asdf
+A: Understood! Feel free to ask me any questions you have.8:24:41 AM
+Q: hello
+A: Hello! How can I assist you today?8:24:51 AM
+Q: tell me about the school
+A: NeoCity Academy is a highly selective public magnet school in Kissimmee, Florida, serving students from grade nine through grade twelve. The school focuses on an inquiry-driven, project-based STEM curriculum and offers various pathways like Artificial Intelligence, Biodesign, and Engineering. The school emphasizes student ownership of learning and offers a unique grading system based on student proficiency. Admission to NeoCity Academy is based on multiple requirements like math and reading placement scores, teacher recommendations, and other assessments. The school also offers various extracurricular activities, like clubs, and students can participate in athletics through partner schools.
