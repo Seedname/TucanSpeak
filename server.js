@@ -48,7 +48,7 @@ let host;
 let players = [];
 
 // const labels = ["Apple", "Baseball", "Bucket", "Bicycle", "Cactus", "Cow", "Computer", "Door", "Eye", "Fish", "Giraffe", "Light Bulb", "Mountain", "Pencil", "Pig", "Scissors", "Rainbow", "Smiley Face", "Sun", "Tree"];
-const labels = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Fish", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Smiley Face", "Sun", "Tree"];
+const labels = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
 
 
 function pickLabel() {
