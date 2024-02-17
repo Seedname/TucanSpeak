@@ -69,7 +69,7 @@ let sizes = [15, 30];
 let colors = [0, 255];
 
 function draw() {
-    if (!checked && millis() - startTime >= 10000) {
+    if (!checked && millis() - startTime >= 6000) {
         classifyDrawing();
         checked = true;
     }
