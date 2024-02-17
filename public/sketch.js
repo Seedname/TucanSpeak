@@ -8,7 +8,7 @@ class Toucan {
         this.origins = origins;
 
         this.moving = false;
-        this.direction = -1;
+        this.direction = 1;
         this.turnAngle = 180;
         this.angle = 0;
         this.scaleAngles = [...angles]
@@ -18,18 +18,18 @@ class Toucan {
         // let dir = x - width/2;/
         let dir = vel.x;
 
-        if (dir > 0 || this.turnAngle < 0) {
+        if (dir >= 0 && this.turnAngle < 180 && this.direction == -1) {
             this.turnAngle += 10;
-            if (this.turnAngle >= 180) {
-                this.direction = 1;
-                this.turnAngle = 180;
-            }
-        }  else if (dir < 0 || this.turnAngle > 0) {
+        } else if (dir >= 0 && this.turnAngle >= 180 && this.direction == -1) {
+            this.direction = 1;
+            this.turnAngle = 180;
+        }
+        
+        if (dir < 0 && this.turnAngle > 0 && this.direction == 1) {
             this.turnAngle -= 10;
-            if (this.turnAngle <= -180) {
-                this.direction = -1;
-                this.turnAngle = -180;
-            }
+        } else if (dir < 0 && this.turnAngle <= 0 && this.direction == 1) {
+            this.direction = -1;
+            this.turnAngle = 0;
         }
     }
 
@@ -96,8 +96,9 @@ class Mover {
     apply(canvas, elements, offsets, really) {
         if (really) {
             this.vel.set(p5.Vector.div(p5.Vector.sub(this.target, this.pos), 30));
-            
-            this.vel.limit(9);
+
+            // this.vel.limit(9);
+            this.vel.x = constrain(this.vel.x, -10, 10)
             this.pos.add(this.vel);
             // this.pos.y += 3*cos(frameCount*0.1);
             // this.pos.x = constrain(this.pos.x, 0, windowWidth-width);
@@ -117,7 +118,7 @@ class Mover {
     }
 }
 
-let size = 500;
+let size = 700
 
 var camera, canvas, sc, flying, x, y, keys, speed, bubble, backgrounds, input, button;
 function setup() {
@@ -136,23 +137,37 @@ function setup() {
     // const rightClaw = loadImage('toucan/claw_right.png');
     // const toucanRest = loadImage('toucanRest.png');
 
-    const head = loadImage('knight2/head.png');
-    const torso = loadImage('knight2/torso.png');
-    const leftArm = loadImage('knight2/left_arm.png');
-    const rightArm = loadImage('knight2/right_arm.png');
-    const leftLeg = loadImage('knight2/left_leg.png');
-    const rightLeg = loadImage('knight2/right_leg.png');
+    // const head = loadImage('knight2/head.png');
+    // const torso = loadImage('knight2/torso.png');
+    // const leftArm = loadImage('knight2/left_arm.png');
+    // const rightArm = loadImage('knight2/right_arm.png');
+    // const leftLeg = loadImage('knight2/left_leg.png');
+    // const rightLeg = loadImage('knight2/right_leg.png');
 
-    sc = 1;
+    // const head = loadImage('knight3/head.png');
+    // const torso = loadImage('knight3/torso.png');
+    // const leftArm = loadImage('knight3/left_arm.png');
+    // const rightArm = loadImage('knight3/right_arm.png');
+    // const leftLeg = loadImage('knight3/left_leg.png');
+    // const rightLeg = loadImage('knight3/right_leg.png');
 
+    const head = loadImage('knight4/head.png');
+    const torso = loadImage('knight4/torso.png');
+    const leftArm = loadImage('knight4/left_arm.png');
+    const rightArm = loadImage('knight4/right_arm.png');
+    const leftLeg = loadImage('knight4/left_leg.png');
+    const rightLeg = loadImage('knight4/right_leg.png');
+
+
+    sc = 1.5;
 
     toucan = new Toucan( 
-        [ leftArm,   rightArm,     leftLeg,   rightLeg,   torso,   head,  ],   // images
-        [ [-70,-170],   [40,-170], [-50,-170],   [50,-165], [10,-50], [0,-170], ],   // position offsets
-        [ 0,            0,          200,          60,         0,       0,     ],  // angle offsets
-        [ 1,            1,          1,            1,         1,       1,     ],  // scale offsets
-        [ [1.8,0],     [0,0],      [0.8,-1.1],   [0.8,-1.1],     [1,1],   [1,1], ]  // origin locations
-    );
+        [ leftLeg,     rightLeg,   torso,    leftArm,      rightArm,      head,  ],   // images
+        [ [-10,5],   [50,25],    [10,-30],  [-10,-290],   [0,-150],     [2,-190], ],   // position offsets
+        [  300,           0,         0,        0,            0,            0,     ],  // angle offsets
+        [ 1,            1,          1,        1,            1,            1,     ],  // scale offsets
+        [ [1.2,0],      [0.5,0],    [1,1],    [1.8,0],       [0,0],       [1,1], ]  // origin locations
+    ); 
 
     // toucan = new Toucan(
     //     [leftArm,   rightArm, leftLeg, rightLeg, head],   // images
@@ -163,7 +178,7 @@ function setup() {
     // );
 
 
-    camera = new Mover(windowWidth/2-width/2, innerHeight/3-height/2);
+    camera = new Mover(windowWidth/2-width/2, innerHeight-height);
 
     flying = true;
     // document.addEventListener('mousemove', (event) => {
@@ -187,9 +202,9 @@ function setup() {
     }
     
     input.style.left = `${windowWidth/2-400/2}px`;
-    input.style.top = "80%";
+    input.style.top = "90%";
     button.style.left = `${windowWidth/2+400/2+30}px`;
-    button.style.top = "80%";
+    button.style.top = "90%";
 
     // input.onfocus=function(){flyDown=true;};
     // input.onblur =function(){
@@ -214,23 +229,23 @@ function draw() {
     // background(255);
 
     if (!flyDown) {
-        // if (keys['w'] || keys['ArrowUp']) {
-        //     y -= speed;
-        // }
-        // if (keys['a'] || keys['ArrowLeft']) {
-        //     x -= speed;
-        // }
-        // if (keys['s'] || keys['ArrowDown']) {
-        //     y += speed;
-        // }
-        // if (keys['d'] || keys["ArrowRight"]) {
-        //     x += speed;
-        // }
+        if (keys['w'] || keys['ArrowUp']) {
+            y -= speed;
+        }
+        if (keys['a'] || keys['ArrowLeft']) {
+            x -= speed;
+        }
+        if (keys['s'] || keys['ArrowDown']) {
+            y += speed;
+        }
+        if (keys['d'] || keys["ArrowRight"]) {
+            x += speed;
+        }
         flying = true;
-        y = constrain(y, 0, window.innerHeight-0.22*innerHeight-height/2);
+        y = innerHeight
         camera.moveTo(x, y);
         if (frameCount % 300 === 0) {
-            x += random(-windowWidth*5, windowWidth*5);
+            x += random(-windowWidth, windowWidth);
             // y = random(150, innerHeight);
         }
         
@@ -254,20 +269,21 @@ function draw() {
 
 
     push();
-        // translate(0, height/4);
-        // scale(sc);
+        translate(-200, -200);
+        scale(sc);
 
         toucan.turn(camera.vel);
-        camera.apply(canvas, [bubble], [[250, -20]], true);
+        camera.apply(canvas, [bubble], [[400, -20]], true);
 
-        if (camera.vel.mag() > .1) {
-            toucan.oscillate(0, 7, 0.1, 0);
-            toucan.oscillate(1, 7, 0.1, 0);
-            toucan.oscillate(2, 3, .1, 0);
-            toucan.oscillate(3, 3, .1, 0);
-            toucan.oscillate(4, 1, .1, 0);
-            toucan.oscillate(5, 1, .1, 0);
-        }
+        // if (camera.vel.mag() > .1) {
+            // leftLeg, rightLeg, torso, leftArm, rightArm, head,
+            toucan.oscillate(0, abs(camera.vel.x), 0.1, 0);
+            toucan.oscillate(1, abs(camera.vel.x), 0.1, 0);
+            // toucan.oscillate(2, 3, .1, 0);
+            toucan.oscillate(3,abs(camera.vel.x)/15+0.1, .1, 0);
+            toucan.oscillate(4, abs(camera.vel.x)/3+0.1, -0.1, 0);
+            toucan.oscillate(5, abs(camera.vel.x)/5+0.1, .1, 0);
+        // }
 
         // if (talking) {
         //     toucan.oscillate(3, 5,  -0.2, 0);

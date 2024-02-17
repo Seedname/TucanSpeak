@@ -12,7 +12,7 @@ function speak(text) {
   utterance.volume = 1;
   utterance.rate = 1.8;
   utterance.pitch = 1;
-  utterance.voice = window.speechSynthesis.getVoices()[2];
+  utterance.voice = window.speechSynthesis.getVoices()[0];
   window.speechSynthesis.speak(utterance);
 }
 
@@ -126,7 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
             differential += m;
             for (let i = 0; i < punctuation.length; i++) {
               if (m == punctuation[i]) {
-                speechQueue.push(differential);
+                if (speechQueue.length === 0 && !talking) {
+                  speak(differential);
+                } else {
+                  speechQueue.push(differential);
+                }
                 differential = "";
                 switched = true;
                 break;
@@ -150,10 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
             responseElement.innerText += m;
             break;
         case 'end':
-            if (!switched) {
-              speechQueue.push(differential);
-              differential = "";
-            }
+            // if (!switched) {
+            //   speechQueue.push(differential);
+            //   differential = "";
+            // }
             // if (!talking && speechQueue.length === 0) {
             //   speak(responseElement.innerText);
             // }
@@ -188,14 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
       talking = false;
       flydownLock = false;
       flying = false;
-      // if (speechQueue[0]) {
-      //   let sentence = speechQueue[0];
-      //   speechQueue.shift();
-      //   speak(sentence);
-      // }
-      // if (speechQueue.length === 0) {
-      //   canDo = true;
-      // }
+      if (speechQueue[0]) {
+        let sentence = speechQueue[0];
+        speechQueue.shift();
+        speak(sentence);
+      }
+      if (speechQueue.length === 0) {
+        canDo = true;
+      }
     };
   
     window.addEventListener('beforeunload', () => {
