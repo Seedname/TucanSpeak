@@ -50,6 +50,9 @@ function setup() {
             case "endRound":
                 roundStart = false;
                 // document.getElementById("defaultCanvas0").style.display = "none";
+                fill(0, 0, 0, 128);
+                rect (-5, -5, width+5, height+5);
+                fill(0);
                 if (packet.data == "tie") {
                     document.getElementById("word").textContent = "Tie Game";
                 } else if (packet.data == "you") {
@@ -59,6 +62,7 @@ function setup() {
                     if (label == predictorWord) {
                         document.getElementById("word").textContent = "You Win!";
                     }
+                    label = "";
                 }
                 break;
             case "disconnect":
