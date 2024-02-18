@@ -48,8 +48,10 @@ let host;
 let players = [];
 
 // const labels = ["Apple", "Baseball", "Bucket", "Bicycle", "Cactus", "Cow", "Computer", "Door", "Eye", "Fish", "Giraffe", "Light Bulb", "Mountain", "Pencil", "Pig", "Scissors", "Rainbow", "Smiley Face", "Sun", "Tree"];
-let labels = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
-let bucket = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
+// let labels = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
+// let bucket = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
+const labels = ["Airplane","Anvil","Backpack","Banana","Baseball Bat","Basket","Basketball","Bed","Book","Bowtie","Brain","Bread","Bucket","Bush","Cactus","Camera","Candle","Carrot","Computer","Donut","Door","Ear","Flower","Fork","Giraffe","Hand","Key","Ladder","Light Bulb","Lightning","Moon","Mountain","Paper Clip","Rainbow","Skyscraper","Smiley Face","Snail","Spoon","Sun","The Eiffel Tower","The Mona Lisa","Tooth","Tree","Umbrella"];
+const bucket = ["Airplane","Anvil","Backpack","Banana","Baseball Bat","Basket","Basketball","Bed","Book","Bowtie","Brain","Bread","Bucket","Bush","Cactus","Camera","Candle","Carrot","Computer","Donut","Door","Ear","Flower","Fork","Giraffe","Hand","Key","Ladder","Light Bulb","Lightning","Moon","Mountain","Paper Clip","Rainbow","Skyscraper","Smiley Face","Snail","Spoon","Sun","The Eiffel Tower","The Mona Lisa","Tooth","Tree","Umbrella"];
 
 function pickLabel() {
   let index = Math.floor(Math.random() * bucket.length);
