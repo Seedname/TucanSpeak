@@ -42,14 +42,14 @@ function setup() {
                 document.getElementById("defaultCanvas0").style.display = "block";
                 document.getElementById("word").textContent = "Draw a " + packet.data;
                 startTime = millis();
+                background(255);
                 predictorWord = packet.data;
                 roundStart = true;
                 checked = false;
                 break;
             case "endRound":
-                background(255);
                 roundStart = false;
-                document.getElementById("defaultCanvas0").style.display = "none";
+                // document.getElementById("defaultCanvas0").style.display = "none";
                 if (packet.data == "tie") {
                     document.getElementById("word").textContent = "Tie Game";
                 } else if (packet.data == "you") {
