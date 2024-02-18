@@ -56,6 +56,9 @@ function setup() {
                     document.getElementById("word").textContent = "You Win!";
                 } else {
                     document.getElementById("word").textContent = "Opponent Wins!";
+                    if (label == predictorWord) {
+                        document.getElementById("word").textContent = "You Win!";
+                    }
                 }
                 break;
             case "disconnect":
