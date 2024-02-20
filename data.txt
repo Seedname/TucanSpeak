@@ -136,4 +136,16 @@ A: Understood! Feel free to ask me any questions you have.8:24:41 AM
 Q: hello
 A: Hello! How can I assist you today?8:24:51 AM
 Q: tell me about the school
-A: NeoCity Academy is a highly selective public magnet school in Kissimmee, Florida, serving students from grade nine through grade twelve. The school focuses on an inquiry-driven, project-based STEM curriculum and offers various pathways like Artificial Intelligence, Biodesign, and Engineering. The school emphasizes student ownership of learning and offers a unique grading system based on student proficiency. Admission to NeoCity Academy is based on multiple requirements like math and reading placement scores, teacher recommendations, and other assessments. The school also offers various extracurricular activities, like clubs, and students can participate in athletics through partner schools.
+A: NeoCity Academy is a highly selective public magnet school in Kissimmee, Florida, serving students from grade nine through grade twelve. The school focuses on an inquiry-driven, project-based STEM curriculum and offers various pathways like Artificial Intelligence, Biodesign, and Engineering. The school emphasizes student ownership of learning and offers a unique grading system based on student proficiency. Admission to NeoCity Academy is based on multiple requirements like math and reading placement scores, teacher recommendations, and other assessments. The school also offers various extracurricular activities, like clubs, and students can participate in athletics through partner schools.3:48:07 AM
+Q: asdf
+A: Hello! How can I assist you today?3:54:26 AM
+Q: hello
+A: Hello! How can I assist you today?3:58:18 AM
+Q: hello
+A: Hello! How can I assist you today?3:59:43 AM
+Q: asdf
+A: Understood! I'll provide concise and accurate answers to the best of my ability. Feel free to ask any questions you have.4:21:32 AM
+Q: what's your name?
+A: I am Sir Kit, a Knight at NeoCity Academy.4:24:33 AM
+Q: uoyg\
+A: Hello! How can I assist you today?

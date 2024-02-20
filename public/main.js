@@ -67,12 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // flyDown = true;
     })
 
-    document.getElementById("hostGame").addEventListener('click', function() {
-      ws.send(JSON.stringify({type: "hostGame"}));
-      document.getElementById("hostGame").style.display = "none";
-      document.getElementById("joinGame").style.display = "none";
-      document.getElementById("startRound").style.display = "block";
-    });
+    // document.getElementById("hostGame").addEventListener('click', function() {
+    //   ws.send(JSON.stringify({type: "hostGame"}));
+    //   document.getElementById("hostGame").style.display = "none";
+    //   document.getElementById("joinGame").style.display = "none";
+    //   document.getElementById("startRound").style.display = "block";
+    // });
 
     // if (annyang) {
     //   annyang.addCommands({
