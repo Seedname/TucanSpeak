@@ -6,6 +6,9 @@
         <!-- <link rel="stylesheet" href="main.css"> -->
         <meta charset="UTF-8">
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+
             .bg {
                 position: absolute;
                 height: 100%;
@@ -100,6 +103,81 @@
                 overflow: hidden;
             }
 
+            button {
+                position: relative;
+                padding: 10px 20px;
+                font-size: 16px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                background-color: #02a5f0; 
+                color: #fff;
+                transition: background-color 0.3s ease;
+                display: inline-block;
+            }
+
+            button:hover {
+                background-color: #0073ff; 
+            }
+
+            button:active {
+                background-color: #398439; 
+            }
+
+            button:disabled {
+                background-color: #ccc;
+                color: #666;
+                cursor: not-allowed;
+            }
+            .menu {
+                padding: 10px;
+                position: relative;
+                display: inline-block;
+            }
+
+            .menu-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+            }
+
+            .menu-items {
+                display: none;
+                position: absolute;
+                background-color: #f9f9f9;
+                box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+                z-index: 1;
+                padding: 0;
+                width: 170px; 
+            }
+
+            .menu-items li {
+                list-style-type: none;
+                width: 100%; 
+            }
+
+            .menu-items li a {
+                display: block;
+                text-decoration: none;
+                color: black;
+                padding: 10px;
+            }
+
+            .menu-items li a:hover {
+                background-color: #ddd;
+            }
+
+
+            .menu:hover .menu-items {
+                display: block;
+            }
+
+            body {
+                font-family: Poppins;
+                background-color: #00ff48;
+            }
         </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
@@ -110,22 +188,31 @@
 
     <body>
         <img class="bg" src="bg.png">
+		<div class="menu">
+			<button class="menu-button">Menu</button>
+			<ul class="menu-items">
+                <li><a href="/">Home</a></li>
+				<li><a href="/flappy">Tucan Flight</a></li>
+				<li><a href="/game">Tucan Draw</a></li>
+				<li><a href="#" onclick="return changeLanguage()">Cambiar Idioma</a></li>
+				<li><a href="#" onclick="return signOut()">Sign out</a></li>
+			</ul>
+		</div>
+        <button id="startRecording" style="margin:10px;z-index:2;" onclick="startRound()">Start Round</button>
+
         <p id="word" class="prevent-select" style="margin:auto;font-size:60px;bottom:10px;color:whitesmoke;position:absolute;"></p>
-        <p id="label" class="prevent-select" style="text-align:center;font-size:60px;margin-top:10px;color:whitesmoke"></p>
+        <p id="label" class="prevent-select" style="text-align:center;font-size:30px;color:whitesmoke;top:0%;"></p>
 
         <div id="button-container">
             <button class="image-button selected prevent-select" onclick="toolClick(0)">
                 <img src="brush.png" alt="Brush">
             </button>
-            <!-- <button class="image-button prevent-select" onclick="toolClick(1)">
+            <button class="image-button prevent-select" onclick="toolClick(1)">
                 <img src="eraser.png" alt="Eraser">
-            </button> -->
-            <button class="image-button prevent-select" onclick="clearScreen()">
-                Clear
             </button>
-            <!-- <button class="image-button" onclick="toolClick(2)">
-                <img src="bucket.png" alt="Bucket">
-            </button> -->
+            <button class="image-button prevent-select" onclick="clearScreen()">
+                <p style="font-size:17px">Clear</p>
+            </button>
         </div>
 
     </body>

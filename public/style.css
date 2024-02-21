@@ -377,8 +377,11 @@ body {
     width: 170px; 
 }
 
-.menu-items li {
+ul {
     list-style-type: none;
+}
+    
+.menu-items li {    
     width: 100%; 
 }
 

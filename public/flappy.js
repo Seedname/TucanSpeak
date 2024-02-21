@@ -419,7 +419,6 @@ function draw() {
     }
 
     for (var i = 0; i < width+600; i += 600) {
-
         image(backgroundImage, i - offset, 0);
     }
 
@@ -477,6 +476,13 @@ function reset() {
     score = 0;
 }
 
+function sendWin() {
+    ws.send(JSON.stringify({type: "flightWin", 
+        "username": getCookie('username'),
+        "password": getCookie('password')
+    }));
+}
+
 function mousePressed() {
     if (mode === "title") {
         if (insideRect(width/3, 3*height/5-height/18, width/3, height/9)) {
@@ -490,6 +496,7 @@ function mousePressed() {
             reset();
             if (randomIndex === 0) {
                 mode = "game";
+                sendWin();
                 return;
             } 
             mode = "retry";
@@ -500,6 +507,7 @@ function mousePressed() {
             reset();
             if (randomIndex === 1) {
                 mode = "game";
+                sendWin();
                 return;
             }
             mode = "retry";
@@ -510,6 +518,7 @@ function mousePressed() {
             reset();
             if (randomIndex === 2) {
                 mode = "game";
+                sendWin();
                 return;
             }
             mode = "retry";
@@ -520,6 +529,7 @@ function mousePressed() {
             reset();
             if (randomIndex === 3) {
                 mode = "game";
+                sendWin();
                 return;
             }
             mode = "retry";

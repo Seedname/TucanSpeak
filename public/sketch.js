@@ -253,6 +253,7 @@ function draw() {
             // toucan.oscillate(5*radians(frameCount))
             
         } else {
+            toucan.turn(camera.vel);    
             camera.apply(canvas, [bubble], [[230, 0]], false);
             toucan.oscillate(0, 0.7, 0.1, 1, 20);
             toucan.oscillate(2, 10, -0.1, 0);

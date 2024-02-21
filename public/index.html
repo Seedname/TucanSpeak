@@ -20,12 +20,19 @@
 
 		<script>
 			function signOut() {
-				function deleteCookie(cookieName) {
-					document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-				}
-				deleteCookie("username");
-				deleteCOokie("password");
-				window.location.href = "login";
+				$(document).ready(function() {
+					$.ajax({
+						type: 'POST',
+						url: '/sign-out', 
+						contentType: 'application/json',
+						success: function(response) {
+							window.location.href = response.url;
+						},
+						error: function(xhr, status, error) {
+							window.location.href = "/login";
+						}
+					});
+				});
 			}
 
 			function changeLanguage() {
@@ -40,9 +47,17 @@
 					success: function(response) {
 						document.getElementById("level_value").textContent = `Level ${response.level+1}`;
 						document.getElementById("level_fill").style.width = `${Math.floor(100*response.xp/20)}%`;
+						if (response.flightWins >= 5) {
+							document.getElementById("first").click();
+						}
+						document.getElementById("flight_wins").textContent = `Numbers (${response.flightWins}/5 Tucan Flight Wins)`;
+						if (response.drawWins >= 5) {
+							document.getElementById("second").click();
+						}
+						document.getElementById("draw_wins").textContent = `Objects (${response.drawWins}/5 Tucan Draw Wins)`;
 					},
 					error: function(xhr, status, error) {
-						console.error('Error checking authentication:', xhr.resposneText);
+						console.error('Error checking authentication:', xhr.responseText);
 					}
 				});
 			});
@@ -57,8 +72,9 @@
 		<div class="menu">
 			<button class="menu-button">Menu</button>
 			<ul class="menu-items">
-				<li><a href="/flappy">Toucan Flight</a></li>
-				<li><a href="/game">Item Draw</a></li>
+				<li><a href="/">Home</a></li>
+				<li><a href="/flappy">Tucan Flight</a></li>
+				<li><a href="/game">Tucan Draw</a></li>
 				<li><a href="#" onclick="return changeLanguage()">Cambiar Idioma</a></li>
 				<li><a href="#" onclick="return signOut()">Sign out</a></li>
 			</ul>
@@ -75,23 +91,23 @@
 		</div>
 
 		<div class="lesson-to-do">
-			<ol class="list">
+			<ul class="list">
 				<h2>Daily Tasks</h2>
 				<li class="list_item">
 					<input type="checkbox" class="hidden-box" id="first">
 					<label for="first" class="check_label">
-						<span class="check_label_text">Numbers in English<img src="images/star.png" alt="Star" class="star"></span>
+						<span class="check_label_text" id="flight_wins">Numbers (0/5 Tucan Flight Wins)<img src="images/star.png" alt="Star" class="star"></span>
 						<span class="check_label_box"></span>
 					</label>
 				</li>
 				<li class="list_item">
 					<input type="checkbox" class="hidden-box" id="second">
 					<label for="second" class="check_label">
-						<span class="check_label_text">Objects in English<img src="images/star.png" alt="Star" class="star"></span>
+						<span class="check_label_text" id="draw_wins">Objects (0/5 Tucan Draw Wins)<img src="images/star.png" alt="Star" class="star"></span>
 						<span class="check_label_box"></span>
 					</label>
 				</li>
-			</ol>			
+			</ul>			
 		</div>
 
 		<!--Julian Part-->

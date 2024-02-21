@@ -8,6 +8,22 @@ var speechQueue = [];
 
 let voice = window.speechSynthesis.getVoices()[0];
 
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
+}
+
+
 function speak(text) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.volume = 1;
@@ -62,7 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendMessage = document.getElementById('ask');
     const messageBox = document.getElementById("message");
     sendMessage.addEventListener('click', function() {
-      ws.send(JSON.stringify({type: "start", "content": messageBox.value}));
+      ws.send(JSON.stringify({type: "start", 
+                              "content": messageBox.value, 
+                              "username": getCookie('username'),
+                              "password": getCookie('password')
+                            }));
       // flydownLock = true;
       // flyDown = true;
     })

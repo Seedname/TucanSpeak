@@ -11,8 +11,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import cookieParser from 'cookie-parser';
 
-let usr = "redacted";
-let passwd = "redacted";
+let usr = 'tilly'; 
+let passwd = 'F6QxVpp6vXlVgdc3';
 const uri = `mongodb+srv://${usr}:${passwd}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -87,7 +87,7 @@ async function validUser(content) {
         "password": password
       });
       if (user) {
-        return true;
+        return user;
       }
     } catch (error) {
       console.error(error);
@@ -142,9 +142,13 @@ app.post('/register', async (req, res) => {
       'password': password,
       'email': email,
       'level': 0,
-      'xp': 0
+      'xp': 0,
+      'tucanFlightWins': 0,
+      'tucanDrawWins': 0,
+      'tucanFlightTime': new Date().toISOString().substring(0, 10),
+      'tucanDrawTime': new Date().toISOString().substring(0, 10)
     });
-
+    
     res.cookie('username', username, { maxAge: 86400*1000, httpOnly: true });
     res.cookie('password', password, { maxAge: 86400*1000, httpOnly: true });
     return res.json({ redirectUrl: '/' });
@@ -156,6 +160,21 @@ app.get('/', async (req, res) => {
   const valid = await validUser(req.cookies);
   if (!valid) {
     return res.redirect('/login');
+  }
+  if (valid) {
+    let currentTime = new Date().toISOString().substring(0, 10);
+    let update = {}
+    if (valid['tucanFlightTime'] != currentTime) {
+      update['tucanFlightWins'] = 0;
+      update['tucanFlightTime'] = currentTime;
+    }
+    if (valid['tucanDrawTime'] != currentTime) {
+      update['tucanDrawWins'] = 0;
+      update['tucanDrawTime'] = currentTime;
+    }
+    if (Object.keys(update).length > 0) {
+      await users.findOneAndUpdate({_id: valid["_id"]}, update);
+    }
   }
   return res.sendFile(__dirname + '/public/index.html');
 });
@@ -169,7 +188,9 @@ app.post('/', async (req, res) => {
         if (user) {
           return res.status(200).json({
             'level': user['level'],
-            'xp': user['xp']
+            'xp': user['xp'],
+            'drawWins': user['tucanDrawWins'],
+            'flightWins': user['tucanFlightWins'],
           });
         }
       } catch (error) {
@@ -180,116 +201,80 @@ app.post('/', async (req, res) => {
   return res.status(400).send("something went wrong");
 });
 
+app.post('/sign-out', async (req, res) => {
+  if (req.cookies && 'username' in req.cookies && 'password' in req.cookies) {
+      res.clearCookie('username');
+      res.clearCookie('password');
+      return res.status(200).json({url: '/login'});
+  }
+  return res.status(400).send("Something went wrong");
+});
+
 app.use(express.static('public', {
   extensions: ['html', 'htm']
 }));
 
+const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help Spanish-speakers who come to you learn English."
+const additionalContext = "";
 
-// const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help people who come to you learn English or Spanish."
-const system = fs.readFileSync('./system_message.txt', 'utf-8');
-const additionalContext = "Keep your answer as consice and accurate as possible while still answering the question completely if possible. If you recieve a prompt that doesn't make sense after this sentence, just respond with 'Could you please repeat that?'. DO NOT try to answer questions you are not 100% sure of.";
+// const system = fs.readFileSync('./system_message.txt', 'utf-8');
+// const additionalContext = "Keep your answer as consice and accurate as possible while still answering the question completely if possible. If you recieve a prompt that doesn't make sense after this sentence, just respond with 'Could you please repeat that?'. DO NOT try to answer questions you are not 100% sure of.";
 
-let host;
-let players = [];
-
-// const labels = ["Apple", "Baseball", "Bucket", "Bicycle", "Cactus", "Cow", "Computer", "Door", "Eye", "Fish", "Giraffe", "Light Bulb", "Mountain", "Pencil", "Pig", "Scissors", "Rainbow", "Smiley Face", "Sun", "Tree"];
-let labels = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
-let bucket = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
-// const labels = ["Airplane","Anvil","Backpack","Banana","Baseball Bat","Basket","Basketball","Bed","Book","Bowtie","Brain","Bread","Bucket","Bush","Cactus","Camera","Candle","Carrot","Computer","Donut","Door","Ear","Flower","Fork","Giraffe","Hand","Key","Ladder","Light Bulb","Lightning","Moon","Mountain","Paper Clip","Rainbow","Skyscraper","Smiley Face","Snail","Spoon","Sun","The Eiffel Tower","The Mona Lisa","Tooth","Tree","Umbrella"];
-// const bucket = ["Airplane","Anvil","Backpack","Banana","Baseball Bat","Basket","Basketball","Bed","Book","Bowtie","Brain","Bread","Bucket","Bush","Cactus","Camera","Candle","Carrot","Computer","Donut","Door","Ear","Flower","Fork","Giraffe","Hand","Key","Ladder","Light Bulb","Lightning","Moon","Mountain","Paper Clip","Rainbow","Skyscraper","Smiley Face","Snail","Spoon","Sun","The Eiffel Tower","The Mona Lisa","Tooth","Tree","Umbrella"];
-
-function pickLabel() {
-  let index = Math.floor(Math.random() * bucket.length);
-  let label = bucket.splice(index, 1).join("");
-  if (bucket.length == 0) {
-    bucket = JSON.parse(JSON.stringify(labels));
-  }
-  return label;
-}
 wss.on('connection', (ws) => {
     ws.send(JSON.stringify({type: 'connected'}));
 
     ws.on('message', (data) => {
         data = JSON.parse(data);
-        if (data.type == "start") {
-          let searchTerm = data.content;
-          const conversation = [
-            { role: 'system', content: system },
-            { role: 'user', content: searchTerm + additionalContext },
-          ];
+        const username = data.username;
+        const password = data.password;
+        const valid = validUser({username: username, password: password});
 
-          ws.send(JSON.stringify({ type: 'start' }));
-          let finalMessage = "";
-          openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
-            messages: conversation,
-            stream: true
-          }) .then(async (completion) => {
-            for await (const chunk of completion) {
-              if (chunk.choices[0].finish_reason !== 'stop') {
-                const content = chunk.choices[0].delta.content;
-                finalMessage += content;
-                ws.send(JSON.stringify({ type: 'update', content }));
+        if (!valid) {
+          return;
+        }
+
+        switch(data.type) {
+          case "start":
+            // let levelUnit = ""
+            // if (valid["level"] === 1) {
+            //   levelUnit = fs.readFileSync('./level_one.txt', 'utf-8');
+            // }
+
+            let searchTerm = data.content;
+            const conversation = [
+              { role: 'system', content: system },
+              { role: 'user', content: searchTerm + additionalContext },
+            ];
+
+            ws.send(JSON.stringify({ type: 'start' }));
+            let finalMessage = "";
+            openai.chat.completions.create({
+              model: 'gpt-3.5-turbo',
+              messages: conversation,
+              stream: true
+            }) .then(async (completion) => {
+              for await (const chunk of completion) {
+                if (chunk.choices[0].finish_reason !== 'stop') {
+                  const content = chunk.choices[0].delta.content;
+                  finalMessage += content;
+                  ws.send(JSON.stringify({ type: 'update', content }));
+                }
               }
-            }
-          }) .catch((error) => {
-            console.error(error);
-          }) .finally(() => {
-            const d = new Date();
-            const n = d.toLocaleTimeString();
-            fs.appendFile('data.txt', `${n}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
-            ws.send(JSON.stringify({ type: 'end' }));
-          });
-        } 
-
-        if (data.type == "hostGame") {
-          host = ws;
-        }
-
-        if (data.type == "startRound") {
-          let word =  pickLabel();
-          host.send(JSON.stringify({type: "startRound", data: "Your word is: " + word}));
-          for (let i = 0; i < players.length; i++) {
-            players[i].send(JSON.stringify({type: "startRound", data: word}));
-          }
-        }
-
-        if (data.type == "endRound") {
-          host.send(JSON.stringify({type: "endRound", data: "Tie Game"}));
-          for (let i = 0; i < players.length; i++) {
-            players[i].send(JSON.stringify({type: "endRound", data: "tie"}));
-          }
-        }
-
-        if (data.type == "joinGame") {
-          players.push(ws);
-        }
-
-        if (data.type == "answer") {
-          const index = players.indexOf(ws);
-          host.send(JSON.stringify({type: "endRound", data: "Player " + (index+1) + " wins"}));
-          for (let i = 0; i < players.length; i++) {
-            if (players[i] == ws) {
-              players[i].send(JSON.stringify({type: "endRound", data: "you"}));
-            } else {
-              players[i].send(JSON.stringify({type: "endRound", data: index}));
-            }
-          }
+            }) .catch((error) => {
+              console.error(error);
+            }) .finally(() => {
+              const d = new Date();
+              const n = d.toLocaleTimeString();
+              fs.appendFile('data.txt', `${n}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
+              ws.send(JSON.stringify({ type: 'end' }));
+            });
+            break;
+          case "drawWin":
+            users.findOneAndUpdate({_id: valid["_id"]}, {'tucanDrawWins': valid["tucanDrawWins"]+1})
+            break;
+          case "flightWin":
+            users.findOneAndUpdate({_id: valid["_id"]}, {'tucanFlightWins': valid["tucanFlightWins"]+1})
+            break;
         }
     });
-
-
-    ws.on('close', () => {
-      if (ws == host) {
-        for (let i = 0; i < players.length; i++) {
-          players[i].send(JSON.stringify({type: "disconnect"}));
-        }
-        players = [];
-      }
-
-      const index = players.indexOf(ws);
-      if (index >= 0) {
-        players.splice(index, 1);
-      }
-   });
 });
