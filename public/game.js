@@ -1,18 +1,18 @@
 function getCookies() {
-    $(document).ready(function() {
-      $.ajax({
+    let resp = false;
+    $.ajax({
         type: 'POST',
         url: '/get-cookie', 
         contentType: 'application/json',
+        async: false,
         success: function(response) {
-          return response;
+            resp = response;;
         },
         error: function(xhr, status, error) {
-          console.error(xhr);
-          return false;
+            console.error(xhr);
         }
-      });
     });
+    return resp;
 }
   
 

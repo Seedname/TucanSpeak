@@ -173,7 +173,7 @@ function setup() {
     
     input.style.left = `${windowWidth/2-400/2}px`;
     input.style.top = "80%";
-    button.style.left = `${windowWidth/2+400/2+30}px`;
+    button.style.left = `${windowWidth/2+400/2+20}px`;
     button.style.top = "80%";
 
     input.onfocus=function(){flyDown=true;};
