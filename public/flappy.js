@@ -245,6 +245,7 @@ var backgroundImage;
 var backgroundOffset = 0;
 var toucan; 
 var randomNums, randomIndex, guessedIndex;
+var cookies;
 
 function drawBackground(x) {
     background(66, 52, 10);
@@ -283,10 +284,29 @@ function insideRect(x, y, w, h) {
     return mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
 }
 
+function getCookies() {
+    $(document).ready(function() {
+      $.ajax({
+        type: 'POST',
+        url: '/get-cookie', 
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(xhr, status, error) {
+          console.error(xhr);
+          return false;
+        }
+      });
+    });
+}
+  
+
 function setup() {
     canvas = createCanvas(window.innerWidth,window.innerHeight);
     canvas.position(0, 0);
     canvas.class("p5canvas");
+    cookies = getCookies();
 
     drawBackground(0);
     backgroundImage = get(0,0,600,height);
@@ -478,8 +498,8 @@ function reset() {
 
 function sendWin() {
     ws.send(JSON.stringify({type: "flightWin", 
-        "username": getCookie('username'),
-        "password": getCookie('password')
+        "username": cookies['username'],
+        "password": cookies['password']
     }));
 }
 

@@ -1,4 +1,4 @@
-async function getCookies() {
+function getCookies() {
     $(document).ready(function() {
       $.ajax({
         type: 'POST',
@@ -13,7 +13,7 @@ async function getCookies() {
         }
       });
     });
-  }
+}
   
 
 // Classifier Variable
@@ -74,6 +74,8 @@ function startRound() {
     checked = false;
 }
 
+let cookies;
+
 function endRound() {
     fill(0, 0, 0, 128);
     noStroke();
@@ -97,7 +99,6 @@ function endRound() {
     roundStart = false;
 }
 
-let cookies;
 function setup() {
     createCanvas(400, 500);
     clearScreen();
