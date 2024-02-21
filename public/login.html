@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    
+    <style>
+        /* styles.css */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('bg.png'); /* Replace 'background-image.jpg' with your image file */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px; /* Adjust the width as per your preference */
+            max-width: 80%; /* Set a maximum width if needed */
+            
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            width: 90%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .login-btn, .register-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .login-btn {
+            background-color: #4caf50;
+            color: #fff;
+            border: 2px solid #4caf50;
+            margin-bottom: 10px;
+        }
+
+        .register-btn {
+            color: #4caf50;
+            border: 2px solid #4caf50;
+            background-color: rgba(255,255,255,0);
+        }
+
+        .login-btn:hover, .register-btn:hover {
+            background-color: #45a049;
+            border-color: #45a049;
+            color: #fff;
+        }
+
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <div id="message" style="color:red;text-align:center;"></div>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        <button class="register-btn" onclick="location.href='register'">Register</button>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#loginForm').submit(function(event) {
+                event.preventDefault();
+
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: '/login',
+                    data: formData,
+                    success: function(response) {
+                        window.location.href = response.redirectUrl;
+                    },
+                    error: function(xhr, status, error) {
+                        $('#message').text(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

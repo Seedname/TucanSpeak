@@ -101,16 +101,17 @@ class Mover {
             
             this.vel.limit(9);
             this.pos.add(this.vel);
+
             this.pos.y += 3*cos(frameCount*0.1);
-            // this.pos.x = constrain(this.pos.x, 0, windowWidth-width);
+            this.pos.x = constrain(this.pos.x, 0, windowWidth-width);
             this.pos.y = constrain(this.pos.y, 0, innerHeight-height);
-            canvas.position( windowWidth/2-width/2, this.pos.y);
+            canvas.position( this.pos.x, this.pos.y);
         }
         if (elements) {
             for (let i = 0; i < elements.length; i++) {
                 // console.log(elements[i])
                 // elements[i].style.left = `${this.pos.x + offsets[i][0]}px`;
-                elements[i].style.left = `${windowWidth/2-width/2 + offsets[i][0]}px`;
+                elements[i].style.left = `${this.pos.x + offsets[i][0]}px`;
                 elements[i].style.top =  `${this.pos.y + offsets[i][1] - elements[i].offsetHeight}px`;
                 // console.log(elements[i].style.minHeight);
                 // console.log(parseInt(window.getComputedStyle(elements[i]).fontSize, 10));
@@ -119,7 +120,7 @@ class Mover {
     }
 }
 
-let size = 200;
+let size = 300;
 
 var camera, canvas, sc, flying, x, y, keys, speed, bubble, backgrounds, input, button;
 function setup() {
@@ -128,21 +129,21 @@ function setup() {
     canvas.position(0, 0);
     canvas.style('z-index', '1');
 
-    const toucanBody = loadImage('Toucan/body.png');
-    const toucanTail = loadImage('Toucan/tail.png');
-    const frontWing = loadImage('Toucan/wing_front.png');
-    const backWing = loadImage('Toucan/wing_back.png');
-    const bottomBeak = loadImage('Toucan/beak_bottom.png');
-    const topBeak = loadImage('Toucan/beak_top.png');
-    const leftClaw = loadImage('Toucan/claw_left.png');
-    const rightClaw = loadImage('Toucan/claw_right.png');
+    const toucanBody = loadImage('toucan/body.png');
+    const toucanTail = loadImage('toucan/tail.png');
+    const frontWing = loadImage('toucan/wing_front.png');
+    const backWing = loadImage('toucan/wing_back.png');
+    const bottomBeak = loadImage('toucan/beak_bottom.png');
+    const topBeak = loadImage('toucan/beak_top.png');
+    const leftClaw = loadImage('toucan/claw_left.png');
+    const rightClaw = loadImage('toucan/claw_right.png');
     // const toucanRest = loadImage('toucanRest.png');
 
     sc = width/450;
 
     toucan = new Toucan(
         [backWing,   leftClaw, toucanTail, bottomBeak, topBeak,   toucanBody,   rightClaw, frontWing],   // images
-        [[120,-100], [122,145], [110,65],   [80,-17], [75 ,-77],  [100,-80],    [170,140],  [125,-25]],  // position offsets
+        [[120,-100], [122,145], [110,65],   [80,-17], [58 ,-77],  [100,-80],    [170,140],  [125,-25]],  // position offsets
         [-30,        0,         0,          -10,      0,          0,            0,          -12],        // angle offsets
         [1,          1,         1,          1,        1,          1,            1,          1],          // scale offsets
         [[1,-1.25],  [1,1],     [1,1],      [2,1],    [2,1],      [1,1],        [1,1],      [1,-0.5]]    // origin locations
@@ -160,15 +161,15 @@ function setup() {
     keys = {};
     speed = 10;
     bubble = document.getElementById("response");
-    backgrounds = document.querySelectorAll(".bg");
+    // backgrounds = document.querySelectorAll(".bg");
     input = document.getElementById("message");
     button = document.getElementById("ask");
 
-    for (let i = 0; i < backgrounds.length; i++) {
-        const bg = backgrounds.item(i);
-        bg.style.top = `${0}px`;
-        bg.style.height = `100%`;
-    }
+    // for (let i = 0; i < backgrounds.length; i++) {
+    //     const bg = backgrounds.item(i);
+    //     bg.style.top = `${0}px`;
+    //     bg.style.height = `100%`;
+    // }
     
     input.style.left = `${windowWidth/2-400/2}px`;
     input.style.top = "80%";
@@ -185,11 +186,11 @@ function setup() {
 
 function draw() {
     clear ();
-    // if (bubble.textContent === "") {
-    //     bubble.style.display = "none";
-    // } else {
-    //     bubble.style.display = "block";
-    // }
+    if (bubble.textContent === "") {
+        bubble.style.display = "none";
+    } else {
+        bubble.style.display = "block";
+    }
     // background(255);
 
     if (!flyDown) {
@@ -206,15 +207,16 @@ function draw() {
             x += speed;
         }
         flying = true;
+        x = constrain(x, windowWidth/4, 3*windowWidth/4);
         y = constrain(y, 0, window.innerHeight-0.22*innerHeight-height/2);
         camera.moveTo(x, y);
         if (frameCount % 300 === 0) {
-            x += random(-windowWidth, windowWidth);
-            y = random(150, innerHeight);
+            x += random(-windowWidth/8, windowWidth/8);
+            y = random(150, 3*innerHeight/4);
         }
         
     } else {
-        camera.moveTo(x, 0.8*innerHeight-height/4);
+        camera.moveTo( windowWidth/2-width/2, 0.8*innerHeight-height/4);
         camera.vel.x = .1;
         if (camera.vel.mag() < 1 && camera.pos.dist(camera.target) < 10) {
             flying =  false;
@@ -252,7 +254,13 @@ function draw() {
             
         } else {
             camera.apply(canvas, [bubble], [[230, 0]], false);
+            toucan.oscillate(0, 0.7, 0.1, 1, 20);
+            toucan.oscillate(2, 10, -0.1, 0);
+            // toucan.oscillate(5, 20, 0.1, 0);
+            // toucan.oscillate(6, 20, 0.1, 0);
+            toucan.oscillate(7, 0.7, 0.1, 1, 20);
 
+            toucan.oscillate(0.2 *sin(frameCount * 0.1) - radians(30));
             // toucan.oscillate(0, 0.1, 0.1, 1, 20);
             // toucan.oscillate(2, 10, -0.1, 0);
             // toucan.oscillate(7, 0.1, 0.1, 1, 20);
@@ -273,9 +281,8 @@ function draw() {
     if (!talking && talkingCooldown > 0) {
         talkingCooldown --;
     } else if (!talking) {
-        bubble.textContent = "Hey, my name is Tilly the Toucan. Let's have fun Learning Spanish Together"
+        bubble.textContent = "Ask me questions about English! Type your question in the box below."
     }
-
     // document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
     // talking = true;
     let w = bubble.style.width.substring(0, bubble.style.width.length-2)
@@ -284,14 +291,14 @@ function draw() {
         bubble.style.width = `${parseInt(w, 10) + 1}px`;
     }
     let x1 = camera.pos.x;
-    for (let i = 0; i < backgrounds.length; i++) {
-        const bg = backgrounds.item(i);
-        // bg.style.left = `${-frameCount*5+bg.width*i}px`;
+    // for (let i = 0; i < backgrounds.length; i++) {
+    //     const bg = backgrounds.item(i);
+    //     // bg.style.left = `${-frameCount*5+bg.width*i}px`;
 
-        bg.style.left = `${-x1-bg.width*(i-ceil(x1/bg.width))}px`
-        bg.style.top = `${0}px`;
-        bg.style.height = `100%`;
-    }
+    //     bg.style.left = `${-x1-bg.width*(i-ceil(x1/bg.width))}px`
+    //     bg.style.top = `${0}px`;
+    //     bg.style.height = `100%`;
+    // }
 }
 
 function mousePressed() {

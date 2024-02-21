@@ -6,12 +6,46 @@ import OpenAI from 'openai';
 import bodyParser from 'body-parser';
 import { config } from 'dotenv';
 import fs from 'fs';
+import { MongoClient, ServerApiVersion } from 'mongodb';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import cookieParser from 'cookie-parser';
+
+let usr = "redacted";
+let passwd = "redacted";
+const uri = `mongodb+srv://${usr}:${passwd}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+let db;
+let users;
+
+async function connectToMongoDB() {
+    try {
+        await client.connect();
+        console.log('Connected successfully to the database');
+
+        db = client.db('TucanSpeak');
+        users = db.collection('users');
+    } catch (error) {
+        console.error('Failed to connect to the database:', error);
+    }
+}
+
+connectToMongoDB();
 
 config();
 
 const useHTTPS = false;
 
 const app = express();
+
 let server;
 
 if (useHTTPS) {
@@ -29,16 +63,127 @@ if (useHTTPS) {
   server = http.createServer(app);
   server.listen(80);
 }
+
 const wss = new WebSocketServer({ server });
 const API_KEY = process.env.OPENAI_API_KEY;
 const openai = new OpenAI({ apiKey: API_KEY });
 
-app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+app.use(cookieParser());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+async function validUser(content) {
+  if (!content) return false;
+  if ('username' in content && 'password' in content) {
+    const username = content['username'];
+    const password = content['password'];
+
+    try {
+      const user = await users.findOne({
+        "username" : username,
+        "password": password
+      });
+      if (user) {
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+  return false;
+}
+
+app.get('/login', async (req, res) => {
+  const valid = await validUser(req.cookies);
+  if (valid) {
+    return res.redirect('/');
+  }
+  return res.sendFile(__dirname + '/public/login.html');
 });
+
+app.post('/login', async (req, res) => {
+  const valid = await validUser(req.body);
+  if (valid) {
+    res.cookie('username', req.body.username, { maxAge: 86400*1000, httpOnly: true });
+    res.cookie('password', req.body.password, { maxAge: 86400*1000, httpOnly: true });
+    return res.json({ redirectUrl: '/' });
+  }
+  if ('username' in req.body && 'password' in req.body) return res.status(400).send('Invalid username or password');
+  return res.sendFile(__dirname + '/public/login.html');
+});
+
+app.post('/register', async (req, res) => {
+  if ('username' in req.body && 'password' in req.body && 'email' in req.body) {
+    const username = req.body['username'];
+    const email = req.body['email'];
+
+    try {
+      const user_username = await users.findOne({"username" : username});
+      if (user_username) {
+        return res.status(400).send('Username taken');
+      }
+      const user_email = await users.findOne({"email" : email});
+      if (user_email) {
+        return res.status(400).send('Account with email already exists');
+      }
+    } catch (error) {
+      console.error(error);
+      return res.sendFile(__dirname + '/public/register.html');
+    }
+
+    const password = req.body['password'];
+    
+    await users.insertOne({
+      'username': username,
+      'password': password,
+      'email': email,
+      'level': 0,
+      'xp': 0
+    });
+
+    res.cookie('username', username, { maxAge: 86400*1000, httpOnly: true });
+    res.cookie('password', password, { maxAge: 86400*1000, httpOnly: true });
+    return res.json({ redirectUrl: '/' });
+  }
+  return res.sendFile(__dirname + '/public/register.html');
+});
+
+app.get('/', async (req, res) => {
+  const valid = await validUser(req.cookies);
+  if (!valid) {
+    return res.redirect('/login');
+  }
+  return res.sendFile(__dirname + '/public/index.html');
+});
+
+app.post('/', async (req, res) => {
+  if (req.cookies && 'username' in req.cookies && 'password' in req.cookies) {
+      const username = req.cookies['username'];
+      const password = req.cookies['password'];
+      try {
+        const user = await users.findOne({"username" : username, "password": password});
+        if (user) {
+          return res.status(200).json({
+            'level': user['level'],
+            'xp': user['xp']
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        return res.status(400).send(error);
+      }
+  }
+  return res.status(400).send("something went wrong");
+});
+
+app.use(express.static('public', {
+  extensions: ['html', 'htm']
+}));
+
 
 // const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help people who come to you learn English or Spanish."
 const system = fs.readFileSync('./system_message.txt', 'utf-8');
