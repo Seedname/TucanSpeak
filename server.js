@@ -210,6 +210,15 @@ app.post('/sign-out', async (req, res) => {
   return res.status(400).send("Something went wrong");
 });
 
+app.post('/get-cookie', async (req, res) => {
+  if (req.cookies && 'username' in req.cookies && 'password' in req.cookies) {
+    const username = req.cookies['username'];
+    const password = req.cookies['password'];
+    return res.status(200).json({username: username, password: password});
+  }
+  return res.status(400).send("Something went wrong");
+});
+
 app.use(express.static('public', {
   extensions: ['html', 'htm']
 }));

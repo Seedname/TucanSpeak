@@ -1,17 +1,20 @@
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
+async function getCookies() {
+    $(document).ready(function() {
+      $.ajax({
+        type: 'POST',
+        url: '/get-cookie', 
+        contentType: 'application/json',
+        success: function(response) {
+          return response;
+        },
+        error: function(xhr, status, error) {
+          console.error(xhr);
+          return false;
         }
-    }
-    return cookieValue;
+      });
+    });
   }
+  
 
 // Classifier Variable
 let classifier;
@@ -83,8 +86,8 @@ function endRound() {
         fill(0, 255, 0);
         text("Correct!\nPalabra: " + spanish[labels.indexOf(predictorWord)], width/2, height/2);
         ws.send(JSON.stringify({type: "drawWin", 
-                                "username": getCookie('username'),
-                                "password": getCookie('password')
+                                "username": cookies['username'],
+                                "password": cookies['password']
         }));
     } else {
         fill(255, 0, 0);
@@ -94,11 +97,13 @@ function endRound() {
     roundStart = false;
 }
 
+let cookies;
 function setup() {
     createCanvas(400, 500);
     clearScreen();
     document.getElementById("defaultCanvas0").style.display = "none";
     classifyDrawing();
+    cookies = getCookies();
 }
 
 var finishedDrawing = false;
