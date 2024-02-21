@@ -245,7 +245,7 @@ var backgroundImage;
 var backgroundOffset = 0;
 var toucan; 
 var randomNums, randomIndex, guessedIndex;
-var cookies;
+var cookies, ws;
 
 function drawBackground(x) {
     background(66, 52, 10);
@@ -307,7 +307,8 @@ function setup() {
     canvas.position(0, 0);
     canvas.class("p5canvas");
     cookies = getCookies();
-
+    ws = new WebSocket(`ws://${window.location.host}:80`);
+    
     drawBackground(0);
     backgroundImage = get(0,0,600,height);
     image(backgroundImage,1000,0);
