@@ -315,7 +315,11 @@ function keyReleased() {
     if (key === "Enter") {
         const messageBox = document.getElementById("message");
         if (messageBox.value !== "") {
-            ws.send(JSON.stringify({type: "start", "content": messageBox.value}));
+            ws.send(JSON.stringify({type: "start", 
+            "content": messageBox.value, 
+            "username": cookies['username'],
+            "password": cookies['password']
+            }));
             flydownLock = true;
             flyDown = true;
         }

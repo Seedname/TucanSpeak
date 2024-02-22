@@ -55,6 +55,11 @@
 							document.getElementById("second").click();
 						}
 						document.getElementById("draw_wins").textContent = `Objects (${response.drawWins}/5 Tucan Draw Wins)`;
+
+						if (response.collectedReward) {
+							document.getElementById("third").click();
+						}
+						document.getElementById("reward").textContent = 'Reward: 5XP⭐';
 					},
 					error: function(xhr, status, error) {
 						console.error('Error checking authentication:', xhr.responseText);
@@ -107,6 +112,15 @@
 						<span class="check_label_box"></span>
 					</label>
 				</li>
+
+				<li class="list_item">
+					<input type="checkbox" class="hidden-box" id="third">
+					<label for="third" class="check_label">
+						<span class="check_label_text" id="reward">Reward: 5XP⭐</span>
+						<span class="check_label_box"></span>
+					</label>
+				</li>
+
 			</ul>			
 		</div>
 

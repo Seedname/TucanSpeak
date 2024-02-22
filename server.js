@@ -146,7 +146,8 @@ app.post('/register', async (req, res) => {
       'tucanFlightWins': 0,
       'tucanDrawWins': 0,
       'tucanFlightTime': new Date().toISOString().substring(0, 10),
-      'tucanDrawTime': new Date().toISOString().substring(0, 10)
+      'tucanDrawTime': new Date().toISOString().substring(0, 10),
+      'collectedReward': false
     });
     
     res.cookie('username', username, { maxAge: 86400*1000, httpOnly: true });
@@ -173,7 +174,7 @@ app.get('/', async (req, res) => {
       update['tucanDrawTime'] = currentTime;
     }
     if (Object.keys(update).length > 0) {
-      await users.findOneAndUpdate({_id: valid["_id"]}, update);
+      await users.findOneAndUpdate({_id: valid["_id"]}, {$set:update});
     }
   }
   return res.sendFile(__dirname + '/public/index.html');
@@ -191,6 +192,7 @@ app.post('/', async (req, res) => {
             'xp': user['xp'],
             'drawWins': user['tucanDrawWins'],
             'flightWins': user['tucanFlightWins'],
+            'collectedReward': user['collectedReward']
           });
         }
       } catch (error) {
@@ -229,14 +231,43 @@ const additionalContext = "";
 // const system = fs.readFileSync('./system_message.txt', 'utf-8');
 // const additionalContext = "Keep your answer as consice and accurate as possible while still answering the question completely if possible. If you recieve a prompt that doesn't make sense after this sentence, just respond with 'Could you please repeat that?'. DO NOT try to answer questions you are not 100% sure of.";
 
+function updateLevel(user) {
+  let level = user['level'];
+  let xp = user['xp'];
+  let collectedReward = user['collectedReward'];
+  
+  let id = user["_id"]
+  let flightWins = user['tucanFlightWins'];
+  let drawWins = user['tucanDrawWins'];
+
+  if (xp >= 20) {
+    level ++;
+    xp %= 20;
+  }
+
+  if (!collectedReward && flightWins >= 5 && drawWins >= 5) {
+    collectedReward = true;
+    xp += 5;
+    if (xp >= 20) {
+      level ++;
+      xp %= 20;
+    }
+  }
+
+  console.log(flightWins);
+  console.log(drawWins);
+  console.log(collectedReward)
+  users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward}})
+}
+
 wss.on('connection', (ws) => {
     ws.send(JSON.stringify({type: 'connected'}));
 
-    ws.on('message', (data) => {
+    ws.on('message', async (data) => {
         data = JSON.parse(data);
         const username = data.username;
         const password = data.password;
-        const valid = validUser({username: username, password: password});
+        const valid = await validUser({username: username, password: password});
 
         if (!valid) {
           return;
@@ -279,10 +310,10 @@ wss.on('connection', (ws) => {
             });
             break;
           case "drawWin":
-            users.findOneAndUpdate({_id: valid["_id"]}, {'tucanDrawWins': valid["tucanDrawWins"]+1})
+            updateLevel(await users.findOneAndUpdate({_id: valid["_id"]}, {$set:{'tucanDrawWins': valid["tucanDrawWins"]+1, 'xp': valid["xp"]+1}}));
             break;
           case "flightWin":
-            users.findOneAndUpdate({_id: valid["_id"]}, {'tucanFlightWins': valid["tucanFlightWins"]+1})
+            updateLevel(await users.findOneAndUpdate({_id: valid["_id"]}, {$set:{'tucanFlightWins': valid["tucanFlightWins"]+1, 'xp': valid["xp"]+1}}));
             break;
         }
     });

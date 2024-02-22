@@ -8,21 +8,21 @@ var speechQueue = [];
 
 let voice = window.speechSynthesis.getVoices()[0];
 
-async function getCookies() {
-  $(document).ready(function() {
-    $.ajax({
+function getCookies() {
+  let resp = false;
+  $.ajax({
       type: 'POST',
       url: '/get-cookie', 
       contentType: 'application/json',
+      async: false,
       success: function(response) {
-        return response;
+          resp = response;;
       },
       error: function(xhr, status, error) {
-        console.error(xhr);
-        return false;
+          console.error(xhr);
       }
-    });
   });
+  return resp;
 }
 
 

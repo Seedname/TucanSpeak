@@ -152,4 +152,12 @@ A: Hello! How can I assist you today?4:16:19 AM
 Q: jkb
 A: Understood! I will provide concise and accurate answers to the best of my knowledge. Feel free to ask your question.4:16:25 AM
 Q: jkb
-A: Understood! Feel free to ask your question.
+A: Understood! Feel free to ask your question.9:47:37 PM
+Q: aasdf
+A: Hello! Welcome to the jungle! How can I help you today?9:48:13 PM
+Q: hello
+A: Hello! Welcome to the jungle! How can I help you with English today?9:48:21 PM
+Q: hola
+A: Hello! How can I help you today?9:48:29 PM
+Q: hola, como estas?
+A: Hello! I'm Tilly the Toucan. I'm here to help you learn English. How can I assist you today?
