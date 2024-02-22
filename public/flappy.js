@@ -456,7 +456,7 @@ function draw() {
             pipes.splice(i, 1);
         }
 
-        if(!player.dead && pipes[i].x + bird.size >= bird.x && pipes[i].x + bird.size <= bird.x+4){
+        if(!bird.dead && pipes[i].x + bird.size >= bird.x && pipes[i].x + bird.size <= bird.x+4){
             score++;
         }
     }
