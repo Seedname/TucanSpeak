@@ -240,6 +240,8 @@ function updateLevel(user) {
   let flightWins = user['tucanFlightWins'];
   let drawWins = user['tucanDrawWins'];
 
+  xp ++;
+  
   if (xp >= 20) {
     level ++;
     xp %= 20;
@@ -310,10 +312,10 @@ wss.on('connection', (ws) => {
             });
             break;
           case "drawWin":
-            updateLevel(await users.findOneAndUpdate({_id: valid["_id"]}, {$set:{'tucanDrawWins': valid["tucanDrawWins"]+1, 'xp': valid["xp"]+1}}));
+            updateLevel(await users.findOneAndUpdate({_id: valid["_id"]}, {$set:{'tucanDrawWins': valid["tucanDrawWins"]+1}}));
             break;
           case "flightWin":
-            updateLevel(await users.findOneAndUpdate({_id: valid["_id"]}, {$set:{'tucanFlightWins': valid["tucanFlightWins"]+1, 'xp': valid["xp"]+1}}));
+            updateLevel(await users.findOneAndUpdate({_id: valid["_id"]}, {$set:{'tucanFlightWins': valid["tucanFlightWins"]+1}}));
             break;
         }
     });

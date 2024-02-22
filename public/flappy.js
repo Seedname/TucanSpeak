@@ -246,6 +246,7 @@ var backgroundOffset = 0;
 var toucan; 
 var randomNums, randomIndex, guessedIndex;
 var cookies, ws;
+var textScale;
 
 function drawBackground(x) {
     background(66, 52, 10);
@@ -308,7 +309,7 @@ function setup() {
     canvas.class("p5canvas");
     cookies = getCookies();
     ws = new WebSocket(`ws://${window.location.host}:80`);
-    
+    textScale = width/1440;
     drawBackground(0);
     backgroundImage = get(0,0,600,height);
     image(backgroundImage,1000,0);
@@ -346,7 +347,7 @@ function titleScreen(){
     textFont("Arial");
     fill(0, titleOpacity);
 
-    textSize(45);
+    textSize(45 *textScale);
     textAlign(CENTER, CENTER);
     text("Bienvenidos a Tucán Volar. Haz clic o presiona la barra espaciadora para comenzar a volar.", width/2 - width/5, height/2.5 - 100, width/2.5, 300);
     
@@ -357,7 +358,7 @@ function titleScreen(){
     rect(width/3, 3*height/5-height/18, width/3, height/9, 20);
 
     fill(255, 255, 255, titleOpacity);
-    textSize(60);
+    textSize(60 * textScale);
     text("Reproducir Ahora", width/2, 3*height/5);
 };
 
@@ -370,7 +371,7 @@ function loseScreen(){
     textFont("Arial");
 
     fill(0, titleOpacity)
-    textSize(30);
+    textSize(30 * textScale);
     textAlign(CENTER, CENTER);
     text("Tu puntuación fue " + score + " \n¿Cómo se dice tu puntuación en inglés?", width/3.3, height/2.5-50, width/2.5, 100);
 
@@ -393,7 +394,7 @@ function loseScreen(){
 
     fill(255, 255, 255,titleOpacity);
 
-    textSize(20);
+    textSize(20 * textScale);
 
     text(randomNums[0], width/2.7, 2.7*height/5);
     text(randomNums[1], 1.7*width/2.7, 2.7*height/5);
@@ -409,7 +410,7 @@ function retryScreen() {
 
     textFont("Arial");
     fill(0, titleOpacity)
-    textSize(30);
+    textSize(30 * textScale);
     textAlign(CENTER, CENTER);
     text("Tu respuesta fue '" + randomNums[guessedIndex] + "'. La respuesta correcta fue '" + randomNums[randomIndex] + "'.", width/3.3, height/2.5-50, width/2.5, 100);
     
@@ -418,7 +419,7 @@ function retryScreen() {
     rect(width/3, 3*height/7+height/18, width/3, height/9, 20);
 
     textAlign(CENTER, CENTER);
-    textSize(50);
+    textSize(50 * textScale);
     fill(255,255,255);
     text("Juega de nuevo", width/2, 3*height/7+height/9);
 };
