@@ -15,7 +15,10 @@ import { promisify } from 'util'
 
 config();
 
-const uri = `mongodb+srv://tilly:${process.env.MONGODB_PASS}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
+let usr = 'tilly'; 
+let passwd = process.env.MONGODB_PASS;
+
+const uri = `mongodb+srv://${usr}:${passwd}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -31,7 +34,7 @@ let users;
 async function connectToMongoDB() {
     try {
         await client.connect();
-        console.log('Connected successfully to the database');
+        console.log('Connected successfully to the database');``
 
         db = client.db('TucanSpeak');
         users = db.collection('users');
@@ -42,9 +45,7 @@ async function connectToMongoDB() {
 
 connectToMongoDB();
 
-
-
-const useHTTPS = true;
+const useHTTPS = false;
 
 const app = express();
 
