@@ -7,6 +7,8 @@
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
             .p5canvas {
                 left: 0;
                 top: 0;
@@ -17,10 +19,9 @@
             body {
                 overflow: hidden;
                 display: flex;
+                font-family: Poppins;
+                background-color: #000;
             }
-
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 
             .bg {
                 position: absolute;
@@ -143,6 +144,9 @@
                 cursor: not-allowed;
             }
             .menu {
+                -webkit-user-select: none; /* Safari */
+                -ms-user-select: none; /* IE 10 and IE 11 */
+                user-select: none; /* Standard syntax */
                 padding: 10px;
                 position: relative;
                 display: inline-block;
@@ -188,10 +192,6 @@
                 display: block;
             }
 
-            body {
-                font-family: Poppins;
-                background-color: #000;
-            }
         </style>
 
 

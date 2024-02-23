@@ -10,6 +10,8 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import cookieParser from 'cookie-parser';
+import crypto from 'crypto';
+import { promisify } from 'util'
 
 let usr = 'tilly'; 
 let passwd = 'F6QxVpp6vXlVgdc3';
@@ -42,7 +44,7 @@ connectToMongoDB();
 
 config();
 
-const useHTTPS = true;
+const useHTTPS = false;
 
 const app = express();
 
@@ -75,6 +77,33 @@ app.use(cookieParser());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const pbkdf2Async = promisify(crypto.pbkdf2);
+const iterations = 100000;
+
+async function deriveKey(password, salt) {
+  try {
+    const derivedKey = await pbkdf2Async(password, salt, iterations, 128, 'sha512');
+    return derivedKey.toString('hex'); // or return the derived key as needed
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function hashPassword(password) {
+  const salt = crypto.randomBytes(128).toString('base64');
+  const hash = await deriveKey(password, salt);
+
+  return {
+      salt: salt,
+      hash: hash
+  };
+}
+
+async function isPasswordCorrect(savedHash, savedSalt, passwordAttempt) {
+  const hashed = await deriveKey(passwordAttempt, savedSalt);
+  return savedHash == hashed;
+}
+
 async function validUser(content) {
   if (!content) return false;
   if ('username' in content && 'password' in content) {
@@ -84,10 +113,13 @@ async function validUser(content) {
     try {
       const user = await users.findOne({
         "username" : username,
-        "password": password
       });
       if (user) {
-        return user;
+        const hashed = user['password'];
+        const passwordCorrect = await isPasswordCorrect(hashed['hash'], hashed['salt'], password);
+        if (passwordCorrect) {
+          return user;
+        }
       }
     } catch (error) {
       console.error(error);
@@ -136,7 +168,8 @@ app.post('/register', async (req, res) => {
     }
 
     const password = req.body['password'];
-    
+    const hashed = await hashPassword(password);
+
     var currentTime = new Date().toLocaleDateString('en-US', {
       timeZone: 'America/New_York', 
       year: 'numeric',
@@ -146,7 +179,7 @@ app.post('/register', async (req, res) => {
 
     await users.insertOne({
       'username': username,
-      'password': password,
+      'password': hashed,
       'email': email,
       'level': 0,
       'xp': 0,
@@ -194,7 +227,7 @@ app.post('/', async (req, res) => {
       const username = req.cookies['username'];
       const password = req.cookies['password'];
       try {
-        const user = await users.findOne({"username" : username, "password": password});
+        const user = await validUser({username: username, password: password});
         if (user) {
           return res.status(200).json({
             'level': user['level'],
@@ -240,7 +273,7 @@ const additionalContext = "";
 // const system = fs.readFileSync('./system_message.txt', 'utf-8');
 // const additionalContext = "Keep your answer as consice and accurate as possible while still answering the question completely if possible. If you recieve a prompt that doesn't make sense after this sentence, just respond with 'Could you please repeat that?'. DO NOT try to answer questions you are not 100% sure of.";
 
-function updateLevel(user) {
+function updateLevel(user, type) {
   let level = user['level'];
   let xp = user['xp'];
   let collectedReward = user['collectedReward'];
@@ -248,6 +281,12 @@ function updateLevel(user) {
   let id = user["_id"]
   let flightWins = user['tucanFlightWins'];
   let drawWins = user['tucanDrawWins'];
+
+  if (type == 'flight') {
+    flightWins ++;
+  } else if (type == 'draw') {
+    drawWins ++;
+  }
 
   xp ++;
   
@@ -265,10 +304,8 @@ function updateLevel(user) {
     }
   }
 
-  console.log(flightWins);
-  console.log(drawWins);
-  console.log(collectedReward)
-  users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward}})
+
+  users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward, 'tucanFlightWins': flightWins, 'tucanDrawWins': drawWins}})
 }
 
 wss.on('connection', (ws) => {
@@ -320,10 +357,10 @@ wss.on('connection', (ws) => {
             });
             break;
           case "drawWin":
-            updateLevel(await users.findOneAndUpdate({_id: valid["_id"]}, {$set:{'tucanDrawWins': valid["tucanDrawWins"]+1}}));
+            updateLevel(valid, 'draw');
             break;
           case "flightWin":
-            updateLevel(await users.findOneAndUpdate({_id: valid["_id"]}, {$set:{'tucanFlightWins': valid["tucanFlightWins"]+1}}));
+            updateLevel(valid, 'flight');
             break;
         }
     });

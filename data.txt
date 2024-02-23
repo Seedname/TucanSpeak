@@ -160,4 +160,6 @@ A: Hello! Welcome to the jungle! How can I help you with English today?9:48:21 P
 Q: hola
 A: Hello! How can I help you today?9:48:29 PM
 Q: hola, como estas?
-A: Hello! I'm Tilly the Toucan. I'm here to help you learn English. How can I assist you today?
+A: Hello! I'm Tilly the Toucan. I'm here to help you learn English. How can I assist you today?11:34:07 PM
+Q: hello
+A: Hello! Welcome to the jungle! How can I help you today?
