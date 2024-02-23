@@ -42,7 +42,7 @@ connectToMongoDB();
 
 config();
 
-const useHTTPS = false;
+const useHTTPS = true;
 
 const app = express();
 
@@ -137,6 +137,13 @@ app.post('/register', async (req, res) => {
 
     const password = req.body['password'];
     
+    var currentTime = new Date().toLocaleDateString('en-US', {
+      timeZone: 'America/New_York', 
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit'
+    });
+
     await users.insertOne({
       'username': username,
       'password': password,
@@ -145,8 +152,7 @@ app.post('/register', async (req, res) => {
       'xp': 0,
       'tucanFlightWins': 0,
       'tucanDrawWins': 0,
-      'tucanFlightTime': new Date().toISOString().substring(0, 10),
-      'tucanDrawTime': new Date().toISOString().substring(0, 10),
+      'gameTime': currentTime,
       'collectedReward': false
     });
     
@@ -163,15 +169,18 @@ app.get('/', async (req, res) => {
     return res.redirect('/login');
   }
   if (valid) {
-    let currentTime = new Date().toISOString().substring(0, 10);
+    let currentTime = new Date().toLocaleDateString('en-US', {
+      timeZone: 'America/New_York', 
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit'
+    });
     let update = {}
-    if (valid['tucanFlightTime'] != currentTime) {
+    if (valid['gameTime'] != currentTime) {
       update['tucanFlightWins'] = 0;
-      update['tucanFlightTime'] = currentTime;
-    }
-    if (valid['tucanDrawTime'] != currentTime) {
       update['tucanDrawWins'] = 0;
-      update['tucanDrawTime'] = currentTime;
+      update['collectedReward'] = false;
+      update['gameTime'] = currentTime;
     }
     if (Object.keys(update).length > 0) {
       await users.findOneAndUpdate({_id: valid["_id"]}, {$set:update});
@@ -305,9 +314,8 @@ wss.on('connection', (ws) => {
             }) .catch((error) => {
               console.error(error);
             }) .finally(() => {
-              const d = new Date();
-              const n = d.toLocaleTimeString();
-              fs.appendFile('data.txt', `${n}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
+              const currentTime = new Date().toLocaleTimeString();
+              fs.appendFile('data.txt', `${currentTime}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {console.error(err)});
               ws.send(JSON.stringify({ type: 'end' }));
             });
             break;

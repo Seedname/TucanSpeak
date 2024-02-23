@@ -31,7 +31,11 @@ let ws;
 // Load the model first
 function preload() {
     classifier = ml5.imageClassifier('/model.json');
-    ws = new WebSocket(`ws://${window.location.host}:80`);
+    if (location.protocol == 'https:') {
+        ws = new WebSocket(`wss://${window.location.host}:443`);
+    } else {
+        ws = new WebSocket(`ws://${window.location.host}:80`);
+    }
 }
 
 let roundStart = false;

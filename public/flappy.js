@@ -308,8 +308,12 @@ function setup() {
     canvas.position(0, 0);
     canvas.class("p5canvas");
     cookies = getCookies();
-    ws = new WebSocket(`ws://${window.location.host}:80`);
-    textScale = width/1440;
+    if (location.protocol == 'https:') {
+        ws = new WebSocket(`wss://${window.location.host}:443`);
+    } else {
+        ws = new WebSocket(`ws://${window.location.host}:80`);
+    }
+    textScale = width/2560;
     drawBackground(0);
     backgroundImage = get(0,0,600,height);
     image(backgroundImage,1000,0);

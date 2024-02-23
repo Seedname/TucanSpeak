@@ -3,7 +3,6 @@ var talkingCooldown = 0;
 var flyDown = false;
 var flydownLock = false;
 const utterance = new SpeechSynthesisUtterance();
-const useHTTPS = false;
 var speechQueue = [];
 
 let voice = window.speechSynthesis.getVoices()[0];
@@ -65,10 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const responseElement = document.getElementById('response');
     const outputDiv = document.getElementById('output');
     
-    if (useHTTPS) {
+    if (location.protocol == 'https:') {
       ws = new WebSocket(`wss://${window.location.host}:443`);
     } else {
-      ws = new WebSocket(`ws://${window.location.host}:80`);
+        ws = new WebSocket(`ws://${window.location.host}:80`);
     }
   
     // const startRecordingButton = document.getElementById('startRecording');
