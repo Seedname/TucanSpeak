@@ -13,9 +13,7 @@ import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import { promisify } from 'util'
 
-let usr = 'tilly'; 
-let passwd = 'F6QxVpp6vXlVgdc3';
-const uri = `mongodb+srv://${usr}:${passwd}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://tilly:${process.env.MONGODB_PASS}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -44,7 +42,7 @@ connectToMongoDB();
 
 config();
 
-const useHTTPS = false;
+const useHTTPS = true;
 
 const app = express();
 
