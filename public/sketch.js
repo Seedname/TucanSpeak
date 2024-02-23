@@ -201,7 +201,7 @@ function draw() {
         camera.moveTo(x, y);
         if (frameCount % 300 === 0) {
             x += random(-windowWidth/8, windowWidth/8);
-            y = random(150, 3*innerHeight/4);
+            y = random(500, 3*innerHeight/4);
         }
         
     } else {
