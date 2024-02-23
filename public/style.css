@@ -217,8 +217,10 @@ body {
 }
 
 p.bubble {
+    overflow-y: scroll;
 	position: absolute;
 	width: 400px;
+    height: 150px;
 	text-align: left;
 	line-height: 1.4em;
 	margin: 40px auto;
@@ -399,3 +401,5 @@ ul {
 .menu:hover .menu-items {
     display: block;
 }
+
+

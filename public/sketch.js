@@ -197,7 +197,7 @@ function draw() {
         }
         flying = true;
         x = constrain(x, windowWidth/4, 3*windowWidth/4);
-        y = constrain(y, 0, window.innerHeight-0.22*innerHeight-height/2);
+        y = constrain(y, 200, window.innerHeight-0.22*innerHeight-height/2);
         camera.moveTo(x, y);
         if (frameCount % 300 === 0) {
             x += random(-windowWidth/8, windowWidth/8);
@@ -260,9 +260,9 @@ function draw() {
             bubble.textContent = "¡Hazme preguntas sobre inglés! Escriba su pregunta en el cuadro a continuación.";
         }
     }
-    if (bubble.offsetHeight > 300) {
-        bubble.style.overflowY = "scroll";
-    }
+    // if (bubble.offsetHeight > 300) {
+        // bubble.style.overflowY = "scroll";
+    // }
 }
 
 function keyPressed() {
