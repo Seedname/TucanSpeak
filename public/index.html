@@ -20,6 +20,27 @@
 		<script src="./menu.js"></script>
 		<script>
 			$(document).ready(function() {
+				var div=document.getElementById("bb");
+				setInterval(function(){ 
+					var toDate=new Date();
+					var tomorrow=new Date();
+					tomorrow.setHours(24,0,0,0);
+					var diffMS=tomorrow.getTime()/1000-toDate.getTime()/1000;
+					var diffHr=Math.floor(diffMS/3600);
+					diffMS=diffMS-diffHr*3600;
+					var diffMi=Math.floor(diffMS/60);
+					diffMS=diffMS-diffMi*60;
+					var diffS=Math.floor(diffMS);
+					var result=((diffHr<10)?"0"+diffHr:diffHr);
+					result+=":"+((diffMi<10)?"0"+diffMi:diffMi);
+					result+=":"+((diffS<10)?"0"+diffS:diffS);
+					if (language == "Spanish") {
+						div.innerHTML="&nbsp;&nbsp;" + result + " restante.";
+					} else {
+						div.innerHTML="&nbsp;&nbsp;" + result + " remaining.";
+					}
+				},1000);
+
 				if (language == "Spanish") {
 					document.querySelectorAll(".menu").item(0).outerHTML = '<div class="menu"><button class="menu-button">Menú</button><ul class="menu-items"><li><a href="/">Página Principal</a></li><li><a href="/flight">Tucan Volar</a></li><li><a href="/draw">Tucan Dibujar</a></li><li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li><li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul></div>';
 					document.getElementById("task_header").textContent = "Tareas Diarias";
@@ -118,7 +139,6 @@
 						<span class="check_label_box"></span>
 					</label>
 				</li>
-
 				<li class="list_item">
 					<input type="checkbox" class="hidden-box" id="third">
 					<label for="third" class="check_label">
@@ -126,6 +146,10 @@
 						<span class="check_label_box"></span>
 					</label>
 				</li>
+				<li class="list_item">
+					<div id="bb"></div>
+				</li>
+				
 
 			</ul>			
 		</div>
