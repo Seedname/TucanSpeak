@@ -249,9 +249,9 @@ var cookies, ws;
 var textScale;
 
 function drawBackground(x) {
-    background(66, 52, 10);
+    background(66, 52, 0);
     for(var i = 0; i < 10; i++){
-        fill(105, 75, 34);
+        fill(105-20, 75-20, 34-20);
         rect((i * 600/10) + x, 0, 600/10.5,height);
     }
     noStroke();
@@ -302,12 +302,16 @@ function getCookies() {
     return resp;
 }
   
-
+let language;
 function setup() {
     canvas = createCanvas(window.innerWidth,window.innerHeight);
     canvas.position(0, 0);
     canvas.class("p5canvas");
     cookies = getCookies();
+    language = cookies['language'];
+    if (language == "Spanish") {
+        document.querySelectorAll(".menu").item(0).outerHTML = '<div class="menu"><button class="menu-button">Menú</button><ul class="menu-items"><li><a href="/">Página Principal</a></li><li><a href="/flight">Tucan Volar</a></li><li><a href="/draw">Tucan Dibujar</a></li><li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li><li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul></div>';
+    } 
     if (location.protocol == 'https:') {
         ws = new WebSocket(`wss://${window.location.host}:443`);
     } else {
@@ -343,6 +347,7 @@ function setup() {
 var titleOpacity = 255;
 
 function titleScreen(){
+    
     fill(0, 0, 0,titleOpacity);
     rect(width/4 + 10, height/3+10, width/2, height/3, 20);
     fill(255, 255, 255,titleOpacity);
@@ -353,8 +358,12 @@ function titleScreen(){
 
     textSize(45 *textScale);
     textAlign(CENTER, CENTER);
-    text("Bienvenidos a Tucán Volar. Haz clic o presiona la barra espaciadora para comenzar a volar.", width/2 - width/5, height/2.5 - 100, width/2.5, 300);
-    
+    if (language == "Spanish") {
+        text("Bienvenidos a Tucán Volar. Haz clic o presiona la barra espaciadora para comenzar a volar.", width/2 - width/5, height/2.5 - 100, width/2.5, 300);
+    } else {
+        text("Welcome to Tucan Fly. Press the screen or tap the space bar to fly.", width/2 - width/5, height/2.5 - 100, width/2.5, 300);
+    }
+
     fill(65, 143,4, titleOpacity);
     if (insideRect(width/3, 3*height/5-height/18, width/3, height/9)) {
         fill(65-30, 143-30, 0, titleOpacity);
@@ -363,7 +372,11 @@ function titleScreen(){
 
     fill(255, 255, 255, titleOpacity);
     textSize(60 * textScale);
-    text("Reproducir Ahora", width/2, 3*height/5);
+    if (language == "Spanish") {
+        text("Reproducir Ahora", width/2, 3*height/5);
+    } else {
+        text("Play Now", width/2, 3*height/5);
+    }
 };
 
 function loseScreen(){
@@ -377,8 +390,11 @@ function loseScreen(){
     fill(0, titleOpacity)
     textSize(30 * textScale);
     textAlign(CENTER, CENTER);
-    text("Tu puntuación fue " + score + " \n¿Cómo se dice tu puntuación en inglés?", width/3.3, height/2.5-50, width/2.5, 100);
-
+    if (language == "Spanish") {
+        text("Tu puntuación fue " + score + " \n¿Cómo se dice tu puntuación en inglés?", width/3.3, height/2.5-50, width/2.5, 100);
+    } else {
+        text("Your score was " + score + " \nHow do you say your score in English?", width/3.3, height/2.5-50, width/2.5, 100);
+    }
     fill(65, 143, 4, titleOpacity);
     if (insideRect(width/2.7-width/10, 2.7*height/5-height/36, width/5, height/18)) fill(65-20, 143-20, 0, titleOpacity);
     rect(width/2.7-width/10, 2.7*height/5-height/36, width/5, height/18, 20);
@@ -398,34 +414,82 @@ function loseScreen(){
 
     fill(255, 255, 255,titleOpacity);
 
-    textSize(20 * textScale);
+    textSize(25 * textScale);
 
-    text(randomNums[0], width/2.7, 2.7*height/5);
-    text(randomNums[1], 1.7*width/2.7, 2.7*height/5);
-    text(randomNums[2], 1.7*width/2.7, 3.1*height/5);
-    text(randomNums[3], width/2.7, 3.1*height/5);
+    text(numberToWords(randomNums[0]), width/2.7, 2.7*height/5);
+    text(numberToWords(randomNums[1]), 1.7*width/2.7, 2.7*height/5);
+    text(numberToWords(randomNums[2]), 1.7*width/2.7, 3.1*height/5);
+    text(numberToWords(randomNums[3]), width/2.7, 3.1*height/5);
 };
 
 function retryScreen() {
     fill(0, 0, 0, titleOpacity);
-    rect(width/4 + 10, height/3+10, width/2, height/3, 20);
-    fill(255, 255, 255,titleOpacity);
-    rect(width/4, height/3, width/2, height/3, 20);
+    rect(width/4 + 10, height/3+10, width/2, height/3+height/9, 20);
+    fill(255, 255, 255, titleOpacity);
+    rect(width/4,height/3,width/2,height/3+height/9,20);
 
     textFont("Arial");
+
     fill(0, titleOpacity)
     textSize(30 * textScale);
     textAlign(CENTER, CENTER);
-    text("Tu respuesta fue '" + randomNums[guessedIndex] + "'. La respuesta correcta fue '" + randomNums[randomIndex] + "'.", width/3.3, height/2.5-50, width/2.5, 100);
+
+    if (guessedIndex != randomIndex) {
+        if (language == "Spanish") {
+            text("Tu respuesta fue '" + randomNums[guessedIndex] + "'. La respuesta correcta fue '" + randomNums[randomIndex] + "'.", width/3.3, height/2.5-50, width/2.5, 100);
+        } else {
+            text("Your answer was '" + randomNums[guessedIndex] + "'. The correct answer was '" + randomNums[randomIndex] + "'.", width/3.3, height/2.5-50, width/2.5, 100);
+        }
+    } else {
+        if (language == "Spanish") {
+            text(`¡Correcto!\n+${Math.floor(Math.log2(randomNums[randomIndex]+1))}XP`, width/3.3, height/2.5-50, width/2.5, 100);
+        } else {
+            text(`Correct!\n+${Math.floor(Math.log2(randomNums[randomIndex]+1))}XP`, width/3.3, height/2.5-50, width/2.5, 100);
+        }
+    }
+
+    fill(45, 123, 0, titleOpacity);
+    if (guessedIndex === 0) fill(200, 0, 0, titleOpacity);
+    if (randomIndex === 0) fill(0, 220, 0, titleOpacity);
+    rect(width/2.7-width/10, 2.7*height/5-height/36, width/5, height/18, 20);
+
+    fill(45, 123, 0, titleOpacity);
+    if (guessedIndex === 1) fill(200, 0, 0, titleOpacity);
+    if (randomIndex === 1) fill(0, 220, 0, titleOpacity);
+    rect(1.7*width/2.7-width/10, 2.7*height/5-height/36, width/5, height/18, 20);
+
+    fill(45, 123, 0, titleOpacity);
+    if (guessedIndex === 2) fill(200, 0, 0, titleOpacity);
+    if (randomIndex === 2) fill(0, 220, 0, titleOpacity);
+    rect(1.7*width/2.7-width/10, 3.1*height/5-height/36, width/5, height/18, 20);
+
+    fill(45, 123, 0, titleOpacity);
+    if (guessedIndex === 3) fill(200, 0, 0, titleOpacity);
+    if (randomIndex === 3) fill(0, 220, 0, titleOpacity);
+    rect(width/2.7-width/10, 3.1*height/5-height/36, width/5, height/18, 20);   
+    
+
+    fill(255, 255, 255,titleOpacity);
+
+    textSize(25 * textScale);
+
+    text(`${numberToWords(randomNums[0])} (${randomNums[0]})`, width/2.7, 2.7*height/5);
+    text(`${numberToWords(randomNums[1])} (${randomNums[1]})`, 1.7*width/2.7, 2.7*height/5);
+    text(`${numberToWords(randomNums[2])} (${randomNums[2]})`, 1.7*width/2.7, 3.1*height/5);
+    text(`${numberToWords(randomNums[3])} (${randomNums[3]})`, width/2.7, 3.1*height/5);
     
     fill(65, 143, 4, titleOpacity);
-    if (insideRect(width/3, 3*height/7+height/18, width/3, height/9)) fill(65-20, 143-20, 0, titleOpacity);
-    rect(width/3, 3*height/7+height/18, width/3, height/9, 20);
+    if (insideRect(width/2-width/10, 2*height/3+height/(18*2), width/5, height/18)) fill(65-20, 143-20, 0, titleOpacity);
+    rect(width/2-width/10, 2*height/3+height/(18*2), width/5, height/18, 20);
 
     textAlign(CENTER, CENTER);
-    textSize(50 * textScale);
-    fill(255,255,255);
-    text("Juega de nuevo", width/2, 3*height/7+height/9);
+    textSize(45 * textScale);
+    fill(255, 255, 255);
+    if (language == "Spanish") {
+        text("Juega de nuevo", width/2, 2*height/3+height/18);
+    } else {
+        text("Play Again", width/2, 2*height/3+height/18);
+    }
 };
 
 function generateNumber(maxNumber, currentNumber) {
@@ -436,8 +500,11 @@ function generateNumber(maxNumber, currentNumber) {
     return num;
 }
 
+let startCountdown = false;
+let startTime;
 function draw() {
     background(66, 52, 10);
+    let startRound = millis() - startTime > 3000;
 
     let offset = (frameCount % 600);
     if (bird.dead) {
@@ -450,7 +517,7 @@ function draw() {
 
     for (let i = pipes.length-1; i >= 0; i--) {
         if (!bird.dead) {
-            if (mode === "game") {
+            if (mode === "game" && startRound) {
                 pipes[i].update();
                 pipes[i].collide(bird);
             }
@@ -465,16 +532,17 @@ function draw() {
         }
     }
     
-    if (mode === "game") {
+    if (mode === "game" && startRound) {
         timer ++;
         if (timer % 100 === 0) {
             pipes.push(new Pipe(width, random(height/4, 3*height/4), 300));
         }
     }
 
-    if (mode === "game") {
+    if ((mode === "game" || mode === "lose") && startRound) {
         bird.update();
     }
+
     bird.display();
 
     if (mode === "title") {
@@ -487,11 +555,20 @@ function draw() {
 
     if (bird.dead && mode !== "lose") {
         mode = "lose";
-        randomNums = shuffle([numberToWords(generateNumber(max(100, score), score)), 
-                              numberToWords(generateNumber(max(100, score), score)), 
-                              numberToWords(generateNumber(max(100, score), score)), 
-                              numberToWords(score)]);
-        randomIndex = randomNums.indexOf(numberToWords(score));
+        randomNums = shuffle([generateNumber(max(100, score), score), 
+                              generateNumber(max(100, score), score), 
+                              generateNumber(max(100, score), score), 
+                              score]);
+        randomIndex = randomNums.indexOf(score);
+    }
+
+    if (startCountdown) {
+        fill(0, 50);
+        rect(-5, -5, width+5, height+5);
+        fill(255);
+        textSize(50*textScale);
+        text(ceil(3-(millis() - startTime)/1000), width/2, height/2);
+        if (startRound) { startCountdown = false; }
     }
 }
 
@@ -504,6 +581,7 @@ function reset() {
 
 function sendWin() {
     ws.send(JSON.stringify({type: "flightWin", 
+        "points": Math.floor(Math.log2(score)),
         "username": cookies['username'],
         "password": cookies['password']
     }));
@@ -513,61 +591,61 @@ function mousePressed() {
     if (mode === "title") {
         if (insideRect(width/3, 3*height/5-height/18, width/3, height/9)) {
             mode = "game";
+            startCountdown = true;
+            startTime = millis();
             return;
         }
     }
 
     if (mode === "lose") {
         if (insideRect(width/2.7-width/10, 2.7*height/5-height/36, width/5, height/18)) {
-            reset();
             if (randomIndex === 0) {
-                mode = "game";
                 sendWin();
-                return;
             } 
+            reset();
             mode = "retry";
             guessedIndex = 0;
+            return;
         }
 
         if (insideRect(1.7*width/2.7-width/10, 2.7*height/5-height/36, width/5, height/18)) {
-            reset();
             if (randomIndex === 1) {
-                mode = "game";
                 sendWin();
-                return;
             }
+            reset();
             mode = "retry";
             guessedIndex = 1;
+            return;
         }
 
         if (insideRect(1.7*width/2.7-width/10, 3.1*height/5-height/36, width/5, height/18))  {
-            reset();
             if (randomIndex === 2) {
-                mode = "game";
                 sendWin();
-                return;
             }
+            reset();
             mode = "retry";
             guessedIndex = 2;
+            return;
         }
 
         if (insideRect(width/2.7-width/10, 3.1*height/5-height/36, width/5, height/18)) {
-            reset();
             if (randomIndex === 3) {
-                mode = "game";
                 sendWin();
-                return;
             }
+            reset();
             mode = "retry";
             guessedIndex = 3;
+            return;
         }
 
         return;
     }
 
     if (mode === "retry") {
-        if (insideRect(width/3, 3*height/7+height/18, width/3, height/9)) {
+        if (insideRect(width/2-width/10, 2*height/3+height/(18*2), width/5, height/18)) {
             mode = "game";
+            startCountdown = true;
+            startTime = millis();
             return;
         }
     }

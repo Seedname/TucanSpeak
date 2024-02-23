@@ -17,10 +17,9 @@ config();
 
 let usr = 'tilly'; 
 let passwd = process.env.MONGODB_PASS;
-console.log(passwd);
 
 const uri = `mongodb+srv://${usr}:${passwd}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -85,7 +84,7 @@ const iterations = 100000;
 async function deriveKey(password, salt) {
   try {
     const derivedKey = await pbkdf2Async(password, salt, iterations, 128, 'sha512');
-    return derivedKey.toString('hex'); // or return the derived key as needed
+    return derivedKey.toString('hex'); 
   } catch (err) {
     throw err;
   }
@@ -144,6 +143,7 @@ app.post('/login', async (req, res) => {
   if (valid) {
     res.cookie('username', req.body.username, { maxAge: 86400*1000, httpOnly: true });
     res.cookie('password', req.body.password, { maxAge: 86400*1000, httpOnly: true });
+    res.cookie('language', "English", { maxAge: 86400*1000*400, httpOnly: true });
     return res.json({ redirectUrl: '/' });
   }
   if ('username' in req.body && 'password' in req.body) return res.status(400).send('Invalid username or password');
@@ -251,31 +251,64 @@ app.post('/sign-out', async (req, res) => {
   if (req.cookies && 'username' in req.cookies && 'password' in req.cookies) {
       res.clearCookie('username');
       res.clearCookie('password');
+      res.clearCookie('language');
       return res.status(200).json({url: '/login'});
   }
   return res.status(400).send("Something went wrong");
 });
 
 app.post('/get-cookie', async (req, res) => {
-  if (req.cookies && 'username' in req.cookies && 'password' in req.cookies) {
+  if (req.cookies && 'username' in req.cookies && 'password' in req.cookies && 'language' in req.cookies) {
     const username = req.cookies['username'];
     const password = req.cookies['password'];
-    return res.status(200).json({username: username, password: password});
+    const language = req.cookies['language'];
+    return res.status(200).json({username: username, password: password, language: language});
   }
   return res.status(400).send("Something went wrong");
+});
+
+app.post('/change-language', async (req, res) => {
+  if ('language' in req.cookies) {
+    if (req.cookies['language'] == "Spanish") {
+      res.cookie('language', "English", { maxAge: 86400*1000*400, httpOnly: true });
+    } else if (req.cookies['language'] == "English") {
+      res.cookie('language', "Spanish", { maxAge: 86400*1000*400, httpOnly: true });
+    }
+  } else {
+    res.cookie('language', "English", { maxAge: 86400*1000*400, httpOnly: true });
+  }
+  return res.status(200).json({});
+});
+
+app.get('/flight', async (req, res) => {
+  const valid = await validUser(req.cookies);
+  if (!valid) {
+    return res.redirect('/login');
+  }
+  return res.sendFile(__dirname + '/public/flight.html');
+});
+
+
+app.get('/draw', async (req, res) => {
+  const valid = await validUser(req.cookies);
+  if (!valid) {
+    return res.redirect('/login');
+  }
+  return res.sendFile(__dirname + '/public/draw.html');
 });
 
 app.use(express.static('public', {
   extensions: ['html', 'htm']
 }));
 
-const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help Spanish-speakers who come to you learn English."
-const additionalContext = "";
+const system = fs.readFileSync('./system_message.txt', 'utf-8');
+const additionalContext = "Be creative with your responses.";
 
-// const system = fs.readFileSync('./system_message.txt', 'utf-8');
-// const additionalContext = "Keep your answer as consice and accurate as possible while still answering the question completely if possible. If you recieve a prompt that doesn't make sense after this sentence, just respond with 'Could you please repeat that?'. DO NOT try to answer questions you are not 100% sure of.";
+function updateLevel(user, points, type) {
+  if (points == 0) {
+    return;
+  }
 
-function updateLevel(user, type) {
   let level = user['level'];
   let xp = user['xp'];
   let collectedReward = user['collectedReward'];
@@ -290,7 +323,7 @@ function updateLevel(user, type) {
     drawWins ++;
   }
 
-  xp ++;
+  xp += points;
   
   if (xp >= 20) {
     level ++;
@@ -299,13 +332,12 @@ function updateLevel(user, type) {
 
   if (!collectedReward && flightWins >= 5 && drawWins >= 5) {
     collectedReward = true;
-    xp += 5;
+    xp += 15;
     if (xp >= 20) {
       level ++;
       xp %= 20;
     }
   }
-
 
   users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward, 'tucanFlightWins': flightWins, 'tucanDrawWins': drawWins}})
 }
@@ -325,11 +357,12 @@ wss.on('connection', (ws) => {
 
         switch(data.type) {
           case "start":
-            let playerLevel = ` The user is currently at level ${valid['level']}. Adjust your responses accordingly.`
+            let playerLevel = ` The user is currently at level ${valid['level']+1}. Adjust your responses accordingly.`
+            let languagePreference = ` The user's language preference is ${data.language}. Respond in this language.`
             let searchTerm = data.content;
             const conversation = [
               { role: 'system', content: system },
-              { role: 'user', content: searchTerm + additionalContext + playerLevel},
+              { role: 'user', content: searchTerm + additionalContext + playerLevel + languagePreference},
             ];
 
             ws.send(JSON.stringify({ type: 'start' }));
@@ -350,15 +383,15 @@ wss.on('connection', (ws) => {
               console.error(error);
             }) .finally(() => {
               const currentTime = new Date().toLocaleTimeString();
-              fs.appendFile('data.txt', `${currentTime}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {console.error(err)});
+              fs.appendFile('data.txt', `${currentTime}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
               ws.send(JSON.stringify({ type: 'end' }));
             });
             break;
           case "drawWin":
-            updateLevel(valid, 'draw');
+            updateLevel(valid, data.points, 'draw');
             break;
           case "flightWin":
-            updateLevel(valid, 'flight');
+            updateLevel(valid, 1, 'flight');
             break;
         }
     });

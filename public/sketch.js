@@ -15,7 +15,6 @@ class Toucan {
     }
 
     turn(vel) {
-        // let dir = x - width/2;/
         let dir = vel.x;
 
         if (dir >= 0 && this.turnAngle < 180 && this.direction == -1) {
@@ -109,12 +108,8 @@ class Mover {
         }
         if (elements) {
             for (let i = 0; i < elements.length; i++) {
-                // console.log(elements[i])
-                // elements[i].style.left = `${this.pos.x + offsets[i][0]}px`;
                 elements[i].style.left = `${this.pos.x + offsets[i][0]}px`;
                 elements[i].style.top =  `${this.pos.y + offsets[i][1] - elements[i].offsetHeight}px`;
-                // console.log(elements[i].style.minHeight);
-                // console.log(parseInt(window.getComputedStyle(elements[i]).fontSize, 10));
             }        
         }
     }
@@ -137,7 +132,6 @@ function setup() {
     const topBeak = loadImage('toucan/beak_top.png');
     const leftClaw = loadImage('toucan/claw_left.png');
     const rightClaw = loadImage('toucan/claw_right.png');
-    // const toucanRest = loadImage('toucanRest.png');
 
     sc = width/450;
 
@@ -151,25 +145,15 @@ function setup() {
     camera = new Mover(windowWidth/2-width/2, innerHeight/3-height/2);
 
     flying = true;
-    // document.addEventListener('mousemove', (event) => {
-    //     camera.moveTo(event.clientX, event.clientY)
-    //     console.log(true);
-    // });
 
     x = windowWidth/2;
     y = innerHeight/3;
     keys = {};
     speed = 10;
     bubble = document.getElementById("response");
-    // backgrounds = document.querySelectorAll(".bg");
     input = document.getElementById("message");
     button = document.getElementById("ask");
-    micButton = document.getElementById('startRecording');
-    // for (let i = 0; i < backgrounds.length; i++) {
-    //     const bg = backgrounds.item(i);
-    //     bg.style.top = `${0}px`;
-    //     bg.style.height = `100%`;
-    // }
+    micButton = document.getElementById('mic');
     
     input.style.left = `${windowWidth/2-400/2}px`;
     input.style.top = "80%";
@@ -197,7 +181,6 @@ function draw() {
     } else {
         bubble.style.display = "block";
     }
-    // background(255);
 
     if (!flyDown) {
         if (keys['w'] || keys['ArrowUp']) {
@@ -222,11 +205,10 @@ function draw() {
         }
         
     } else {
-        camera.moveTo( windowWidth/2-width/2, 0.8*innerHeight-height/4);
+        camera.moveTo( windowWidth/2, 0.8*innerHeight-height/4);
         camera.vel.x = .1;
         if (camera.vel.mag() < 1 && camera.pos.dist(camera.target) < 10) {
             flying =  false;
-            // toucan.reset();
         }
     }
 
@@ -236,10 +218,7 @@ function draw() {
         speechQueue.shift();
         speak(sentence);
     }
-    // x = constrain(x, 0, windowWidth);
     
-
-
     push();
         translate(0, height/4);
         scale(sc);
@@ -248,30 +227,18 @@ function draw() {
             toucan.turn(camera.vel);
             camera.apply(canvas, [bubble], [[230, 0]], true);
 
-            
             toucan.oscillate(0, 0.7, 0.1, 1, 20);
             toucan.oscillate(2, 10, -0.1, 0);
-            // toucan.oscillate(5, 20, 0.1, 0);
-            // toucan.oscillate(6, 20, 0.1, 0);
             toucan.oscillate(7, 0.7, 0.1, 1, 20);
-
             toucan.oscillate(0.2 *sin(frameCount * 0.1) - radians(30));
-            // toucan.oscillate(5*radians(frameCount))
             
         } else {
             toucan.turn(camera.vel);    
             camera.apply(canvas, [bubble], [[230, 0]], false);
             toucan.oscillate(0, 0.7, 0.1, 1, 20);
             toucan.oscillate(2, 10, -0.1, 0);
-            // toucan.oscillate(5, 20, 0.1, 0);
-            // toucan.oscillate(6, 20, 0.1, 0);
             toucan.oscillate(7, 0.7, 0.1, 1, 20);
-
             toucan.oscillate(0.2 *sin(frameCount * 0.1) - radians(30));
-            // toucan.oscillate(0, 0.1, 0.1, 1, 20);
-            // toucan.oscillate(2, 10, -0.1, 0);
-            // toucan.oscillate(7, 0.1, 0.1, 1, 20);
-
         }
 
         if (talking) {
@@ -288,32 +255,14 @@ function draw() {
     if (!talking && talkingCooldown > 0) {
         talkingCooldown --;
     } else if (!talking) {
-        bubble.textContent = "Ask me questions about English! Type your question in the box below."
+        bubble.textContent = "Ask me questions about English! Type your question in the box below.";
+        if (language == "Spanish") {
+            bubble.textContent = "¡Hazme preguntas sobre inglés! Escriba su pregunta en el cuadro a continuación.";
+        }
     }
-    // document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
-    // talking = true;
-    if (bubble.offsetHeight > 500) {
+    if (bubble.offsetHeight > 300) {
         bubble.style.overflowY = "scroll";
     }
-
-    // let w = bubble.style.width.substring(0, bubble.style.width.length-2)
-    // if (bubble.offsetHeight > 500 && w < 1000) {
-    //     if (!w) {w = 400;}
-    //     bubble.style.width = `${parseInt(w, 10) + 1}px`;
-    // }
-    // let x1 = camera.pos.x;
-    // for (let i = 0; i < backgrounds.length; i++) {
-    //     const bg = backgrounds.item(i);
-    //     // bg.style.left = `${-frameCount*5+bg.width*i}px`;
-
-    //     bg.style.left = `${-x1-bg.width*(i-ceil(x1/bg.width))}px`
-    //     bg.style.top = `${0}px`;
-    //     bg.style.height = `100%`;
-    // }
-}
-
-function mousePressed() {
-    // flying = false;
 }
 
 function keyPressed() {
@@ -328,7 +277,8 @@ function keyReleased() {
             ws.send(JSON.stringify({type: "start", 
             "content": messageBox.value, 
             "username": cookies['username'],
-            "password": cookies['password']
+            "password": cookies['password'],
+            "language": cookies['language']
             }));
             flydownLock = true;
             flyDown = true;

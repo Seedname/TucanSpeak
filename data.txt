@@ -162,4 +162,220 @@ A: Hello! How can I help you today?9:48:29 PM
 Q: hola, como estas?
 A: Hello! I'm Tilly the Toucan. I'm here to help you learn English. How can I assist you today?11:34:07 PM
 Q: hello
-A: Hello! Welcome to the jungle! How can I help you today?
+A: Hello! Welcome to the jungle! How can I help you today?2:20:57 AM
+Q: hello
+A: Hello! Welcome to the jungle! How can I assist you today?2:21:54 AM
+Q: hello
+A: Hello! I'm Tilly the Toucan, here to help you learn English. What would you like to know today?2:22:06 AM
+Q: tell me everything you know about spanish
+A: ¡Hola! Bienvenido a la selva. Soy Tilly, el tucán, y estaré encantado de ayudarte a aprender inglés. ¿Quieres que te enseñe sobre los fundamentos del idioma inglés?2:23:19 AM
+Q: asdf
+A: ¡Hola! Soy Tilly the Toucan. ¡Bienvenido a la jungla! ¿En qué puedo ayudarte hoy?2:23:20 AM
+Q: asdf
+A: Hello! Welcome to the jungle! How can I help you with your English learning journey today? Feel free to ask me anything you'd like to know or practice!4:19:54 AM
+Q: give me a lesson
+A: Hello! Welcome to your English lesson with Tilly the Toucan. Since you are at level 3, we will focus on building on your basics and expanding your vocabulary and grammar skills.
+
+Today, let's work on forming simple sentences in English. Here are a few examples:
+
+1. The cat is sleeping.
+2. She likes to read books.
+3. He is playing soccer.
+4. They are eating lunch.
+5. I have a blue car.
+
+Feel free to practice making sentences and ask me any questions you may have. Let's have fun learning together!4:22:04 AM
+Q: dame una lección 
+A: ¡Hola! ¡Claro que sí! Here is a lesson for you at level 3:
+
+Vocabulary:
+1. Tree - Árbol
+2. River - Río
+3. Bird - Pájaro
+4. Sun - Sol
+5. Flower - Flor
+
+Sentences:
+1. The tree is tall. - El árbol es alto.
+2. The river is flowing. - El río está fluyendo.
+3. The bird is singing. - El pájaro está cantando.
+4. The sun is shining. - El sol está brillando.
+5. The flower is beautiful. - La flor es hermosa.
+
+Practice saying these sentences out loud to practice both vocabulary and pronunciation. Let me know if you have any questions or need more help. ¡Buena suerte!4:23:08 AM
+Q: dame una lección sobre numeros en ingles
+A: ¡Hola! ¡Claro que sí! Hoy te voy a enseñar los números en inglés del 1 al 10. 
+
+1 - one
+2 - two
+3 - three
+4 - four
+5 - five
+6 - six
+7 - seven
+8 - eight
+9 - nine
+10 - ten
+
+Si quieres practicar más números en inglés, no dudes en pedirme ayuda. ¡Estoy aquí para apoyarte!4:24:36 AM
+Q: hola como estas
+A: Hello! I'm doing well, thank you for asking. How can I help you with your English learning today? Feel free to ask any questions you have.4:24:49 AM
+Q: hola
+A: Hello! Welcome to the jungle! How can I assist you today?4:25:17 AM
+Q: asdf
+A: Hello! Welcome to the jungle! How can I help you today with your English learning journey?4:26:55 AM
+Q: hello
+A: Hello! Welcome to the jungle! How can I assist you today?4:28:39 AM
+Q: hello
+A: Hello! I'm Tilly the Toucan, here to help you learn English. What would you like to know today?4:28:50 AM
+Q: hello
+A: Hello! I'm Tilly the Toucan. How can I help you with English today?4:28:58 AM
+Q: hello
+A: Hello! I am Tilly the Toucan. How can I assist you today with practicing your English skills? Feel free to ask any questions or practice conversations with me.4:29:12 AM
+Q: como estas
+A: Hello! I'm doing well, thank you. How can I help you today?4:29:24 AM
+Q: hablar en espanol por favor, como estas?
+A: ¡Hola! ¡Estoy bien, gracias! ¿Y tú? Si deseas practicar inglés, estaré encantado de ayudarte. Feel free to ask me any questions or practice any topics you'd like to focus on. How can I assist you today?4:29:39 AM
+Q: hi
+A: Hello! It's great to see you here at level 4. How can I help you with your English learning today?4:29:53 AM
+Q: dame un leccion
+A: ¡Hola! ¡Bienvenido! En el nivel 4, podemos enfocarnos en construir tu vocabulario y en mejorar tu comprensión de lectura. ¿Estás listo para aprender algunas palabras nuevas en inglés y practicar la lectura de frases simples? ¡Vamos a empezar!
+
+Primero, vamos a aprender algunas palabras básicas en inglés y sus traducciones en español:
+
+1. Dog - Perro
+2. Cat - Gato
+3. Book - Libro
+4. Tree - Árbol
+5. Chair - Silla
+
+Ahora, vamos a practicar formando frases simples con estas palabras. Por ejemplo:
+
+- The cat is on the chair. (El gato está en la silla)
+- I like to read books. (Me gusta leer libros)
+
+¡Practiquemos juntos! ¿Puedes formar una frase con las palabras que aprendimos?4:30:27 AM
+Q: dame un leccion
+A: ¡Hola! Bienvenido a tu lección de inglés. En el nivel 4, es importante seguir practicando vocabulario y gramática básica. ¿Estás listo para aprender algo nuevo hoy? ¡Vamos a empezar!
+
+Vamos a revisar los verbos en presente continuo. En inglés, el presente continuo se utiliza para hablar de acciones que están sucediendo en este momento. Se forma con el verbo "to be" (estar) y el verbo en gerundio (-ing).
+
+Por ejemplo:
+- I am eating (Estoy comiendo)
+- She is running (Ella está corriendo)
+- They are studying (Ellos están estudiando)
+
+¿Podrías usar el presente continuo en una frase? ¡Inténtalo y practiquemos juntos!4:30:40 AM
+Q: asdf
+A: Great! Let's continue learning English together. How can I assist you today?4:31:00 AM
+Q: hola como estas
+A: Hello! I'm great, thank you for asking. How can I help you today with your English learning at level 4?4:31:18 AM
+Q: hola como estas, habla en espanol por favor
+A: ¡Hola! Soy Tilly the Toucan. Estoy bien, ¡gracias! ¿Cómo estás tú? ¿En qué puedo ayudarte hoy?4:31:37 AM
+Q: dame un leccion
+A: ¡Hola! ¡Bienvenido! En el nivel 4, podemos repasar algunas palabras y frases básicas en inglés. ¿Listo para aprender? 
+
+Primero, repasemos los saludos en inglés:
+- Good morning = Buenos días
+- Good afternoon = Buenas tardes
+- Good evening = Buenas noches
+
+Ahora, practiquemos algunas preguntas comunes:
+- How are you? = ¿Cómo estás?
+- What's your name? = ¿Cuál es tu nombre?
+- Where are you from? = ¿De dónde eres?
+
+¿Tienes alguna pregunta o algo más que te gustaría aprender? ¡Estoy aquí para ayudarte!4:33:23 AM
+Q: hello
+A: Hola! Welcome to the jungle! I'm Tilly the Toucan, and I'm here to help you learn English. Let's spread our wings and explore together! If you have any questions or need help with English, feel free to ask. ¡Vamos a aprender juntos! 🌿🌺🐦4:33:45 AM
+Q: dame un leccion
+A: ¡Hola! ¡Bienvenido! Today's lesson focuses on food vocabulary in English.
+
+1. Let's start with some basic food words:
+- Apple
+- Banana
+- Rice
+- Bread
+
+2. Now let's learn some verbs related to food:
+- Cook
+- Eat
+- Drink
+- Taste
+
+3. Next, let's learn some common phrases:
+- "I am hungry."
+- "I want to eat something delicious."
+- "Let's go out for dinner."
+
+Practice these words and phrases, and feel free to ask me any questions you may have. ¡Buena suerte! (Good luck!)4:36:14 AM
+Q: hello
+A: Hello! How can I help you with learning English today? Let me know if you have any questions or need any assistance.4:36:51 AM
+Q: helllo, how are you?
+A: Hello! I'm doing well, thank you. How can I help you with your English today at level 4?4:37:02 AM
+Q: hi
+A: Hello! Welcome to the jungle! How can I help you with your English learning journey today? Feel free to ask me any questions you may have.4:37:13 AM
+Q: hi
+A: Hello! Welcome to the jungle! How can I help you improve your English today? Feel free to ask me any questions you have.4:37:46 AM
+Q: hello
+A: ¡Hola! Welcome to the jungle! How can I help you with your English learning today? Feel free to ask me anything.4:37:57 AM
+Q: dame un leccion
+A: ¡Hola! ¡Bienvenido al nivel 4! En este nivel, vamos a enfocarnos en expandir tu vocabulario y mejorar tu gramática en inglés. ¿Estás listo para comenzar? ¡Vamos a aprender juntos!
+
+Primero, vamos a repasar algunos verbos en pasado simple. Por ejemplo:
+- I **walked** to the store yesterday.
+- She **cooked** dinner last night.
+- They **visited** a museum on Saturday.
+
+¿Puedes crear algunas oraciones en pasado simple con otros verbos que conozcas? ¡Inténtalo!4:39:12 AM
+Q: hi
+A: Hello! Welcome to the jungle! How can I help you with learning English today?4:39:32 AM
+Q: hi
+A: Hello! I see you're at Level 4. How can I help you with your English learning today? Feel free to ask me any questions you have.4:39:48 AM
+Q: what level am i at
+A: Hola! ¡Bienvenido al nivel 4! Estás progresando en tu aprendizaje del inglés. ¿En qué puedo ayudarte hoy?6:19:30 AM
+Q: hello
+A: ¡Hola! Welcome to our English learning adventure. Let's start with the English alphabet. 
+A: "'aye', como 'amor.' ¿Puedes decirlo conmigo? A."
+B: "'Bee', como 'bueno.' ¡Muy bien! B."
+C: "'Cee', como 'casa.' ¡Excelente! C."
+D: "'Dee', como 'día.' Muy bien. D."
+E: "E, como 'elefante.' ¡Maravilloso! E."
+F: "'Eff', como 'flor.' Fantástico. F."
+G: "'Gee', como 'gato.' Genial. G."
+H: "'Aitch', como 'hola.' Muy bien. H."
+I: "'Eye', como 'iglú.' ¡Increíble! I."
+J: "'Jay', como 'jirafa.' Justo así. J."
+K: "'Kay', como 'kilo.' ¡K, muy bien!"
+L: "'Elle', como 'luz.' Lindo. L."
+M: "'Emm', como 'mariposa.' Magnífico. M."
+N: "'Enn', como 'nube.' N, perfecto."
+O: "'Oh', como 'oso.' ¡Óptimo! O."
+P: "'Pee', como 'pelota.' Preciso. P."
+Q: "'Cue', como 'queso.' ¡Qué bueno! Q."
+R: "'Arr', como 'ratón.' Realmente bien. R."
+S: "'Ess', como 'sol.' S, excelente."
+T: "'Tee', como 'tigre.' Tremendo. T."
+U: "'You', como 'uva.' Único. U."
+V: "'Vee', como 'vaca.' V, vamos."
+W: "'Double-U', como 'waffle.' ¡Wow, fantástico! W."
+X: "'Ex', como 'xilófono.' ¡Xilófono! X."
+Y: "'Why', como 'yo-yo.' ¡Yupi! Y."
+Z: "'Zee', como 'zorro.' Z, excelente."
+Feel free to practice and ask any questions you may have. ¡Buena suerte!6:20:06 AM
+Q: hola
+A: ¡Hola! Welcome to the jungle, my friend! If you need help with anything at all, just let me know. I'm Tilly the Toucan, and I'm here to help you on your English learning journey. What do you want to learn today? 🌿🦜6:20:45 AM
+Q: hola
+A: ¡Hola! Welcome to the jungle, my friend! How can I help you today? If you need help navigating through the vast world of English, don't hesitate to ask! 🌿🦜6:21:17 AM
+Q: hello
+A: ¡Hola! Welcome to the jungle, my friend! If you ever need help with English, just squawk my way, and I'll flutter over to assist you. Let's embark on this language learning adventure together!6:21:35 AM
+Q: hola
+A: ¡Hola! Bienvenido al bosque, ¡estoy feliz de ayudarte a aprender inglés! Si tienes alguna pregunta sobre vocabulario o gramática en inglés, ¡no dudes en decírmelo! ¿En qué puedo ayudarte hoy?6:21:52 AM
+Q: dame un leccion
+A: ¡Hola! ¡Bienvenido a tu lección de inglés con Tilly the Toucan! Empecemos con algo básico. 
+
+En inglés, "hello" significa "hola". ¿Puedes repetirlo? 
+
+Cuando quieras aprender más, ¡vuelve aquí y estaré lista para ayudarte! ¡Buena suerte!6:25:37 AM
+Q: hello
+A: ¡Hola! ¡Bienvenido al emocionante mundo del aprendizaje de inglés! ¿En qué puedo ayudarte hoy? Si tienes alguna pregunta sobre el idioma inglés, estaré encantado de ayudarte. ¡Vamos a volar juntos en este divertido viaje de aprendizaje! ¿Listo para despegar?

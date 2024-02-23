@@ -15,51 +15,57 @@
 		<script src="main.js" type="text/javascript"></script>
 		<script src="sketch.js" type="text/javascript"></script>
 		
-
 		<title>Tucan Speak</title>
 
+		<script src="./menu.js"></script>
 		<script>
-			function signOut() {
-				$(document).ready(function() {
-					$.ajax({
-						type: 'POST',
-						url: '/sign-out', 
-						contentType: 'application/json',
-						success: function(response) {
-							window.location.href = response.url;
-						},
-						error: function(xhr, status, error) {
-							window.location.href = "/login";
-						}
-					});
-				});
-			}
-
-			function changeLanguage() {
-
-			}
-
 			$(document).ready(function() {
+				if (language == "Spanish") {
+					document.querySelectorAll(".menu").item(0).outerHTML = '<div class="menu"><button class="menu-button">Menú</button><ul class="menu-items"><li><a href="/">Página Principal</a></li><li><a href="/flight">Tucan Volar</a></li><li><a href="/draw">Tucan Dibujar</a></li><li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li><li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul></div>';
+					document.getElementById("task_header").textContent = "Tareas Diarias";
+					document.getElementById("message").placeholder = "Pregúntame lo que sea";
+				} 
 				$.ajax({
 					type: 'POST',
 					url: '/', 
 					contentType: 'application/json',
 					success: function(response) {
-						document.getElementById("level_value").textContent = `Level ${response.level+1}`;
-						document.getElementById("level_fill").style.width = `${Math.floor(100*response.xp/20)}%`;
-						if (response.flightWins >= 5) {
-							document.getElementById("first").click();
-						}
-						document.getElementById("flight_wins").textContent = `Numbers (${response.flightWins}/5 Tucan Flight Wins)`;
-						if (response.drawWins >= 5) {
-							document.getElementById("second").click();
-						}
-						document.getElementById("draw_wins").textContent = `Objects (${response.drawWins}/5 Tucan Draw Wins)`;
+						language = cookies['language'];
 
-						if (response.collectedReward) {
-							document.getElementById("third").click();
+						if (language == "English") {
+							document.getElementById("level_value").textContent = `Level ${response.level+1}`;
+							document.getElementById("level_fill").style.width = `${Math.floor(100*response.xp/20)}%`;
+							if (response.flightWins >= 5) {
+								document.getElementById("first").click();
+							}
+							document.getElementById("flight_wins").textContent = `Numbers (${response.flightWins}/5 Tucan Flight Wins)`;
+							if (response.drawWins >= 5) {
+								document.getElementById("second").click();
+							}
+							document.getElementById("draw_wins").textContent = `Objects (${response.drawWins}/5 Tucan Draw Wins)`;
+
+							if (response.collectedReward) {
+								document.getElementById("third").click();
+							}
+							document.getElementById("reward").textContent = 'Reward: 15XP⭐';
+						} else if (language === "Spanish") {
+							document.getElementById("level_value").textContent = `Nivel ${response.level+1}`;
+							document.getElementById("level_fill").style.width = `${Math.floor(100*response.xp/20)}%`;
+							if (response.flightWins >= 5) {
+								document.getElementById("first").click();
+							}
+							document.getElementById("flight_wins").textContent = `Números (${response.flightWins}/5 Tucan Volar Victorias)`;
+							if (response.drawWins >= 5) {
+								document.getElementById("second").click();
+							}
+							document.getElementById("draw_wins").textContent = `Objetos (${response.drawWins}/5 Tucan Dibujar Victorias)`;
+
+							if (response.collectedReward) {
+								document.getElementById("third").click();
+							}
+							document.getElementById("reward").textContent = 'Premio: 15XP⭐';
 						}
-						document.getElementById("reward").textContent = 'Reward: 5XP⭐';
+						
 					},
 					error: function(xhr, status, error) {
 						console.error('Error checking authentication:', xhr.responseText);
@@ -77,11 +83,11 @@
 		<div class="menu">
 			<button class="menu-button">Menu</button>
 			<ul class="menu-items">
-				<li><a href="/">Home</a></li>
-				<li><a href="/flappy">Tucan Flight</a></li>
-				<li><a href="/game">Tucan Draw</a></li>
-				<li><a href="#" onclick="return changeLanguage()">Cambiar Idioma</a></li>
-				<li><a href="#" onclick="return signOut()">Sign out</a></li>
+                <li><a href="/">Home</a></li>
+				<li><a href="/flight">Tucan Fly</a></li>
+				<li><a href="/draw">Tucan Draw</a></li>
+				<li><a href="javascript:void(0);" onclick="return changeLanguage()">Cambiar Idioma</a></li>
+				<li><a href="javascript:void(0);" onclick="return signOut()">Sign out</a></li>
 			</ul>
 		</div>
 
@@ -97,7 +103,7 @@
 
 		<div class="lesson-to-do">
 			<ul class="list">
-				<h2>Daily Tasks</h2>
+				<h2 id="task_header">Daily Tasks</h2>
 				<li class="list_item">
 					<input type="checkbox" class="hidden-box" id="first">
 					<label for="first" class="check_label">
@@ -116,7 +122,7 @@
 				<li class="list_item">
 					<input type="checkbox" class="hidden-box" id="third">
 					<label for="third" class="check_label">
-						<span class="check_label_text" id="reward">Reward: 5XP⭐</span>
+						<span class="check_label_text" id="reward">Reward: 15XP⭐</span>
 						<span class="check_label_box"></span>
 					</label>
 				</li>
@@ -124,26 +130,13 @@
 			</ul>			
 		</div>
 
-		<!--Julian Part-->
         <div id="audio"></div>
         <div id="output"></div>
-        <!-- <div id="response"></div> -->
         <input type="text" id="message" placeholder="Ask me anything">
-        <button id="ask" class="image-button"><img src="./send.png"></button>
-		<button id="startRecording" class='image-button'><img id='mic-button' src="./microphone-slash.png"></button>
+        <button id="ask" class="image-button" style="position: absolute;"><img src="./send.png"></button>
+		<button id="mic" class='image-button' style="position: absolute;"><img id='mic-button' src="./microphone.png"></button>
         <br>
 		<p id="response" class="bubble speech"></p>
-		
-		
-
-		<!-- <button id="startRecording">Start Recording</button>
-        <button id="stopRecording" disabled>Stop Recording</button>
-        <div id="audio"></div>
-        <div id="output"></div>
-		<input type="text" id="message" placeholder="Ask me anything">
-		<button id="ask" class="image-button"><img src="images/send.png" alt="send button"></button>
-		<p id="response" class="bubble speech"></p>
- -->
 
 	</body>
 

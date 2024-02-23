@@ -14,21 +14,16 @@ function getCookies() {
     });
     return resp;
 }
-  
 
-// Classifier Variable
 let classifier;
-// Model URL
 let imageModelURL = './';
 
-// Video
 let video;
 let flippedVideo;
-// To store the classification
 let label = "";
 
 let ws;
-// Load the model first
+
 function preload() {
     classifier = ml5.imageClassifier('/model.json');
     if (location.protocol == 'https:') {
@@ -51,9 +46,9 @@ function clearScreen() {
     rect(0,height-50,width,50);
 }
 
-let labels = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
-let bucket = ["Baseball", "Bucket", "Bicycle", "Cactus", "Computer", "Door", "Eye", "Giraffe", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
-let spanish = ["Béisbol", "Balde", "Bicicleta", "Cactus", "Computadora", "Puerta", "Ojo", "Jirafa", "Bombilla", "Montaña", "Tijeras", "Arcoíris", "Sol", "Árbol"];
+let labels = ["Bucket", "Computer", "Door", "Eye", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
+let bucket = ["Bucket", "Computer", "Door", "Eye", "Light Bulb", "Mountain", "Scissors", "Rainbow", "Sun", "Tree"];
+let spanish = ["Balde", "Computadora", "Puerta", "Ojo", "Bombilla", "Montaña", "Tijeras", "Arcoíris", "Sol", "Árbol"];
 
 function pickLabel() {
     let index = Math.floor(Math.random() * bucket.length);
@@ -78,7 +73,7 @@ function startRound() {
     checked = false;
 }
 
-let cookies;
+let cookies, language;
 
 function endRound() {
     fill(0, 0, 0, 128);
@@ -109,6 +104,12 @@ function setup() {
     document.getElementById("defaultCanvas0").style.display = "none";
     classifyDrawing();
     cookies = getCookies();
+    language = cookies['language'];
+    if (language == "Spanish") {
+        document.querySelectorAll(".menu").item(0).outerHTML = '<div class="menu"><button class="menu-button">Menú</button><ul class="menu-items"><li><a href="/">Página Principal</a></li><li><a href="/flight">Tucan Volar</a></li><li><a href="/draw">Tucan Dibujar</a></li><li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li><li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul></div>';
+        document.getElementById("startRound").textContent = "Empezar la Ronda";
+        document.getElementById("clearButton").textContent = "Borrar";
+    } 
 }
 
 var finishedDrawing = false;
@@ -135,17 +136,28 @@ function draw() {
     rect(0, height-50, width, 50);
     fill(255);
     textAlign(LEFT, TOP);
-    textSize(30);
-    text("Draw: '" + predictorWord + "'", 10, 10);
-
+    textSize(25);
+    if (language == "Spanish") {
+        text("Dibujar: '" + predictorWord + "'", 10, 10);
+    } else {
+        text("Draw: '" + predictorWord + "'", 10, 10);
+    }
     textAlign(CENTER, BOTTOM);
     if (sayText) {
-        text("Looks like: '" + sayText + "'", width/2, height-10);
+        if (language == "Spanish") {
+            text("Parece Como: '" + sayText + "'", width/2, height-10);
+        } else {
+            text("Looks Like: '" + sayText + "'", width/2, height-10);
+        }
     }
 
     textAlign(RIGHT, TOP);
     if (roundStart) {
-        text("Time: " + (25-floor((millis() - startTime)/1000)), width-10, 10);
+        if (language == "Spanish") {
+            text("Time: " + (25-floor((millis() - startTime)/1000)), width-10, 10);
+        } else {
+            text("Tiempo: " + (25-floor((millis() - startTime)/1000)), width-10, 10);
+        }
     }
 }
 

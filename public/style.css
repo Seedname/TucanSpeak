@@ -266,9 +266,6 @@ p.speech:after {
 	z-index: 3;
 }
 
-#ask {
-	position: absolute;	
-}
 input[type="text"] {
 	padding: 10px;
 	border: 1px solid #ccc;
@@ -302,17 +299,17 @@ button {
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
-	background-color: #4CAF50;
+	background-color: #00ccff;
 	color: #fff;
 	transition: background-color 0.3s ease;
 }
 
 button:hover {
-	background-color: #07560a;; 
+	background-color: #00a2ff;; 
 }
 
 button:active {
-	background-color: #398439; 
+	background-color: #0040ff; 
 }
 
 button:disabled {
@@ -364,6 +361,9 @@ body {
     border: none;
     padding: 10px 20px;
     cursor: pointer;
+}
+.menu-button:hover {
+    background-color: #2e5a2f;
 }
 
 .menu-items {

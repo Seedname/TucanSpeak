@@ -4,9 +4,10 @@ var flyDown = false;
 var flydownLock = false;
 const utterance = new SpeechSynthesisUtterance();
 var speechQueue = [];
-var recording = false;
+var recording = true;
+var language = "English";
 
-let voice = window.speechSynthesis.getVoices()[0];
+var voice = window.speechSynthesis.getVoices()[0];
 
 function getCookies() {
   let resp = false;
@@ -16,7 +17,8 @@ function getCookies() {
       contentType: 'application/json',
       async: false,
       success: function(response) {
-          resp = response;;
+          resp = response;
+          language = response['language'];
       },
       error: function(xhr, status, error) {
           console.error(xhr);
@@ -26,21 +28,44 @@ function getCookies() {
 }
 
 function speak(text) {
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.volume = 1;
-  utterance.rate = 1.8;
-  utterance.pitch = 1;
-  utterance.voice = voice;
-  window.speechSynthesis.speak(utterance);
-  let r = setInterval(() => {
-    console.log(window.speechSynthesis.speaking);
-    if (!window.speechSynthesis.speaking) {
-      clearInterval(r);
-    } else {
-      window.speechSynthesis.resume();
+  const punctuationRegex = /[.,\/#!$%\^&\*;:{}=\-_`~()]/g;
+  const segments = text.split(punctuationRegex);
+
+  const speakSegment = (index) => {
+    if (index >= segments.length) return; 
+    const segment = segments[index].trim();
+    if (segment.length === 0) {
+      speakSegment(index + 1);
+      return;
     }
-  }, 14000);
+
+    const utterance = new SpeechSynthesisUtterance(segment);
+    utterance.volume = 1;
+    if (!recording) {
+      utterance.volume = 0;
+    }
+    utterance.rate = 1.3;
+    utterance.pitch = 1;
+    utterance.voice = voice;
+
+    utterance.onend = () => {
+      speakSegment(index + 1);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // let r = setInterval(() => {
+  //   if (!window.speechSynthesis.speaking) {
+  //     clearInterval(r);
+  //   } else {
+  //     window.speechSynthesis.resume();
+  //   }
+  // }, 1000);
+
+  speakSegment(0); 
 }
+
 
 function isNumeric(str) {
   if (typeof str != "string") return false 
@@ -60,22 +85,24 @@ let cookies;
 
 function micRecord() {
   if (!recording) {
-    annyang.resume();
     recording = true;
     document.getElementById('mic-button').src = "./microphone.png";
   } else if (recording) {
-    annyang.pause();
     recording = false;
     document.getElementById('mic-button').src = "./microphone-slash.png";
   }
 }
 
-
+window.speechSynthesis.onvoiceschanged = () =>{ 
+  console.log(true);
+  voice = window.speechSynthesis.getVoices()[7];
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     cookies = getCookies();
     speak("");
-    document.getElementById('startRecording').addEventListener('click', micRecord);
+    
+    document.getElementById('mic').addEventListener('click', micRecord);
     
     const responseElement = document.getElementById('response');
     
@@ -91,51 +118,54 @@ document.addEventListener('DOMContentLoaded', () => {
       ws.send(JSON.stringify({type: "start", 
                               "content": messageBox.value, 
                               "username": cookies['username'],
-                              "password": cookies['password']
+                              "password": cookies['password'],
+                              "language": cookies['language']
                             }));
       flydownLock = true;
       flyDown = true;
     })
 
-    if (annyang) {
-      annyang.init({
-        'en-US': {
-          'tilly': function() {
-            flyDown = true;
-            flydownLock = true;
-          },
-          'tilly *tag': function(transcript) {
-            messageBox.value = transcript;
-            flydownLock = true;
-            flyDown = true;
-            ws.send(JSON.stringify({type: "start", 
-              "content": messageBox.value, 
-              "username": cookies['username'],
-              "password": cookies['password']
-            }));
-          }
-        },
-        'es-US': {
-          'tilly': function() {
-            flyDown = true;
-            flydownLock = true;
-          },
-          'tilly *tag': function(transcript) {
-            messageBox.value = transcript;
-            flydownLock = true;
-            flyDown = true;
-            ws.send(JSON.stringify({type: "start", 
-              "content": messageBox.value, 
-              "username": cookies['username'],
-              "password": cookies['password']
-            }));
-          }
-        }
-      });
+    // if (annyang) {
+    //   annyang.setLanguage('en-US');
+
+    //   annyang.init({
+    //     'en-US': {
+    //       'tilly': function() {
+    //         flyDown = true;
+    //         flydownLock = true;
+    //       },
+    //       'tilly *tag': function(transcript) {
+    //         messageBox.value = transcript;
+    //         flydownLock = true;
+    //         flyDown = true;
+    //         ws.send(JSON.stringify({type: "start", 
+    //           "content": messageBox.value, 
+    //           "username": cookies['username'],
+    //           "password": cookies['password']
+    //         }));
+    //       }
+    //     },
+    //     'es-US': {
+    //       'tilly': function() {
+    //         flyDown = true;
+    //         flydownLock = true;
+    //       },
+    //       'tilly *tag': function(transcript) {
+    //         messageBox.value = transcript;
+    //         flydownLock = true;
+    //         flyDown = true;
+    //         ws.send(JSON.stringify({type: "start", 
+    //           "content": messageBox.value, 
+    //           "username": cookies['username'],
+    //           "password": cookies['password']
+    //         }));
+    //       }
+    //     }
+    //   });
     
-      annyang.start();
-      annyang.pause();
-    }
+    //   annyang.start();
+    //   annyang.pause();
+    // }
 
     ws.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
@@ -149,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             break;
         case 'update':
             let message =  data.content;
-            if (isNumeric(m) && !isNumeric(message.charAt(message.length-1))) {
+            if (isNumeric(message)) {
               message = " " + message;
             }
             responseElement.innerText += message;
