@@ -17,6 +17,7 @@ config();
 
 let usr = 'tilly'; 
 let passwd = process.env.MONGODB_PASS;
+console.log(passwd);
 
 const uri = `mongodb+srv://${usr}:${passwd}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -45,7 +46,7 @@ async function connectToMongoDB() {
 
 connectToMongoDB();
 
-const useHTTPS = true;
+const useHTTPS = false;
 
 const app = express();
 
@@ -324,15 +325,11 @@ wss.on('connection', (ws) => {
 
         switch(data.type) {
           case "start":
-            // let levelUnit = ""
-            // if (valid["level"] === 1) {
-            //   levelUnit = fs.readFileSync('./level_one.txt', 'utf-8');
-            // }
-
+            let playerLevel = ` The user is currently at level ${valid['level']}. Adjust your responses accordingly.`
             let searchTerm = data.content;
             const conversation = [
               { role: 'system', content: system },
-              { role: 'user', content: searchTerm + additionalContext },
+              { role: 'user', content: searchTerm + additionalContext + playerLevel},
             ];
 
             ws.send(JSON.stringify({ type: 'start' }));

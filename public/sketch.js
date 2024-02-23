@@ -122,7 +122,7 @@ class Mover {
 
 let size = 300;
 
-var camera, canvas, sc, flying, x, y, keys, speed, bubble, backgrounds, input, button;
+var camera, canvas, sc, flying, x, y, keys, speed, bubble, backgrounds, input, button, micButton;
 function setup() {
     canvas = createCanvas(size, size);
 
@@ -164,7 +164,7 @@ function setup() {
     // backgrounds = document.querySelectorAll(".bg");
     input = document.getElementById("message");
     button = document.getElementById("ask");
-
+    micButton = document.getElementById('startRecording');
     // for (let i = 0; i < backgrounds.length; i++) {
     //     const bg = backgrounds.item(i);
     //     bg.style.top = `${0}px`;
@@ -175,6 +175,8 @@ function setup() {
     input.style.top = "80%";
     button.style.left = `${windowWidth/2+400/2+10}px`;
     button.style.top = "80%";
+    micButton.style.left = `${windowWidth/2-400/2-50}px`;
+    micButton.style.top = "80%";
 
     input.onfocus=function(){flyDown=true;};
     input.onblur =function(){
@@ -186,9 +188,9 @@ function setup() {
 
 function draw() {
     input.style.left = `${windowWidth/2-400/2}px`;
-    input.style.top = "80%";
     button.style.left = `${windowWidth/2+400/2+10}px`;
-    button.style.top = "80%";
+    micButton.style.left = `${windowWidth/2-400/2-50}px`;
+
     clear ();
     if (bubble.textContent === "") {
         bubble.style.display = "none";
@@ -290,12 +292,16 @@ function draw() {
     }
     // document.getElementById("response").textContent = test.substring(0, floor(frameCount/1))
     // talking = true;
-    let w = bubble.style.width.substring(0, bubble.style.width.length-2)
-    if (bubble.offsetHeight > 500 && w < 1000) {
-        if (!w) {w = 400;}
-        bubble.style.width = `${parseInt(w, 10) + 1}px`;
+    if (bubble.offsetHeight > 500) {
+        bubble.style.overflowY = "scroll";
     }
-    let x1 = camera.pos.x;
+
+    // let w = bubble.style.width.substring(0, bubble.style.width.length-2)
+    // if (bubble.offsetHeight > 500 && w < 1000) {
+    //     if (!w) {w = 400;}
+    //     bubble.style.width = `${parseInt(w, 10) + 1}px`;
+    // }
+    // let x1 = camera.pos.x;
     // for (let i = 0; i < backgrounds.length; i++) {
     //     const bg = backgrounds.item(i);
     //     // bg.style.left = `${-frameCount*5+bg.width*i}px`;

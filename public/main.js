@@ -4,6 +4,7 @@ var flyDown = false;
 var flydownLock = false;
 const utterance = new SpeechSynthesisUtterance();
 var speechQueue = [];
+var recording = false;
 
 let voice = window.speechSynthesis.getVoices()[0];
 
@@ -23,7 +24,6 @@ function getCookies() {
   });
   return resp;
 }
-
 
 function speak(text) {
   const utterance = new SpeechSynthesisUtterance(text);
@@ -57,25 +57,33 @@ function startRound() {
 }
 
 let cookies;
+
+function micRecord() {
+  if (!recording) {
+    annyang.resume();
+    recording = true;
+    document.getElementById('mic-button').src = "./microphone.png";
+  } else if (recording) {
+    annyang.pause();
+    recording = false;
+    document.getElementById('mic-button').src = "./microphone-slash.png";
+  }
+}
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     cookies = getCookies();
     speak("");
-
+    document.getElementById('startRecording').addEventListener('click', micRecord);
+    
     const responseElement = document.getElementById('response');
-    const outputDiv = document.getElementById('output');
     
     if (location.protocol == 'https:') {
       ws = new WebSocket(`wss://${window.location.host}:443`);
     } else {
         ws = new WebSocket(`ws://${window.location.host}:80`);
-    }
-  
-    // const startRecordingButton = document.getElementById('startRecording');
-    // const stopRecordingButton = document.getElementById('stopRecording');
-  
-    // startRecordingButton.addEventListener('click', startRecording);
-    // stopRecordingButton.addEventListener('click', stopRecording);
-    
+    }    
 
     const sendMessage = document.getElementById('ask');
     const messageBox = document.getElementById("message");
@@ -85,53 +93,49 @@ document.addEventListener('DOMContentLoaded', () => {
                               "username": cookies['username'],
                               "password": cookies['password']
                             }));
-      // flydownLock = true;
-      // flyDown = true;
+      flydownLock = true;
+      flyDown = true;
     })
 
-    // document.getElementById("hostGame").addEventListener('click', function() {
-    //   ws.send(JSON.stringify({type: "hostGame"}));
-    //   document.getElementById("hostGame").style.display = "none";
-    //   document.getElementById("joinGame").style.display = "none";
-    //   document.getElementById("startRound").style.display = "block";
-    // });
-
-    // if (annyang) {
-    //   annyang.addCommands({
-    //     'toucan': function() {
-    //       flyDown = true;
-    //       flydownLock = true;
-    //     },
-    //     'toucan *tag': function(transcript) {
-    //       messageBox.value = transcript;
-    //       ws.send(JSON.stringify({type: "start", "content": transcript}));
-    //     }
-    //   });
+    if (annyang) {
+      annyang.init({
+        'en-US': {
+          'tilly': function() {
+            flyDown = true;
+            flydownLock = true;
+          },
+          'tilly *tag': function(transcript) {
+            messageBox.value = transcript;
+            flydownLock = true;
+            flyDown = true;
+            ws.send(JSON.stringify({type: "start", 
+              "content": messageBox.value, 
+              "username": cookies['username'],
+              "password": cookies['password']
+            }));
+          }
+        },
+        'es-US': {
+          'tilly': function() {
+            flyDown = true;
+            flydownLock = true;
+          },
+          'tilly *tag': function(transcript) {
+            messageBox.value = transcript;
+            flydownLock = true;
+            flyDown = true;
+            ws.send(JSON.stringify({type: "start", 
+              "content": messageBox.value, 
+              "username": cookies['username'],
+              "password": cookies['password']
+            }));
+          }
+        }
+      });
     
-    //   annyang.start();
-    //   annyang.pause();
-    // }
-
-    // function startRecording() {
-    //   // annyang.start();
-    //   annyang.resume();
-    //   // recognition.start();
-    //   startRecordingButton.disabled = true;
-    //   stopRecordingButton.disabled = false;
-    // }
-  
-    // function stopRecording() {
-    //   // annyang.abort();
-    //   // recognition.stop();
-    //   annyang.pause();
-    //   startRecordingButton.disabled = false;
-    //   stopRecordingButton.disabled = true;
-    // }
-    
-    var differential = "";
-    var punctuation = [".", "!", "?"];
-    var numbers = "0123456789"
-    let switched = false;
+      annyang.start();
+      annyang.pause();
+    }
 
     ws.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
@@ -140,79 +144,19 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'start':
             responseElement.innerText = "";
             talkingCooldown = Infinity;
-            // flyDown = true;
-            // flydownLock = true;
-            switched = false;
+            flyDown = true;
+            flydownLock = true;
             break;
         case 'update':
-            let m =  data.content;
-            // if (m == undefined) {break;}
-            // console.log(numbers.indexOf(m), numbers.indexOf(differential.charAt(differential.length-1)) );
-            if (isNumeric(m) && !isNumeric(differential.charAt(differential.length-1))) {
-              m = " " + m;
+            let message =  data.content;
+            if (isNumeric(m) && !isNumeric(message.charAt(message.length-1))) {
+              message = " " + message;
             }
-            // if (numbers.indexOf(m) >= 0 && numbers.indexOf(differential.charAt(differential.length-1)) < 0) {
-            //   m = " " + m;
-            //   console.log(true);
-            // }
-            // differential += m;
-            // for (let i = 0; i < punctuation.length; i++) {
-            //   if (m == punctuation[i]) {
-            //     if (speechQueue.length === 0 && !talking) {
-            //       speak(differential);
-            //     } else {
-            //       speechQueue.push(differential);
-            //     }
-            //     differential = "";
-            //     switched = true;
-            //     break;
-            //   }
-            // }
-            // let normal = true;
-            // for (let i = 0; i < punctuation.length; i++) {
-            //   let index = data.content.indexOf(punctuation[i]);
-            //   if (index >= 0) {
-            //     speechQueue.push(differential + data.content.substring(0, index+1));
-            //     let rest = data.content.substring(index+1);
-            //     differential = rest;
-            //     normal = false;
-            //     break;
-            //   }
-            // }
-            
-            // if (normal) {
-            //   differential += data.content;
-            // }
-            responseElement.innerText += m;
+            responseElement.innerText += message;
             break;
         case 'end':
-            // speechQueue = responseElement.innerText.split(".");
-            // console.log(speechQueue);
-            // let sentence1 = String(speechQueue[0]);
-            // speechQueue.shift();
             speak(responseElement.innerText);
-            // console.log(speechQueue);
-            // if (!switched) {
-            //   speechQueue.push(differential);
-            //   differential = "";
-            // }
-            // if (!talking && speechQueue.length === 0) {
-            //   speak(responseElement.innerText);
-            // }
             break;
-        case 'startRound':
-          if (!talking) {
-            responseElement.textContent = data.data;
-            speak(data.data);
-          }
-          break;
-        case 'endRound':
-          startTimer = false;
-          if (!talking) {
-            responseElement.textContent = data.data;
-            speak(data.data);
-          }
-          break;
         default:
             break;
       }
@@ -230,20 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
       talking = false;
       flydownLock = false;
       flying = false;
-
-      // if (speechQueue[0]) {
-      //   let sentence = String(speechQueue[0]);
-      //   if (!sentence) {
-      //     speechQueue = [];
-      //   } else {
-      //     speechQueue.shift();
-      //     speak(sentence);
-      //     console.log(sentence);
-      //   }
-      // }
-      // if (speechQueue.length === 0) {
-      //   canDo = true;
-      // }
     };
   
     window.addEventListener('beforeunload', () => {

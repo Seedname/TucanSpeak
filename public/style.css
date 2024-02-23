@@ -216,7 +216,6 @@ body {
     width: 100%;
 }
 
-
 p.bubble {
 	position: absolute;
 	width: 400px;
@@ -232,16 +231,16 @@ p.bubble {
     z-index: 2;
     display: none;
 }
-
+/* 
 p.bubble:before,
 p.bubble:after {
 	content: ' ';
 	position: absolute;
 	width: 0;
 	height: 0;
-}
+} */
 
-p.speech:before {
+/* p.speech:before {
 	left: 30px;
 	bottom: -50px;
 	border: 25px solid;
@@ -253,7 +252,7 @@ p.speech:after {
 	bottom: -30px;
 	border: 15px solid;
 	border-color: #fff transparent transparent #fff;
-}
+} */
 
 
 .bg {
