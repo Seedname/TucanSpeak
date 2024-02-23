@@ -388,10 +388,10 @@ wss.on('connection', (ws) => {
             });
             break;
           case "drawWin":
-            updateLevel(valid, data.points, 'draw');
+            updateLevel(valid, 1, 'draw');
             break;
           case "flightWin":
-            updateLevel(valid, 1, 'flight');
+            updateLevel(valid, data.points, 'flight');
             break;
         }
     });
