@@ -45,7 +45,7 @@ async function connectToMongoDB() {
 
 connectToMongoDB();
 
-const useHTTPS = false;
+const useHTTPS = true;
 
 const app = express();
 
