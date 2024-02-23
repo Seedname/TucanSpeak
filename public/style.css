@@ -220,7 +220,7 @@ p.bubble {
     overflow-y: scroll;
 	position: absolute;
 	width: 400px;
-    height: 150px;
+    height: 300px;
 	text-align: left;
 	line-height: 1.4em;
 	margin: 40px auto;
