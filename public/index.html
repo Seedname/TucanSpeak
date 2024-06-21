@@ -1,167 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="style.css">
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-		<link rel="shortcut icon" type="image/jpg" href="images/Bird.png"/>
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
-		<script src="main.js" type="text/javascript"></script>
-		<script src="sketch.js" type="text/javascript"></script>
-		
-		<title>Tucan Speak</title>
 
-		<script src="./menu.js"></script>
-		<script>
-			$(document).ready(function() {
-				var div=document.getElementById("bb");
-				setInterval(function(){ 
-					var toDate=new Date();
-					var tomorrow=new Date();
-					tomorrow.setHours(24,0,0,0);
-					var diffMS=tomorrow.getTime()/1000-toDate.getTime()/1000;
-					var diffHr=Math.floor(diffMS/3600);
-					diffMS=diffMS-diffHr*3600;
-					var diffMi=Math.floor(diffMS/60);
-					diffMS=diffMS-diffMi*60;
-					var diffS=Math.floor(diffMS);
-					var result=((diffHr<10)?"0"+diffHr:diffHr);
-					result+=":"+((diffMi<10)?"0"+diffMi:diffMi);
-					result+=":"+((diffS<10)?"0"+diffS:diffS);
-					if (language == "Spanish") {
-						div.innerHTML="&nbsp;&nbsp;" + result + " restante.";
-					} else {
-						div.innerHTML="&nbsp;&nbsp;" + result + " remaining.";
-					}
-				},1000);
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tilly the Toucan</title> <!-- Corrected spelling -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-				if (language == "Spanish") {
-					document.querySelectorAll(".menu").item(0).outerHTML = '<div class="menu"><button class="menu-button">Menú</button><ul class="menu-items"><li><a href="/">Página Principal</a></li><li><a href="/flight">Tucan Volar</a></li><li><a href="/draw">Tucan Dibujar</a></li><li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li><li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul></div>';
-					document.getElementById("task_header").textContent = "Tareas Diarias";
-					document.getElementById("message").placeholder = "Pregúntame lo que sea";
-				} 
-				$.ajax({
-					type: 'POST',
-					url: '/', 
-					contentType: 'application/json',
-					success: function(response) {
-						language = cookies['language'];
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet"> <!-- Corrected font weights -->
 
-						if (language == "English") {
-							document.getElementById("level_value").textContent = `Level ${response.level+1}`;
-							document.getElementById("level_fill").style.width = `${Math.floor(100*response.xp/20)}%`;
-							if (response.flightWins >= 5) {
-								document.getElementById("first").click();
-							}
-							document.getElementById("flight_wins").textContent = `Numbers (${response.flightWins}/5 Tucan Flight Wins)`;
-							if (response.drawWins >= 5) {
-								document.getElementById("second").click();
-							}
-							document.getElementById("draw_wins").textContent = `Objects (${response.drawWins}/5 Tucan Draw Wins)`;
+    <link rel="icon" type="image/x-icon" href="pictures/toucan.png">
+</head>
 
-							if (response.collectedReward) {
-								document.getElementById("third").click();
-							}
-							document.getElementById("reward").textContent = 'Reward: 15XP⭐';
-						} else if (language === "Spanish") {
-							document.getElementById("level_value").textContent = `Nivel ${response.level+1}`;
-							document.getElementById("level_fill").style.width = `${Math.floor(100*response.xp/20)}%`;
-							if (response.flightWins >= 5) {
-								document.getElementById("first").click();
-							}
-							document.getElementById("flight_wins").textContent = `Números (${response.flightWins}/5 Tucan Volar Victorias)`;
-							if (response.drawWins >= 5) {
-								document.getElementById("second").click();
-							}
-							document.getElementById("draw_wins").textContent = `Objetos (${response.drawWins}/5 Tucan Dibujar Victorias)`;
+<body>
+    <div class="scoreboard">
+        <div class="finalscore-container">
+            <h1 id="final-title">FINAL SCORES</h1>
+            <h2 class="final-score">
+                Your final score is: <h2 id="final-score">0</h2>
+            </h2>
+            <h2 class="final-message">¡Awesome job! Cada día que practicas, te acercas más a tus sueños. ¡Keep going, you’re amazing! 🌟💪</h2>
+            <input class="final-button" type="button" value="EXIT">
 
-							if (response.collectedReward) {
-								document.getElementById("third").click();
-							}
-							document.getElementById("reward").textContent = 'Premio: 15XP⭐';
-						}
-						
-					},
-					error: function(xhr, status, error) {
-						console.error('Error checking authentication:', xhr.responseText);
-					}
-				});
-			});
-		</script>
-	</head>
-	<body>
+        </div>
+    </div>
 
-		<div class="background">
-			<img src="images/Background.png" alt="background" class="background-img">
-		</div> 
+    
 
-		<div class="menu">
-			<button class="menu-button">Menu</button>
-			<ul class="menu-items">
-                <li><a href="/">Home</a></li>
-				<li><a href="/flight">Tucan Fly</a></li>
-				<li><a href="/draw">Tucan Draw</a></li>
-				<li><a href="javascript:void(0);" onclick="return changeLanguage()">Cambiar Idioma</a></li>
-				<li><a href="javascript:void(0);" onclick="return signOut()">Sign out</a></li>
-			</ul>
-		</div>
+    <div class="top-section ">
+        <div class="ai-section">
+            <input class="ai-button" type="button" >
+            <div class="api container">
+        
+                <div class="api-response">
+                    <p>"¡Hola! I am tu AI assistant. I’ll be helping you con hints y explicaciones en your respuestas. ¡You got this!🙌"
+                    </p>
+                </div>
+            </div>
+        
+        </div>
+        
+        
+        <div class="trackers">
+            <p class="time">TIME: 0:00</p>
+            <p class="score">SCORE: 0</p>
+        </div>
+    </div>
+    
 
-		<div class="top-row">
-			<div class="level_bar">
-				<div class="level_bar_value" id="level_value">Level</div>
-				<div class="level_fill" id="level_fill"></div>
-				<div class="level_bar_icon">
-					<img src="images/star.png" alt="star">
-				</div>
-			</div> 
-		</div>
+    <div class="bottom-section">
+        <div class="output-container">
+            <img class="toucan" src="./pictures/toucan.png" style="transform: scaleX(-1);">
+            <p class="output">Press 'START' para comenzar el TuCan Translate ✨</p>
+        
+        </div>
+        
+        
+        <div class="submit-container">
+            <div class="submit-section">
+                <input class="input" type="text" placeholder="Start typing here (empieza a escribir aquí)...">
+                <div class="button-container">
+                    <input class="start-button" type="button" value="START">
+                    <input class="button" type="button" value="SUBMIT">
+                </div>
+            </div>
+        </div>
+    </div>
 
-		<div class="lesson-to-do">
-			<ul class="list">
-				<h2 id="task_header">Daily Tasks</h2>
-				<li class="list_item">
-					<input type="checkbox" class="hidden-box" id="first">
-					<label for="first" class="check_label">
-						<span class="check_label_text" id="flight_wins">Numbers (0/5 Tucan Flight Wins)</span>
-						<span class="check_label_box"></span>
-					</label>
-				</li>
-				<li class="list_item">
-					<input type="checkbox" class="hidden-box" id="second">
-					<label for="second" class="check_label">
-						<span class="check_label_text" id="draw_wins">Objects (0/5 Tucan Draw Wins)</span>
-						<span class="check_label_box"></span>
-					</label>
-				</li>
-				<li class="list_item">
-					<input type="checkbox" class="hidden-box" id="third">
-					<label for="third" class="check_label">
-						<span class="check_label_text" id="reward">Reward: 15XP⭐</span>
-						<span class="check_label_box"></span>
-					</label>
-				</li>
-				<li class="list_item">
-					<div id="bb"></div>
-				</li>
-				
 
-			</ul>			
-		</div>
-
-        <div id="audio"></div>
-        <div id="output"></div>
-        <input type="text" id="message" placeholder="Ask me anything">
-        <button id="ask" class="image-button" style="position: absolute;"><img src="./send.png"></button>
-		<button id="mic" class='image-button' style="position: absolute;"><img id='mic-button' src="./microphone.png"></button>
-        <br>
-		<p id="response" class="bubble speech"></p>
-
-	</body>
+    
+    <script type="module" src="script.js"></script>
+</body>
 
 </html>
