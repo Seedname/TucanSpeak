@@ -16,7 +16,7 @@ import { promisify } from 'util'
 import session from 'express-session';
 import { default as RedisStore } from "connect-redis";
 import { createClient } from 'redis';``
-import { TranslationServiceClient } from '@google-cloud/translate';
+// import { TranslationServiceClient } from '@google-cloud/translate';
 import path from 'path';
 
 
@@ -189,7 +189,7 @@ function sign(val, secret){
 }
 
 let nextUpdateTime;
-const translate = new TranslationServiceClient();
+// const translate = new TranslationServiceClient();
 
 async function generatePrompts() {
   try {
@@ -216,21 +216,21 @@ async function generatePrompts() {
 
 async function translatePrompts(prompts, targetLanguage) {
   try {
-    const [translations] = await translate.translateText({
-        parent: `projects/${process.env.GOOGLE_CLOUD_CONSOLE_PROJECT_ID}`,
-        contents: prompts,
-        mimeType: 'text/plain',
-        sourceLanguageCode: 'en',
-        targetLanguageCode: targetLanguage,
-    });
+    // const [translations] = await translate.translateText({
+    //     parent: `projects/${process.env.GOOGLE_CLOUD_CONSOLE_PROJECT_ID}`,
+    //     contents: prompts,
+    //     mimeType: 'text/plain',
+    //     sourceLanguageCode: 'en',
+    //     targetLanguageCode: targetLanguage,
+    // });
 
-    if (!Array.isArray(translations.translations)) {
-        throw new Error('Translations are not in expected format.');
-    }
+    // if (!Array.isArray(translations.translations)) {
+    //     throw new Error('Translations are not in expected format.');
+    // }
 
-    const translatedPrompts = translations.translations.map(translation => translation.translatedText);
+    // const translatedPrompts = translations.translations.map(translation => translation.translatedText);
 
-    return translatedPrompts;
+    // return translatedPrompts;
   } catch (e) {
     console.error('Error translating prompts: ', e);
     return prompts;
