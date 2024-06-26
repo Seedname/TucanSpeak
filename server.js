@@ -368,6 +368,7 @@ function updateLevel(user, points, type) {
   users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward, 'tucanFlightWins': flightWins, 'tucanDrawWins': drawWins}})
 }
 
+var parseCookie = express.cookieParser();
 wss.on('connection', async (ws) => {
   let session;
 
@@ -384,7 +385,6 @@ wss.on('connection', async (ws) => {
       }
       session = currentSession;
     });
-  
   });
 
   if (!session) {
@@ -393,7 +393,7 @@ wss.on('connection', async (ws) => {
   }
 
   ws.send(JSON.stringify({type: 'connected'}));
-  
+
   const username = session.username;
   const password = session.password;
 
@@ -418,7 +418,7 @@ wss.on('connection', async (ws) => {
         ws.send(JSON.stringify({ type: 'start' }));
         let finalMessage = "";
         openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4o',
           messages: conversation,
           stream: true
         }) .then(async (completion) => {
