@@ -20,6 +20,8 @@
 		<script src="./menu.js"></script>
 		<script>
 			$(document).ready(function() {
+				let language = getCookie("language");
+
 				var div=document.getElementById("bb");
 				setInterval(function(){ 
 					var toDate=new Date();
@@ -51,8 +53,6 @@
 					url: '/', 
 					contentType: 'application/json',
 					success: function(response) {
-						language = cookies['language'];
-
 						if (language == "English") {
 							document.getElementById("level_value").textContent = `Level ${response.level+1}`;
 							document.getElementById("level_fill").style.width = `${Math.floor(100*response.xp/20)}%`;

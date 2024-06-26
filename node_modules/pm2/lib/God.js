@@ -114,6 +114,7 @@ God.prepare = function prepare (env, cb) {
         }
       }
       God.clusters_db[env.pm_id] = clu
+      God.registerCron(env)
       return cb(null, [ God.clusters_db[env.pm_id] ])
     }
 
@@ -167,7 +168,7 @@ God.executeApp = function executeApp(env, cb) {
 
   Utility.extend(env_copy, env_copy.env);
 
-  env_copy['status']         = cst.LAUNCHING_STATUS;
+  env_copy['status']         = env.autostart ? cst.LAUNCHING_STATUS : cst.STOPPED_STATUS;
   env_copy['pm_uptime']      = Date.now();
   env_copy['axm_actions']    = [];
   env_copy['axm_monitor']    = {};
@@ -209,6 +210,12 @@ God.executeApp = function executeApp(env, cb) {
   }
 
   God.registerCron(env_copy)
+
+  if (env_copy['autostart'] === false) {
+    var clu = {pm2_env: env_copy, process: {pid: 0}};
+    God.clusters_db[env_copy.pm_id] = clu;
+    return cb(null, clu);
+  }
 
   /** Callback when application is launched */
   var readyCb = function ready(proc) {
@@ -360,10 +367,17 @@ God.handleExit = function handleExit(clu, exit_code, kill_signal) {
     return false;
   }
 
+  var stopExitCodes = proc.pm2_env.stop_exit_codes !== undefined && proc.pm2_env.stop_exit_codes !== null ? proc.pm2_env.stop_exit_codes : [];
+  if (!Array.isArray(stopExitCodes)) {
+    stopExitCodes = [stopExitCodes];
+  }
+
   var stopping = (proc.pm2_env.status == cst.STOPPING_STATUS
                   || proc.pm2_env.status == cst.STOPPED_STATUS
                   || proc.pm2_env.status == cst.ERRORED_STATUS)
-      || (proc.pm2_env.autorestart === false || proc.pm2_env.autorestart === "false");
+      || (proc.pm2_env.autorestart === false || proc.pm2_env.autorestart === "false")
+      || (stopExitCodes.map((strOrNum) => typeof strOrNum === 'string' ? parseInt(strOrNum, 10) : strOrNum)
+      .includes(exit_code));
 
   var overlimit   = false;
 

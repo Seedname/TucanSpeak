@@ -117,7 +117,7 @@ class Mover {
 
 let size = 300;
 
-var camera, canvas, sc, flying, x, y, keys, speed, bubble, backgrounds, input, button, micButton;
+var camera, canvas, sc, flying, x, y, keys, speed, bubble, backgrounds, input, button, micButton, language;
 function setup() {
     canvas = createCanvas(size, size);
 
@@ -168,6 +168,8 @@ function setup() {
             flyDown=false;
         }
     };
+
+    language = getCookie("language")
 }
 
 function draw() {
@@ -275,10 +277,8 @@ function keyReleased() {
         const messageBox = document.getElementById("message");
         if (messageBox.value !== "") {
             ws.send(JSON.stringify({type: "start", 
-            "content": messageBox.value, 
-            "username": cookies['username'],
-            "password": cookies['password'],
-            "language": cookies['language']
+                "content": messageBox.value, 
+                "language": language
             }));
             flydownLock = true;
             flyDown = true;

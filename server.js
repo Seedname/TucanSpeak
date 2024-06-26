@@ -12,13 +12,25 @@ import { dirname } from 'path';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
 import { promisify } from 'util'
+import session from 'express-session';
+import { default as RedisStore } from "connect-redis";
+import { createClient } from 'redis';
+import url from 'url';
 
 config();
 
-let usr = 'tilly'; 
-let passwd = process.env.MONGODB_PASS;
+const redisClient = createClient({
+  socket: {
+    host: "localhost",
+    port: 6379
+  }
+});
 
-const uri = `mongodb+srv://${usr}:${passwd}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
+redisClient.connect().catch(console.error);
+
+const dev = process.env.NODE_ENV !== 'production'
+
+const uri = `mongodb+srv://${process.env.MONGODB_PASS}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -34,7 +46,7 @@ let users;
 async function connectToMongoDB() {
     try {
         await client.connect();
-        console.log('Connected successfully to the database');``
+        console.log('Connected successfully to the database');
 
         db = client.db('TucanSpeak');
         users = db.collection('users');
@@ -45,26 +57,37 @@ async function connectToMongoDB() {
 
 connectToMongoDB();
 
-const useHTTPS = true;
-
 const app = express();
 
 let server;
 
-if (useHTTPS) {
-  const privateKey = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/privkey.pem', 'utf8');
-  const certificate = fs.readFileSync('/etc/letsencrypt/live/tucanspeak.ddns.net/fullchain.pem', 'utf8');
+if (dev) {
+  server = http.createServer(app);
+  server.listen(80);
+} else {
+  const privateKey = fs.readFileSync('/etc/cert/privkey.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/cert/fullchain.pem', 'utf8');
+  const passphrase = process.env.CERT_PASS;
 
   const credentials = {
     key: privateKey,
-    cert: certificate
+    cert: certificate,
+    passphrase: passphrase,
   };
+
   server = https.createServer(credentials, app);
+  app.enable('trust proxy');
+
   app.listen(80);
   server.listen(443);
-} else {
-  server = http.createServer(app);
-  server.listen(80);
+
+  app.use ((req, res, next) => {
+    if (rec.secure)  {
+      next();
+    } else {
+      res.redirect('https://tucanspeak.org' + req.url);
+    }
+  });
 }
 
 const wss = new WebSocketServer({ server });
@@ -74,6 +97,13 @@ const openai = new OpenAI({ apiKey: API_KEY });
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(session({
+  store: new RedisStore({ client: redisClient }),
+  secret: crypto.randomBytes(128).toString('base64'),
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: !dev, httpOnly: false }
+}));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -95,8 +125,8 @@ async function hashPassword(password) {
   const hash = await deriveKey(password, salt);
 
   return {
-      salt: salt,
-      hash: hash
+    salt: salt,
+    hash: hash
   };
 }
 
@@ -123,7 +153,6 @@ async function validUser(content) {
         }
       }
     } catch (error) {
-      console.error(error);
       return false;
     }
   }
@@ -131,7 +160,7 @@ async function validUser(content) {
 }
 
 app.get('/login', async (req, res) => {
-  const valid = await validUser(req.cookies);
+  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
   if (valid) {
     return res.redirect('/');
   }
@@ -139,11 +168,14 @@ app.get('/login', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
+  if (req.session.user) {
+    return res.json({ redirectUrl: '/' });
+  }
   const valid = await validUser(req.body);
   if (valid) {
-    res.cookie('username', req.body.username, { maxAge: 86400*1000, httpOnly: true });
-    res.cookie('password', req.body.password, { maxAge: 86400*1000, httpOnly: true });
-    res.cookie('language', "English", { maxAge: 86400*1000*400, httpOnly: true });
+    req.session.user = req.body.username;
+    req.session.password = req.body.password;
+    res.cookie('language', "English", { maxAge: 86400*1000*400 });
     return res.json({ redirectUrl: '/' });
   }
   if ('username' in req.body && 'password' in req.body) return res.status(400).send('Invalid username or password');
@@ -191,15 +223,16 @@ app.post('/register', async (req, res) => {
       'collectedReward': false
     });
     
-    res.cookie('username', username, { maxAge: 86400*1000, httpOnly: true });
-    res.cookie('password', password, { maxAge: 86400*1000, httpOnly: true });
+    req.session.user = username;
+    req.session.password = password;
+
     return res.json({ redirectUrl: '/' });
   }
   return res.sendFile(__dirname + '/public/register.html');
 });
 
 app.get('/', async (req, res) => {
-  const valid = await validUser(req.cookies);
+  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
   if (!valid) {
     return res.redirect('/login');
   }
@@ -225,9 +258,9 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/', async (req, res) => {
-  if (req.cookies && 'username' in req.cookies && 'password' in req.cookies) {
-      const username = req.cookies['username'];
-      const password = req.cookies['password'];
+  if (req.session.user) {
+      const username = req.session.user;
+      const password = req.session.password;
       try {
         const user = await validUser({username: username, password: password});
         if (user) {
@@ -248,21 +281,14 @@ app.post('/', async (req, res) => {
 });
 
 app.post('/sign-out', async (req, res) => {
-  if (req.cookies && 'username' in req.cookies && 'password' in req.cookies) {
-      res.clearCookie('username');
-      res.clearCookie('password');
-      res.clearCookie('language');
-      return res.status(200).json({url: '/login'});
-  }
-  return res.status(400).send("Something went wrong");
+    req.session.destroy();
+    return res.status(200).json({url: '/login'});
 });
 
 app.post('/get-cookie', async (req, res) => {
-  if (req.cookies && 'username' in req.cookies && 'password' in req.cookies && 'language' in req.cookies) {
-    const username = req.cookies['username'];
-    const password = req.cookies['password'];
+  if ('language' in req.cookies) {
     const language = req.cookies['language'];
-    return res.status(200).json({username: username, password: password, language: language});
+    return res.status(200).json({language: language});
   }
   return res.status(400).send("Something went wrong");
 });
@@ -270,18 +296,18 @@ app.post('/get-cookie', async (req, res) => {
 app.post('/change-language', async (req, res) => {
   if ('language' in req.cookies) {
     if (req.cookies['language'] == "Spanish") {
-      res.cookie('language', "English", { maxAge: 86400*1000*400, httpOnly: true });
+      res.cookie('language', "English", { maxAge: 86400*1000*400 });
     } else if (req.cookies['language'] == "English") {
-      res.cookie('language', "Spanish", { maxAge: 86400*1000*400, httpOnly: true });
+      res.cookie('language', "Spanish", { maxAge: 86400*1000*400 });
     }
   } else {
-    res.cookie('language', "English", { maxAge: 86400*1000*400, httpOnly: true });
+    res.cookie('language', "English", { maxAge: 86400*1000*400 });
   }
   return res.status(200).json({});
 });
 
 app.get('/flight', async (req, res) => {
-  const valid = await validUser(req.cookies);
+  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
   if (!valid) {
     return res.redirect('/login');
   }
@@ -290,7 +316,7 @@ app.get('/flight', async (req, res) => {
 
 
 app.get('/draw', async (req, res) => {
-  const valid = await validUser(req.cookies);
+  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
   if (!valid) {
     return res.redirect('/login');
   }
@@ -342,19 +368,34 @@ function updateLevel(user, points, type) {
   users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward, 'tucanFlightWins': flightWins, 'tucanDrawWins': drawWins}})
 }
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
+    const sessionID = req.headers['sec-websocket-protocol'];
+    console.log(sessionID);
+    if (!sessionID) {
+      ws.close();
+      return;
+    }
+
     ws.send(JSON.stringify({type: 'connected'}));
 
-    ws.on('message', async (data) => {
-        data = JSON.parse(data);
-        const username = data.username;
-        const password = data.password;
-        const valid = await validUser({username: username, password: password});
+    redisClient.get(`sess:${sessionID}`, async (err, session) => {
+      if (err || !session) {
+        ws.close();
+        return;
+      }
+      
+      const parsedSession = JSON.parse(session);
+      const username = parsedSession.username;
+      const password = parsedSession.password;
+      
+      const valid = await validUser({'username': username, 'password': password});
+      
+      if (!valid) {
+        ws.close();
+        return;
+      }
 
-        if (!valid) {
-          return;
-        }
-
+      ws.on('message', async (data) => {
         switch(data.type) {
           case "start":
             let playerLevel = ` The user is currently at level ${valid['level']+1}. Adjust your responses accordingly.`
@@ -394,5 +435,7 @@ wss.on('connection', (ws) => {
             updateLevel(valid, data.points, 'flight');
             break;
         }
+      });
+
     });
 });

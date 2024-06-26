@@ -1,18 +1,13 @@
-function getCookies() {
-    let resp = false;
-    $.ajax({
-        type: 'POST',
-        url: '/get-cookie', 
-        contentType: 'application/json',
-        async: false,
-        success: function(response) {
-            resp = response;;
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr);
+function getCookie(name) {
+    let cookieArr = document.cookie.split(";");
+    for(let i = 0; i < cookieArr.length; i++) {
+        let cookiePair = cookieArr[i].split("=");
+        if(name == cookiePair[0].trim()) {
+            return decodeURIComponent(cookiePair[1]);
         }
-    });
-    return resp;
+    }
+    
+    return null;
 }
 
 let classifier;
@@ -26,10 +21,12 @@ let ws;
 
 function preload() {
     classifier = ml5.imageClassifier('/model.json');
+    const sessionID = getCookie("connect.sid");
+
     if (location.protocol == 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}:443`);
+        ws = new WebSocket(`wss://${window.location.host}:443`, sessionID);
     } else {
-        ws = new WebSocket(`ws://${window.location.host}:80`);
+        ws = new WebSocket(`ws://${window.location.host}:80`, sessionID);
     }
 }
 
@@ -73,7 +70,7 @@ function startRound() {
     checked = false;
 }
 
-let cookies, language;
+let language;
 
 function endRound() {
     fill(0, 0, 0, 128);
@@ -86,10 +83,7 @@ function endRound() {
     if (label == predictorWord) {
         fill(0, 255, 0);
         text("Correct!\nPalabra: " + spanish[labels.indexOf(predictorWord)], width/2, height/2);
-        ws.send(JSON.stringify({type: "drawWin", 
-                                "username": cookies['username'],
-                                "password": cookies['password']
-        }));
+        ws.send(JSON.stringify({type: "drawWin"}));
     } else {
         fill(255, 0, 0);
         text("Time's Up!\nPalabra: " + spanish[labels.indexOf(predictorWord)], width/2, height/2);
@@ -103,13 +97,12 @@ function setup() {
     clearScreen();
     document.getElementById("defaultCanvas0").style.display = "none";
     classifyDrawing();
-    cookies = getCookies();
-    language = cookies['language'];
+    language = getCookie('language');
     if (language == "Spanish") {
         document.querySelectorAll(".menu").item(0).outerHTML = '<div class="menu"><button class="menu-button">Menú</button><ul class="menu-items"><li><a href="/">Página Principal</a></li><li><a href="/flight">Tucan Volar</a></li><li><a href="/draw">Tucan Dibujar</a></li><li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li><li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul></div>';
         document.getElementById("startRound").textContent = "Empezar la Ronda";
         document.getElementById("clearButton").textContent = "Borrar";
-    } 
+    }
 }
 
 var finishedDrawing = false;

@@ -9,22 +9,16 @@ var language = "English";
 
 var voice = window.speechSynthesis.getVoices()[0];
 
-function getCookies() {
-  let resp = false;
-  $.ajax({
-      type: 'POST',
-      url: '/get-cookie', 
-      contentType: 'application/json',
-      async: false,
-      success: function(response) {
-          resp = response;
-          language = response['language'];
-      },
-      error: function(xhr, status, error) {
-          console.error(xhr);
+function getCookie(name) {
+  let cookieArr = document.cookie.split(";");
+  for(let i = 0; i < cookieArr.length; i++) {
+      let cookiePair = cookieArr[i].split("=");
+      if(name == cookiePair[0].trim()) {
+          return decodeURIComponent(cookiePair[1]);
       }
-  });
-  return resp;
+  }
+  
+  return null;
 }
 
 function speak(text) {
@@ -99,27 +93,27 @@ window.speechSynthesis.onvoiceschanged = () =>{
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    cookies = getCookies();
     speak("");
     
     document.getElementById('mic').addEventListener('click', micRecord);
     
     const responseElement = document.getElementById('response');
     
+    const sessionID = getCookie("connect.sid");
+
     if (location.protocol == 'https:') {
-      ws = new WebSocket(`wss://${window.location.host}:443`);
+      ws = new WebSocket(`wss://${window.location.host}:443`, sessionID);
     } else {
-        ws = new WebSocket(`ws://${window.location.host}:80`);
+      ws = new WebSocket(`ws://${window.location.host}:80`, sessionID);
     }    
 
+    const language = getCookie("language");
     const sendMessage = document.getElementById('ask');
     const messageBox = document.getElementById("message");
     sendMessage.addEventListener('click', function() {
       ws.send(JSON.stringify({type: "start", 
                               "content": messageBox.value, 
-                              "username": cookies['username'],
-                              "password": cookies['password'],
-                              "language": cookies['language']
+                              "language": language
                             }));
       flydownLock = true;
       flyDown = true;

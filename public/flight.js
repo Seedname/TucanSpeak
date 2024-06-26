@@ -245,7 +245,7 @@ var backgroundImage;
 var backgroundOffset = 0;
 var toucan; 
 var randomNums, randomIndex, guessedIndex;
-var cookies, ws;
+var ws;
 var textScale;
 
 function drawBackground(x) {
@@ -285,21 +285,16 @@ function insideRect(x, y, w, h) {
     return mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h;
 }
 
-function getCookies() {
-    let resp = false;
-    $.ajax({
-        type: 'POST',
-        url: '/get-cookie', 
-        contentType: 'application/json',
-        async: false,
-        success: function(response) {
-            resp = response;
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr);
+function getCookie(name) {
+    let cookieArr = document.cookie.split(";");
+    for(let i = 0; i < cookieArr.length; i++) {
+        let cookiePair = cookieArr[i].split("=");
+        if(name == cookiePair[0].trim()) {
+            return decodeURIComponent(cookiePair[1]);
         }
-    });
-    return resp;
+    }
+    
+    return null;
 }
   
 let language;
@@ -307,15 +302,15 @@ function setup() {
     canvas = createCanvas(window.innerWidth,window.innerHeight);
     canvas.position(0, 0);
     canvas.class("p5canvas");
-    cookies = getCookies();
-    language = cookies['language'];
+    language = getCookie('language');
     if (language == "Spanish") {
         document.querySelectorAll(".menu").item(0).outerHTML = '<div class="menu"><button class="menu-button">Menú</button><ul class="menu-items"><li><a href="/">Página Principal</a></li><li><a href="/flight">Tucan Volar</a></li><li><a href="/draw">Tucan Dibujar</a></li><li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li><li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul></div>';
-    } 
+    }
+    const sessionID = getCookie("connect.sid");
     if (location.protocol == 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}:443`);
+        ws = new WebSocket(`wss://${window.location.host}:443`, sessionID);
     } else {
-        ws = new WebSocket(`ws://${window.location.host}:80`);
+        ws = new WebSocket(`ws://${window.location.host}:80`, sessionID);
     }
     textScale = width/2560;
     drawBackground(0);
@@ -581,10 +576,7 @@ function reset() {
 
 function sendWin() {
     ws.send(JSON.stringify({type: "flightWin", 
-        "points": Math.floor(Math.log2(score)),
-        "username": cookies['username'],
-        "password": cookies['password']
-    }));
+        "points": Math.floor(Math.log2(score))}));
 }
 
 function mousePressed() {
