@@ -93,17 +93,18 @@ const wss = new WebSocketServer({ server });
 const API_KEY = process.env.OPENAI_API_KEY;
 const openai = new OpenAI({ apiKey: API_KEY });
 const sessionStore = new RedisStore({ client: redisClient });
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(session({
+const sessionParser = session({
   store: sessionStore,
   secret: crypto.randomBytes(128).toString('base64'),
   resave: false,
   saveUninitialized: true,
   cookie: { secure: !dev, httpOnly: false }
-}));
+});
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(sessionParser);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -368,34 +369,22 @@ function updateLevel(user, points, type) {
   users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward, 'tucanFlightWins': flightWins, 'tucanDrawWins': drawWins}})
 }
 
-var parseCookie = express.cookieParser();
 wss.on('connection', async (ws) => {
-  let session;
+  let sess;
 
-  parseCookie(ws.upgradeReq, null, function(err) {
-    var sessionID = ws.upgradeReq.cookies['sid'];
-
-    if (err || !sessionID) {
-      return;
-    }
-
-    sessionStore.get(sessionID, async (err, currentSession) => {
-      if (err || !currentSession) {
-        return;
-      }
-      session = currentSession;
-    });
+  sessionParser(ws.upgradeReq, {}, function () {
+    sess = ws.upgradeReq.session;
   });
 
-  if (!session) {
+  if (!sess) {
     ws.close();
     return;
   }
 
   ws.send(JSON.stringify({type: 'connected'}));
 
-  const username = session.username;
-  const password = session.password;
+  const username = sess.username;
+  const password = sess.password;
 
   const valid = await validUser({'username': username, 'password': password});
 
