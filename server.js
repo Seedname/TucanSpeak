@@ -41,6 +41,7 @@ const client = new MongoClient(uri, {
 
 let db;
 let users;
+const sessionHash = [];
 
 async function connectToMongoDB() {
     try {
@@ -93,12 +94,13 @@ const wss = new WebSocketServer({ server });
 const API_KEY = process.env.OPENAI_API_KEY;
 const openai = new OpenAI({ apiKey: API_KEY });
 const sessionStore = new RedisStore({ client: redisClient });
+const secret = crypto.randomBytes(128).toString('base64');
 const sessionParser = session({
   store: sessionStore,
-  secret: crypto.randomBytes(128).toString('base64'),
+  secret: secret,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: !dev, httpOnly: false }
+  cookie: { secure: !dev, httpOnly: false, signed: false }
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -160,6 +162,14 @@ async function validUser(content) {
   return false;
 }
 
+function sign(val, secret){
+  return val + '.' + crypto
+    .createHmac('sha256', secret)
+    .update(val)
+    .digest('base64')
+    .replace(/=+$/, '');
+}
+
 app.get('/login', async (req, res) => {
   const valid = await validUser({'username': req.session.user, 'password': req.session.password});
   if (valid) {
@@ -176,6 +186,8 @@ app.post('/login', async (req, res) => {
   if (valid) {
     req.session.user = req.body.username;
     req.session.password = req.body.password;
+    let sessionIdHash = sign(req.sessionID, secret);
+    sessionHash[encodeURIComponent(`s:${sessionIdHash}`)] = req.sessionID;
     res.cookie('language', "English", { maxAge: 86400*1000*400 });
     return res.json({ redirectUrl: '/' });
   }
@@ -369,29 +381,39 @@ function updateLevel(user, points, type) {
   users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward, 'tucanFlightWins': flightWins, 'tucanDrawWins': drawWins}})
 }
 
-wss.on('connection', async (ws) => {
-  let sess;
 
-  sessionParser(ws.upgradeReq, {}, function () {
-    sess = ws.upgradeReq.session;
+function getCookies(request) {
+  var cookies = {};
+  request.headers && request.headers.cookie.split(';').forEach(function(cookie) {
+    var parts = cookie.match(/(.*?)=(.*)$/)
+    cookies[ parts[1].trim() ] = (parts[2] || '').trim();
   });
+  return cookies;
+}
 
-  if (!sess) {
-    ws.close();
-    return;
+wss.on('connection', async (ws, req) => {
+  var sessionID = getCookies(req)["connect.sid"];
+  var sid = sessionHash[sessionID];
+  let sess;
+  try {
+    sess = await new Promise((resolve, reject) => {
+      sessionStore.load(sid, function (err, session) {
+        if (err || !session) {
+          return reject(err || new Error('Session not found'));
+        }
+        resolve(session);
+      });
+    });    
+  } catch (error) {
+    console.error('Failed to retrieve session:', error);
   }
 
   ws.send(JSON.stringify({type: 'connected'}));
 
-  const username = sess.username;
+  const username = sess.user;
   const password = sess.password;
 
   const valid = await validUser({'username': username, 'password': password});
-
-  if (!valid) {
-    ws.close();
-    return;
-  }
 
   ws.on('message', async (data) => {
     switch(data.type) {
