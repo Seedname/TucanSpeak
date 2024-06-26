@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tucan Speech</title>
+        <link rel="stylesheet" href="prompts.css">
+        <link rel="stylesheet" href="menu.css">
+        <script src="./menu.js"></script>
+
+    </head>
+    <body>
+        <div class="menu">
+			<button class="menu-button">Menu</button>
+			<ul class="menu-items">
+                <li><a href="/">Home</a></li>
+				<li><a href="/flight">Tucan Fly</a></li>
+				<li><a href="/draw">Tucan Draw</a></li>
+				<li><a href="/speak">Tucan Talk</a></li>
+				<li><a href="/write">Tucan Write</a></li>
+				<li><a href="javascript:void(0);" onclick="return changeLanguage()">Cambiar Idioma</a></li>
+				<li><a href="javascript:void(0);" onclick="return signOut()">Sign out</a></li>
+			</ul>
+		</div>
+
+
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+        <h1 class="head">Speak this Sentence</h1>
+
+        <img class="tucan" src="img\Asset 2.png" alt="Tilly the Tucan">
+
+        <img class="tablet" src="img/tablet.png" alt="tablet">
+
+        <div class="prompt_div">
+            <button id="playPromptButton"><img class="button_image_speak"src="img/speaker.png"></button>
+            <div class="text">
+                <p id="prompt">...</p>
+                <p id="prompt-translation" class="translation">...</p>
+            </div>
+        </div>
+
+        <div class="record_div">
+            <button id="recordButton"><img class="button_image_record" src="img/microphone.png"></button>
+        </div>
+        <img src="img/Asset 3.png" alt="user_icon" class="user">
+        <div class="transcript_div">
+            <div id="transcript">...</div>
+        </div>
+
+        <div class="success_screen" id="successMessage">
+            <h2 class="s-text">Correct! Loading the next prompt...</h2>
+        </div>
+
+        <div class="incorrect_screen" id="incorrectMessage">
+            <h2 class="i-text">Try Again!</h2>
+        </div>
+
+        <audio id="correctSound" src="sound/Prodigy Sounds_ Correct.mp3" alt="correct sound" preload="auto"></audio>
+        <audio id="wrongSound" src="sound/negative_beeps.mp3" alt="wrong sound" preload="auto"></audio>
+
+        <script src="prompts.js"></script>
+    </body>
+</html>

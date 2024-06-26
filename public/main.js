@@ -117,48 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
       flyDown = true;
     })
 
-    // if (annyang) {
-    //   annyang.setLanguage('en-US');
-
-    //   annyang.init({
-    //     'en-US': {
-    //       'tilly': function() {
-    //         flyDown = true;
-    //         flydownLock = true;
-    //       },
-    //       'tilly *tag': function(transcript) {
-    //         messageBox.value = transcript;
-    //         flydownLock = true;
-    //         flyDown = true;
-    //         ws.send(JSON.stringify({type: "start", 
-    //           "content": messageBox.value, 
-    //           "username": cookies['username'],
-    //           "password": cookies['password']
-    //         }));
-    //       }
-    //     },
-    //     'es-US': {
-    //       'tilly': function() {
-    //         flyDown = true;
-    //         flydownLock = true;
-    //       },
-    //       'tilly *tag': function(transcript) {
-    //         messageBox.value = transcript;
-    //         flydownLock = true;
-    //         flyDown = true;
-    //         ws.send(JSON.stringify({type: "start", 
-    //           "content": messageBox.value, 
-    //           "username": cookies['username'],
-    //           "password": cookies['password']
-    //         }));
-    //       }
-    //     }
-    //   });
-    
-    //   annyang.start();
-    //   annyang.pause();
-    // }
-
     ws.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
   
@@ -177,7 +135,20 @@ document.addEventListener('DOMContentLoaded', () => {
             responseElement.innerText += message;
             break;
         case 'end':
-            speak(responseElement.innerText);
+            let audioContainer = document.getElementById("audio-container");
+            if (audioContainer.childNodes.length > 0) {
+              audioContainer.removeChild(audioContainer.childNodes[0]);
+            }
+            let audioSource = document.createElement("source");
+            audioSource.src = data.audio;
+
+            let audio = document.createElement("audio");
+            audio.controls = "controls";
+            audio.autobuffer = "autobuffer";
+            audio.autoplay = "autoplay";
+            
+            audio.appendChild(audioSource);
+            audioContainer.appendChild(audio);
             break;
         default:
             break;

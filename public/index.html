@@ -4,6 +4,7 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="menu.css">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -107,6 +108,8 @@
                 <li><a href="/">Home</a></li>
 				<li><a href="/flight">Tucan Fly</a></li>
 				<li><a href="/draw">Tucan Draw</a></li>
+				<li><a href="/speak">Tucan Talk</a></li>
+				<li><a href="/write">Tucan Write</a></li>
 				<li><a href="javascript:void(0);" onclick="return changeLanguage()">Cambiar Idioma</a></li>
 				<li><a href="javascript:void(0);" onclick="return signOut()">Sign out</a></li>
 			</ul>
@@ -149,8 +152,6 @@
 				<li class="list_item">
 					<div id="bb"></div>
 				</li>
-				
-
 			</ul>			
 		</div>
 
@@ -161,6 +162,8 @@
 		<button id="mic" class='image-button' style="position: absolute;"><img id='mic-button' src="./microphone.png"></button>
         <br>
 		<p id="response" class="bubble speech"></p>
+
+		<div style="display:none;" id="audio-container"></div>
 
 	</body>
 

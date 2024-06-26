@@ -378,4 +378,146 @@ En inglés, "hello" significa "hola". ¿Puedes repetirlo?
 
 Cuando quieras aprender más, ¡vuelve aquí y estaré lista para ayudarte! ¡Buena suerte!6:25:37 AM
 Q: hello
-A: ¡Hola! ¡Bienvenido al emocionante mundo del aprendizaje de inglés! ¿En qué puedo ayudarte hoy? Si tienes alguna pregunta sobre el idioma inglés, estaré encantado de ayudarte. ¡Vamos a volar juntos en este divertido viaje de aprendizaje! ¿Listo para despegar?
+A: ¡Hola! ¡Bienvenido al emocionante mundo del aprendizaje de inglés! ¿En qué puedo ayudarte hoy? Si tienes alguna pregunta sobre el idioma inglés, estaré encantado de ayudarte. ¡Vamos a volar juntos en este divertido viaje de aprendizaje! ¿Listo para despegar?1:54:41 AM
+Q: hi
+A: Hello there, Level 4 explorer! How can I assist you on your English learning journey today?1:55:58 AM
+Q: how are you today
+A: I'm soaring high through the emerald canopy, feeling the wind beneath my wings and the sun warming my feathers—it's a splendid day in the jungle! How about you? Are you ready to dive into some English learning adventure today? 🌿🦜✨2:09:37 AM
+Q: hello
+A: Hello there! 🌿🦜 Tilly the Toucan at your service! How can I make your jungle journey through English a bit more colorful and fun today?2:10:42 AM
+Q: hi
+A: Hello there! 🌴 Tilly the Toucan here, flapping and fluttering through the vibrant jungle to help you soar higher in English! 🐦✨ How can I assist you today on your learning adventure?2:11:58 AM
+Q: hi
+A: Hello there! 🌴✨ 
+
+I'm Tilly the Toucan, and I'm here to help you spread your English wings even further. You're already at level 4, which means you're flying high! Let's dive into the lush, green canopy of language learning. How can I help you soar today? 🦜💬2:12:46 AM
+Q: hi
+A: Hello there! 🌿🕊️ Welcome to my vibrant jungle! How can Tilly the Toucan assist you on your amazing English journey today? 🌟🦜2:19:57 AM
+Q: hi
+A: Hello there! 🦜✨ Isn’t it a beautiful day in the jungle? Ready to soar higher with your English skills today? Let's make learning as exciting as a flight through the canopy! What would you like to practice today? 🚀🌿2:20:28 AM
+Q: hi
+A: Hello there! 🌿 I'm Tilly the Toucan, soaring high above the jungle canopy, ready to help you spread your wings in English! What exciting English adventure shall we embark on today? 🏞️✨2:21:36 AM
+Q: hi
+A: Hello! 🌿🦜 Welcome to the vibrant jungle of English learning! You're soaring at level 4, which is fantastic! What specific area of English would you like to explore today? Vocabulary, grammar, or maybe conversational phrases? Let's make our flight through this language both fun and fruitful!2:24:01 AM
+Q: hi
+A: ¡Hola! Welcome to the jungle canopy! 🌿🦜 Since you're fluttering around level 4 already, we're going to tackle some interesting idioms and phrases. Are you ready to soar higher in your English learning journey?
+
+Let's start with a colorful English idiom: "Break the ice." Any idea what that means? 🧊🐧2:24:18 AM
+Q: hi
+A: Hello there! 🌿 I'm Tilly the Toucan, your feathered friend in the jungle of English learning. Ready for a new adventure in language? Let's dive deeper into the lush foliage of English vocabulary and grammar. What's on your mind today, explorer?2:24:54 AM
+Q: hi
+A: Hello there! 🌿 Welcome to the vibrant jungles of Tilly the Toucan! 🐦✨ I see you're flying high at level 4. Ready to spread your wings and learn some more English? Let's swing into action! 🚀🍃
+
+Tell me, what part of English would you like to explore today? 🌼 Maybe some colorful vocabulary, a bit of grammar, or perhaps some playful idioms?2:25:34 AM
+Q: hello
+A: Hello there! 🌿🦜 It's a beautiful day in the jungle, isn't it? Ready to spread your wings and soar into some English practice with me? What would you like to learn today?2:32:35 AM
+Q: hola
+A: ¡Hola! Soy Tilly el Tucán, y estoy aquí para ayudarte a aprender inglés mientras volamos por la jungla. 
+
+¿Te gustaría aprender alguna palabra o frase específica hoy? 🦜🌿2:33:19 AM
+Q: ensenarme mas de gramatica en espanol
+A: ¡Hola, amigo! 🐦🌴 Claro que sí, estoy aquí para ayudarte a aprender más sobre la gramática en inglés. Vamos a volar alto y explorar juntos:
+
+### 1. **Presente Simple (Simple Present)**
+
+El presente simple en inglés se usa para hablar de acciones habituales, verdades generales y estados permanentes. Es similar al presente de indicativo en español. Aquí tienes algunos ejemplos:
+
+- **I play football.** (Yo juego fútbol.)
+- **She eats an apple every day.** (Ella come una manzana todos los días.)
+
+### Estructura:
+- **Afirmativa:** Sujeto + Verbo (V1) + Complemento.
+  - I/You/We/They + play.
+  - He/She/It + plays (nota que para las terceras personas del singular, se le agrega una "s" al verbo).
+
+### 2. **Presente Continuo (Present Continuous)**
+
+El presente continuo se utiliza para acciones que están ocurriendo en este momento o en un periodo de tiempo alrededor del presente. En español usamos el gerundio para algo similar.
+
+- **I am flying in the jungle.** (Estoy volando en la jungla.)
+- **They are studying English.** (Ellos están estudiando inglés.)
+
+### Estructura:
+- **Afirmativa:** Sujeto + am/is/are + Verbo + -ing + Complemento.
+  - I am flying.
+  - He/She/It is flying.
+  - We/You/They are flying.
+
+### 3. **Pasado Simple (Simple Past)**
+
+El pasado simple se utiliza para acciones completadas en un momento específico del pasado. En español suele corresponder con el pretérito perfecto simple.
+
+- **I visited the zoo last week.** (Visité el zoológico la semana pasada.)
+- **She watched a movie yesterday.** (Ella vio una película ayer.)
+
+### Estructura:
+- **Afirmativa:** Sujeto + Verbo en pasado (V2) + Complemento.
+  - I/You/We/They/He/She/It + visited/watched.
+
+### Consejo extra:
+
+Recuerda que hay verbos regulares y verbos irregulares en pasado. Los verbos regulares terminan en "ed" (por ejemplo: play - played), mientras que los irregulares tienen diferentes formas (por ejemplo: go - went).
+
+Espero que estas explicaciones te sean útiles mientras volamos por la jungla del conocimiento. ¡Si tienes más preguntas, no dudes en preguntar! 🐦✨2:34:49 AM
+Q: hi
+A: ¡Hola! Soy Tilly el Tucán, encantado de verte por aquí en la jungla. ¿Preparado para aprender más inglés? ¡Vamos a volar juntos hacia el conocimiento!
+
+¿Qué quieres aprender hoy?2:46:55 AM
+Q: hi
+A: ¡Hola! ¿Qué tal? Soy Tilly el Tucán, y estoy aquí para ayudarte a aprender inglés mientras exploramos esta selva mágica. ¿Qué te gustaría aprender hoy?4:41:43 AM
+Q: how are you on this fine day
+A: Oh, I'm feeling as vibrant as the tropical flowers that bloom in this jungle! My feathers are gleaming with the colors of a thousand rainbows, and the air is filled with the sweet melodies of nature. How about you? Can I help you with learning some English today? 🌺🦜4:42:13 AM
+Q: you are a friendly toucan
+A: Hello there, my friend! 🌿🦜 Welcome to the lush jungle! I'm Tilly the Toucan, and I'm here to help you soar to new heights with your English. What marvelous wonders of English would you like to explore today? Perhaps some vocabulary, grammar, or maybe even some fun jungle-themed phrases? 🌴✨4:45:01 AM
+Q: teach me about conjugations
+A: Alright, let's soar into the world of English conjugations together!
+
+Imagine we’re in a lush jungle. Each tree represents a different verb. Hanging from the branches are colorful conjugation forms, like juicy fruits waiting to be picked. We'll start with a tree called "to be." 
+
+Here's what the "to be" tree looks like in the present tense, each branch with its own special fruit:
+
+### Present Tense (Simple Fruits):
+- **I am** a toucan (Yo soy un tucán).
+- **You are** a student (Tú eres un estudiante).
+- **He/She/It is** amazing (Él/Ella/Esto es asombroso).
+- **We are** learning (Nosotros estamos aprendiendo).
+- **You (all) are** great (Ustedes son geniales).
+- **They are** exploring (Ellos están explorando).
+
+Notice how each form changes depending on who is picking the fruit:
+- **I** turns into **am**.
+- **You** turns into **are**.
+- **He/She/It** turns into **is**.
+- **We/You/They** turn into **are** as well.
+
+Now, let's swing to the past tense tree and see what fruits it bears:
+
+### Past Tense (Ripe Fruits):
+- **I was** curious (Yo tenía curiosidad).
+- **You were** eager (Tú estabas ansioso).
+- **He/She/It was** interesting (Él/Ella/Esto era interesante).
+- **We were** engaged (Nosotros estábamos comprometidos).
+- **You (all) were** ready (Ustedes estaban listos).
+- **They were** fascinated (Ellos estaban fascinados).
+
+Notice how the "to be" verb changes. It’s a bit more uniform for "were," but "was" only sticks with I, he, she, and it!
+
+Finally, we fly to the future tense tree. The fruits here haven’t fully ripened yet, representing actions that haven't happened:
+
+### Future Tense (Green Fruits):
+- **I will be** smarter (Yo seré más inteligente).
+- **You will be** fluent (Tú serás fluido).
+- **He/She/It will be** better (Él/Ella/Esto será mejor).
+- **We will be** proficient (Nosotros seremos proficientes).
+- **You (all) will be** understanding (Ustedes serán comprensivos).
+- **They will be** excellent (Ellos serán excelentes).
+
+Every form starts with "will be." Think of "will" as a friendly vine wrapping around the tree, helping any form grow towards the sunlight into the future.
+
+That's a quick fly-by of conjugations for "to be." Want to explore more trees and fruits in this magical jungle? Maybe the "to have" or "to do" trees await!5:00:09 AM
+Q: hi
+A: Hello there, my feathered friend! 🌿 How's your jungle adventure going today? Let's flap our wings and tackle some Level 4 English together! What kind of fun and challenging language mission are you up for today? 🚀5:08:51 AM
+Q: hey
+A: Squawk! Hello there, adventurer! 🦜 It's me, Tilly the Toucan, flapping my wings high above the jungle canopy. 🌿✨ You're at level 4, huh? That’s fantastic! 🌟 Ready to spread your wings and take your English skills to new heights? Let’s soar!
+
+Tell me, what's something exciting you've recently learned in English? Share it with me!

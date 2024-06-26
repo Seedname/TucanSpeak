@@ -1,0 +1,322 @@
+
+
+/* 🌟 GAME PAGE */
+
+
+body {
+    background-size: cover;
+    background-image: url(./pictures/background.jpg);
+    font-family: "Noto Sans", sans-serif;
+    font-weight: bolder;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.scoreboard { 
+    background-color: pink;
+    background-image: url("./pictures/score.jpg");
+    border: 5px solid rgb(81, 35, 11);
+    border-radius: 50px;
+    width: 1200px;
+    height: 700px;
+    margin-left: calc(100% / 2 - 600px);
+    margin-top: calc(50vh - 350px);
+    position: absolute;
+    z-index: 10;
+    text-align: center;
+    visibility: hidden;
+    
+}
+
+.scoreboard-show { 
+    visibility: visible;
+}
+
+.finalscore-container { 
+    /* margin-left: 50px; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+#final-score { 
+    color: red;
+}
+
+.final-message { 
+    padding-right: 100px;
+    padding-left: 100px;
+}
+
+#final-title{ 
+    font-size: 50px;
+    color: rgb(127, 37, 10);
+    font-weight: bolder;
+    justify-content: end;
+}
+
+.final-button{ 
+    background-color: rgb(199, 123, 100);
+    color: rgb(255, 255, 255);
+    border: 1px solid rgb(132, 80, 64);
+    border-radius: 20px;
+    padding: 10px;
+    width: 150px;
+    text-align: center;
+    font-size: 25px;
+    margin-top: 50px;
+}
+
+.final-button:hover { 
+    background-color: rgb(160, 100, 82);
+    color: rgb(255, 255, 255);
+    border: 1px solid rgb(132, 80, 64);
+}
+.final-button:active {
+    background-color: rgb(188, 133, 117);
+    color: rgb(255, 255, 255);
+    border: 1px solid rgb(132, 80, 64);
+}
+
+
+.top-section { 
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+
+.trackers {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 20px;
+    font-weight: bold;
+    
+
+}
+
+.trackers>* {
+    padding: 10px;
+    margin: 10px;
+    margin-top: 0;
+    border-radius: 20px;
+    width: 150px;
+    text-align: center;
+    font-size: 25px;
+
+
+}
+
+.time {
+    background-color: #FFAC8C;
+    border: 2.5px solid #F1591E;
+    color: #D64107;
+}
+
+.score {
+    background-color: #A4DD8C;
+    border: 2.5px solid #49841B;
+    color: #205003;
+}
+
+
+
+.ai-section {
+    margin-left: 10px;
+}
+
+.ai-button { 
+    width: 70px; 
+    height:70px; 
+    border-radius: 100%;
+    background-image: url(./pictures/robo1.png); 
+    background-size: contain;
+    border: 2px solid rgb(48, 127, 172);
+
+}
+
+.ai-button:hover { 
+    background-image: url(./pictures/robo2.png);
+}
+
+
+
+.api-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+    margin-left: 20px;
+}
+
+.api-response {
+    background-color: rgb(225, 249, 255);
+    border-radius: 25px;
+    border: 1px rgb(114, 142, 171) solid;
+    text-align: center;
+    word-wrap: break-word;
+    visibility: hidden;
+    margin-right: calc(100% - 245px);
+    position: absolute;
+    
+}
+.api-response-show{ 
+    visibility: visible;
+    padding: 10px;
+    flex-basis: auto;
+    width: 200px;
+    flex-grow: 4;
+
+}
+
+
+
+
+.bottom-section { 
+    margin-top: 100px;
+    margin-bottom: 40px;
+}
+
+
+.submit-container {
+    display: flex;
+    justify-content: center;
+}
+
+.submit-section {
+    border-radius: 30px;
+    background-color: #FFFEEC;
+    width: 780px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1.5px solid #A47E45;
+}
+.input {
+
+    width: 700px;
+    height: 100px;
+    outline: 0;
+    border: none;
+    background-color: #FFFEEC;
+    margin-top: 20px;
+    font-size: 18px;
+} 
+
+
+
+    input[type="text"]::placeholder {
+        color: #BBB784;
+        font-style: italic;
+    }
+
+
+
+.button {
+
+
+    border-radius: 20px; 
+    background-color: #E9F2FF;
+    color: #4F5F76;
+    border: 1px solid #A4B3C8; 
+    font-weight: bold;  
+
+
+    margin-right: 15px;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 80px; 
+   
+}
+
+.button:hover { 
+    background-color: #A4B3C8;
+    color: rgb(221, 221, 240);
+    border-color: #A4B3C8;
+}
+
+.button:active { 
+    background-color: #A4B3C8;
+    color: white;
+}
+
+.start-button { 
+    width: 80px; 
+    border-radius: 20px;
+        background-color: #e9fffc;
+        color: #4f766c;
+        border: 1px solid #A4B3C8;
+        font-weight: bold;
+        margin-bottom: 10px;
+        padding: 10px; 
+
+        
+}
+
+.start-button:hover { 
+    background-color: #a4c7c8;
+    color: rgb(221, 237, 240);
+    border-color: #A4B3C8;
+
+}
+
+.start-button:active{ 
+    background-color: #a4c8c8;
+    color: white;
+
+}
+
+.start-button-pressed{ 
+    background-color: rgb(177, 177, 177);
+    color:grey; 
+    border: 1px solid grey;
+
+}
+
+.start-button-pressed:active{
+    background-color: rgb(177, 177, 177);
+    color: grey;
+    border: 1px solid grey;
+
+}
+
+.start-button-pressed:hover {
+    background-color: rgb(177, 177, 177);
+    color: grey;
+    border: 1px solid grey;
+
+}
+
+
+.output-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.toucan {
+    width: 200px; 
+
+}
+
+.output { 
+    background-color: white;
+    height: 100px;
+    width: 400px;
+    border-radius: 100px;
+    overflow-wrap: break-word;
+    text-align: center;
+    bottom: 350px;
+    padding-top: 40px;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+

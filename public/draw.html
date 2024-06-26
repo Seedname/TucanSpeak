@@ -139,61 +139,12 @@
                 color: #666;
                 cursor: not-allowed;
             }
-
-            .menu {
-                padding: 10px;
-                position: relative;
-                display: inline-block;
-            }
-
-            .menu-button:hover {
-                background-color: #2e5a2f;
-            }
-
-            .menu-button {
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                cursor: pointer;
-            }
-
-            .menu-items {
-                display: none;
-                position: absolute;
-                background-color: #f9f9f9;
-                box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-                z-index: 1;
-                padding: 0;
-                width: 170px; 
-            }
-
-            .menu-items li {
-                list-style-type: none;
-                width: 100%; 
-            }
-
-            .menu-items li a {
-                display: block;
-                text-decoration: none;
-                color: black;
-                padding: 10px;
-            }
-
-            .menu-items li a:hover {
-                background-color: #ddd;
-            }
-
-
-            .menu:hover .menu-items {
-                display: block;
-            }
-
         </style>
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/ml5@latest/dist/ml5.min.js"></script>
+        <link rel="stylesheet" href="menu.css">
         <script src="./draw.js" type="text/javascript"></script>
         <script src="./menu.js"></script>
 
@@ -207,10 +158,13 @@
                 <li><a href="/">Home</a></li>
 				<li><a href="/flight">Tucan Fly</a></li>
 				<li><a href="/draw">Tucan Draw</a></li>
+				<li><a href="/speak">Tucan Talk</a></li>
+				<li><a href="/write">Tucan Write</a></li>
 				<li><a href="javascript:void(0);" onclick="return changeLanguage()">Cambiar Idioma</a></li>
 				<li><a href="javascript:void(0);" onclick="return signOut()">Sign out</a></li>
 			</ul>
 		</div>
+
         <div>
         <button id="startRound" style="margin:10px;z-index:2;" onclick="startRound()">Start Round</button>
         </div>

@@ -3,6 +3,7 @@ import https from 'https';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import OpenAI from 'openai';
+import OpenAIAPI from 'openai';
 import bodyParser from 'body-parser';
 import { config } from 'dotenv';
 import fs from 'fs';
@@ -14,7 +15,10 @@ import crypto from 'crypto';
 import { promisify } from 'util'
 import session from 'express-session';
 import { default as RedisStore } from "connect-redis";
-import { createClient } from 'redis';
+import { createClient } from 'redis';``
+import { TranslationServiceClient } from '@google-cloud/translate';
+import path from 'path';
+
 
 config();
 
@@ -93,20 +97,34 @@ if (dev) {
 const wss = new WebSocketServer({ server });
 const API_KEY = process.env.OPENAI_API_KEY;
 const openai = new OpenAI({ apiKey: API_KEY });
-const sessionStore = new RedisStore({ client: redisClient });
+const openaiInstruct = new OpenAIAPI({ apiKey: API_KEY });
+const sessionStore = new RedisStore({ 
+  client: redisClient,
+  ttl: 24 * 60 * 60
+});
 const secret = crypto.randomBytes(128).toString('base64');
 const sessionParser = session({
   store: sessionStore,
   secret: secret,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: !dev, httpOnly: false, signed: false }
+  cookie: { 
+    secure: !dev, 
+    httpOnly: false, 
+    signed: false,
+    maxAge: 24 * 60 * 60 * 1000
+  }
 });
 
+app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(sessionParser);
+app.use(express.static('public', {
+  extensions: ['html', 'htm']
+}));
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -169,6 +187,122 @@ function sign(val, secret){
     .digest('base64')
     .replace(/=+$/, '');
 }
+
+let nextUpdateTime;
+const translate = new TranslationServiceClient();
+
+async function generatePrompts() {
+  try {
+      const response = await openaiInstruct.completions.create({
+          model: 'gpt-3.5-turbo-instruct',
+          prompt: 'Generate a list of ten basic english sentences the progressively get more difficult. Do not number them the prompts. They should not contain numbers. Each sentence must be at maximum equal to 68 characters in length and no less then 50 characters.',
+          max_tokens: 250,
+          temperature: 0.7,
+      });
+
+      const generatedText = response.choices[0].text.trim();
+      const generatedPrompts = generatedText
+          .split('\n')
+          .map(prompt => prompt.replace(/^\d+\.\s*/, '').trim()) 
+          .filter(prompt => prompt);
+
+      console.log("Generated prompts successfully")
+      return generatedPrompts
+  } catch (e) {
+      console.error('Error generating prompts: ', e);
+      return [];
+  }
+};
+
+async function translatePrompts(prompts, targetLanguage) {
+  try {
+    const [translations] = await translate.translateText({
+        parent: `projects/${process.env.GOOGLE_CLOUD_CONSOLE_PROJECT_ID}`,
+        contents: prompts,
+        mimeType: 'text/plain',
+        sourceLanguageCode: 'en',
+        targetLanguageCode: targetLanguage,
+    });
+
+    if (!Array.isArray(translations.translations)) {
+        throw new Error('Translations are not in expected format.');
+    }
+
+    const translatedPrompts = translations.translations.map(translation => translation.translatedText);
+
+    return translatedPrompts;
+  } catch (e) {
+    console.error('Error translating prompts: ', e);
+    return prompts;
+  }
+}
+
+async function updatePrompts() {
+  try {
+      const prompts = await generatePrompts();
+      const translatedPrompts = await translatePrompts(prompts, 'es');
+
+      fs.writeFileSync(path.join(__dirname, 'prompts.json'), JSON.stringify({ prompts, translatedPrompts }));
+      console.log("Prompts updated successfully")
+      nextUpdateTime = Date.now() + (5 * 60 * 1000)
+  } catch (e) {
+      console.error('Error updating prompts:', e);
+  }
+};
+
+async function generateTTS(text) {
+  const mp3 = await openai.audio.speech.create({
+    model: "tts-1",
+    voice: "nova",
+    input: text,
+    response_format: "opus"
+  });
+  const bufferStr = Buffer.from(await mp3.arrayBuffer()).toString("base64");
+  return bufferStr;
+}
+
+async function initializePromptsSchedule() {
+  await updatePrompts();
+  setInterval(updatePrompts, 5 * 60 * 1000);
+};
+
+initializePromptsSchedule();
+
+
+app.post('/prompts', (req, res) => {
+  try {
+      const promptsData = fs.readFileSync(path.join(__dirname, 'prompts.json'));
+      const { prompts, translatedPrompts } = JSON.parse(promptsData);
+
+      res.json({ prompts, translatedPrompts });
+  } catch (e) {
+      console.error('Error fetching prompts: ', e);
+      res.status(500).json({ error: 'Error fetching prompts'});
+  }
+});
+
+
+app.get('/time-remaining', (req, res) => {
+  const timeRemaining = nextUpdateTime - Date.now();
+  res.json({ timeRemaining });
+});
+
+app.post('/synthesize-speech', async (req, res) => {
+  const { text } = req.body;
+
+  if (!text) {
+    return res.status(400).json({ error: 'Text parameter required' });
+  }
+
+  try {
+    let audioResponse = "data:audio/ogg;base64," + await generateTTS(text);
+    res.json({ audioResponse });
+  } catch (e) {
+    console.error('error synthesizing speech: ', e);
+    res.status(500).json({ error: 'Error synthesizing speech'});
+  }
+});
+
 
 app.get('/login', async (req, res) => {
   const valid = await validUser({'username': req.session.user, 'password': req.session.password});
@@ -245,6 +379,10 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
   const valid = await validUser({'username': req.session.user, 'password': req.session.password});
   if (!valid) {
     return res.redirect('/login');
@@ -298,14 +436,6 @@ app.post('/sign-out', async (req, res) => {
     return res.status(200).json({url: '/login'});
 });
 
-app.post('/get-cookie', async (req, res) => {
-  if ('language' in req.cookies) {
-    const language = req.cookies['language'];
-    return res.status(200).json({language: language});
-  }
-  return res.status(400).send("Something went wrong");
-});
-
 app.post('/change-language', async (req, res) => {
   if ('language' in req.cookies) {
     if (req.cookies['language'] == "Spanish") {
@@ -327,7 +457,6 @@ app.get('/flight', async (req, res) => {
   return res.sendFile(__dirname + '/public/flight.html');
 });
 
-
 app.get('/draw', async (req, res) => {
   const valid = await validUser({'username': req.session.user, 'password': req.session.password});
   if (!valid) {
@@ -336,9 +465,73 @@ app.get('/draw', async (req, res) => {
   return res.sendFile(__dirname + '/public/draw.html');
 });
 
-app.use(express.static('public', {
-  extensions: ['html', 'htm']
-}));
+app.get('/speak', async (req, res) => {
+  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  if (!valid) {
+    return res.redirect('/login');
+  }
+  return res.sendFile(__dirname + '/public/prompts.html');
+});
+
+async function handleUserInput(userInput) {
+  const systemPrompt = "You are an English teacher for Spanish-speaking students. Your task is to assess if the student's translation from Spanish to English is correct. If the translation is correct, include the word “correct” in your response, and briefly explain why their answer is accurate. Additionally, mention how the translated sentence is useful in real-world contexts. Your response should be primarily in English, with a few minor Spanish words sprinkled in for flavor. If the translation is incorrect, do not use the word “correct” in your response. Instead, provide a subtle hint pointing out their mistake without directly correcting it. Your feedback should help guide the student toward the right answer. The response should still be mostly in English, with a few minor Spanish words here and there to maintain a conversational tone. Your response should not exceed 200 characters.";
+  try {
+      const assistant = await openai.beta.assistants.create({
+          name: "Tilly",
+          instructions: systemPrompt,
+          tools: [{ type: "code_interpreter" }],
+          model: "gpt-4o"
+      });
+
+      const thread = await openai.beta.threads.create();
+
+      await openai.beta.threads.messages.create(thread.id, {
+          role: "user",
+          content: userInput
+      });
+
+      let assistantResponse = '';
+      const run = openai.beta.threads.runs.stream(thread.id, {
+          assistant_id: assistant.id
+      }).on('textDelta', textDelta => {
+          assistantResponse += textDelta.value;
+      }).on('end', () => {
+          return assistantResponse;
+      });
+
+      return new Promise((resolve) => {
+          run.on('end', () => resolve(assistantResponse));
+      });
+
+  } catch (error) {
+      console.error('Error with OpenAI:', error);
+      throw new Error('Failed to get a response from the assistant.');
+  }
+}
+
+app.post('/message', async (req, res) => {
+  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  if (!valid) {
+    res.status(500).json({ error: 'An error occurred while processing your request.' });
+    return;
+  }
+
+  const userInput = req.body.message;
+  try {
+      const response = await handleUserInput(userInput);
+      res.json({ response });
+  } catch (error) {
+      res.status(500).json({ error: 'An error occurred while processing your request.' });
+  }
+});
+
+app.get('/write', async (req, res) => {
+  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  if (!valid) {
+    return res.redirect('/login');
+  }
+  return res.sendFile(__dirname + '/public/scramble.html');
+});
 
 const system = fs.readFileSync('./system_message.txt', 'utf-8');
 const additionalContext = "Be creative with your responses.";
@@ -381,7 +574,6 @@ function updateLevel(user, points, type) {
   users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward, 'tucanFlightWins': flightWins, 'tucanDrawWins': drawWins}})
 }
 
-
 function getCookies(request) {
   var cookies = {};
   request.headers && request.headers.cookie.split(';').forEach(function(cookie) {
@@ -393,6 +585,10 @@ function getCookies(request) {
 
 wss.on('connection', async (ws, req) => {
   var sessionID = getCookies(req)["connect.sid"];
+  if (!(sessionID in sessionHash)) {
+    ws.close();
+    return;
+  }
   var sid = sessionHash[sessionID];
   let sess;
   try {
@@ -416,6 +612,7 @@ wss.on('connection', async (ws, req) => {
   const valid = await validUser({'username': username, 'password': password});
 
   ws.on('message', async (data) => {
+    data = JSON.parse(data);
     switch(data.type) {
       case "start":
         let playerLevel = ` The user is currently at level ${valid['level']+1}. Adjust your responses accordingly.`
@@ -425,7 +622,7 @@ wss.on('connection', async (ws, req) => {
           { role: 'system', content: system },
           { role: 'user', content: searchTerm + additionalContext + playerLevel + languagePreference},
         ];
-
+        
         ws.send(JSON.stringify({ type: 'start' }));
         let finalMessage = "";
         openai.chat.completions.create({
@@ -442,10 +639,10 @@ wss.on('connection', async (ws, req) => {
           }
         }) .catch((error) => {
           console.error(error);
-        }) .finally(() => {
+        }) .finally(async () => {
           const currentTime = new Date().toLocaleTimeString();
           fs.appendFile('data.txt', `${currentTime}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
-          ws.send(JSON.stringify({ type: 'end' }));
+          ws.send(JSON.stringify({ type: 'end', audio: "data:audio/ogg;base64," + await generateTTS(finalMessage) }));
         });
         break;
       case "drawWin":
