@@ -306,11 +306,11 @@ function setup() {
     if (language == "Spanish") {
         document.querySelectorAll(".menu").item(0).outerHTML = '<div class="menu"><button class="menu-button">Menú</button><ul class="menu-items"><li><a href="/">Página Principal</a></li><li><a href="/flight">Tucan Volar</a></li><li><a href="/draw">Tucan Dibujar</a></li><li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li><li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul></div>';
     }
-    const sessionID = getCookie("connect.sid");
+
     if (location.protocol == 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}:443`, sessionID);
+        ws = new WebSocket(`wss://${window.location.host}:443`);
     } else {
-        ws = new WebSocket(`ws://${window.location.host}:80`, sessionID);
+        ws = new WebSocket(`ws://${window.location.host}:80`);
     }
     textScale = width/2560;
     drawBackground(0);

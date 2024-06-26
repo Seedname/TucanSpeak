@@ -21,12 +21,11 @@ let ws;
 
 function preload() {
     classifier = ml5.imageClassifier('/model.json');
-    const sessionID = getCookie("connect.sid");
 
     if (location.protocol == 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}:443`, sessionID);
+        ws = new WebSocket(`wss://${window.location.host}:443`);
     } else {
-        ws = new WebSocket(`ws://${window.location.host}:80`, sessionID);
+        ws = new WebSocket(`ws://${window.location.host}:80`);
     }
 }
 

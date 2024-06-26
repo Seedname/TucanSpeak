@@ -15,7 +15,6 @@ import { promisify } from 'util'
 import session from 'express-session';
 import { default as RedisStore } from "connect-redis";
 import { createClient } from 'redis';
-import url from 'url';
 
 config();
 
@@ -82,7 +81,7 @@ if (dev) {
   server.listen(443);
 
   app.use ((req, res, next) => {
-    if (rec.secure)  {
+    if (req.secure)  {
       next();
     } else {
       res.redirect('https://tucanspeak.org' + req.url);
@@ -93,12 +92,13 @@ if (dev) {
 const wss = new WebSocketServer({ server });
 const API_KEY = process.env.OPENAI_API_KEY;
 const openai = new OpenAI({ apiKey: API_KEY });
+const sessionStore = new RedisStore({ client: redisClient });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(session({
-  store: new RedisStore({ client: redisClient }),
+  store: sessionStore,
   secret: crypto.randomBytes(128).toString('base64'),
   resave: false,
   saveUninitialized: true,
@@ -114,7 +114,7 @@ const iterations = 100000;
 async function deriveKey(password, salt) {
   try {
     const derivedKey = await pbkdf2Async(password, salt, iterations, 128, 'sha512');
-    return derivedKey.toString('hex'); 
+    return derivedKey.toString('hex');
   } catch (err) {
     throw err;
   }
@@ -205,9 +205,9 @@ app.post('/register', async (req, res) => {
     const hashed = await hashPassword(password);
 
     var currentTime = new Date().toLocaleDateString('en-US', {
-      timeZone: 'America/New_York', 
+      timeZone: 'America/New_York',
       year: 'numeric',
-      month: '2-digit', 
+      month: '2-digit',
       day: '2-digit'
     });
 
@@ -222,7 +222,7 @@ app.post('/register', async (req, res) => {
       'gameTime': currentTime,
       'collectedReward': false
     });
-    
+
     req.session.user = username;
     req.session.password = password;
 
@@ -238,9 +238,9 @@ app.get('/', async (req, res) => {
   }
   if (valid) {
     let currentTime = new Date().toLocaleDateString('en-US', {
-      timeZone: 'America/New_York', 
+      timeZone: 'America/New_York',
       year: 'numeric',
-      month: '2-digit', 
+      month: '2-digit',
       day: '2-digit'
     });
     let update = {}
@@ -338,7 +338,7 @@ function updateLevel(user, points, type) {
   let level = user['level'];
   let xp = user['xp'];
   let collectedReward = user['collectedReward'];
-  
+
   let id = user["_id"]
   let flightWins = user['tucanFlightWins'];
   let drawWins = user['tucanDrawWins'];
@@ -350,7 +350,7 @@ function updateLevel(user, points, type) {
   }
 
   xp += points;
-  
+
   if (xp >= 20) {
     level ++;
     xp %= 20;
@@ -368,74 +368,81 @@ function updateLevel(user, points, type) {
   users.findOneAndUpdate({_id: id}, {$set: {'level': level, 'xp': xp, 'collectedReward': collectedReward, 'tucanFlightWins': flightWins, 'tucanDrawWins': drawWins}})
 }
 
-wss.on('connection', (ws, req) => {
-    const sessionID = req.headers['sec-websocket-protocol'];
-    console.log(sessionID);
-    if (!sessionID) {
-      ws.close();
+wss.on('connection', async (ws) => {
+  let session;
+
+  parseCookie(ws.upgradeReq, null, function(err) {
+    var sessionID = ws.upgradeReq.cookies['sid'];
+
+    if (err || !sessionID) {
       return;
     }
 
-    ws.send(JSON.stringify({type: 'connected'}));
-
-    redisClient.get(`sess:${sessionID}`, async (err, session) => {
-      if (err || !session) {
-        ws.close();
+    sessionStore.get(sessionID, async (err, currentSession) => {
+      if (err || !currentSession) {
         return;
       }
-      
-      const parsedSession = JSON.parse(session);
-      const username = parsedSession.username;
-      const password = parsedSession.password;
-      
-      const valid = await validUser({'username': username, 'password': password});
-      
-      if (!valid) {
-        ws.close();
-        return;
-      }
-
-      ws.on('message', async (data) => {
-        switch(data.type) {
-          case "start":
-            let playerLevel = ` The user is currently at level ${valid['level']+1}. Adjust your responses accordingly.`
-            let languagePreference = ` The user's language preference is ${data.language}. Respond in this language.`
-            let searchTerm = data.content;
-            const conversation = [
-              { role: 'system', content: system },
-              { role: 'user', content: searchTerm + additionalContext + playerLevel + languagePreference},
-            ];
-
-            ws.send(JSON.stringify({ type: 'start' }));
-            let finalMessage = "";
-            openai.chat.completions.create({
-              model: 'gpt-3.5-turbo',
-              messages: conversation,
-              stream: true
-            }) .then(async (completion) => {
-              for await (const chunk of completion) {
-                if (chunk.choices[0].finish_reason !== 'stop') {
-                  const content = chunk.choices[0].delta.content;
-                  finalMessage += content;
-                  ws.send(JSON.stringify({ type: 'update', content }));
-                }
-              }
-            }) .catch((error) => {
-              console.error(error);
-            }) .finally(() => {
-              const currentTime = new Date().toLocaleTimeString();
-              fs.appendFile('data.txt', `${currentTime}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
-              ws.send(JSON.stringify({ type: 'end' }));
-            });
-            break;
-          case "drawWin":
-            updateLevel(valid, 1, 'draw');
-            break;
-          case "flightWin":
-            updateLevel(valid, data.points, 'flight');
-            break;
-        }
-      });
-
+      session = currentSession;
     });
+  
+  });
+
+  if (!session) {
+    ws.close();
+    return;
+  }
+
+  ws.send(JSON.stringify({type: 'connected'}));
+  
+  const username = session.username;
+  const password = session.password;
+
+  const valid = await validUser({'username': username, 'password': password});
+
+  if (!valid) {
+    ws.close();
+    return;
+  }
+
+  ws.on('message', async (data) => {
+    switch(data.type) {
+      case "start":
+        let playerLevel = ` The user is currently at level ${valid['level']+1}. Adjust your responses accordingly.`
+        let languagePreference = ` The user's language preference is ${data.language}. Respond in this language.`
+        let searchTerm = data.content;
+        const conversation = [
+          { role: 'system', content: system },
+          { role: 'user', content: searchTerm + additionalContext + playerLevel + languagePreference},
+        ];
+
+        ws.send(JSON.stringify({ type: 'start' }));
+        let finalMessage = "";
+        openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: conversation,
+          stream: true
+        }) .then(async (completion) => {
+          for await (const chunk of completion) {
+            if (chunk.choices[0].finish_reason !== 'stop') {
+              const content = chunk.choices[0].delta.content;
+              finalMessage += content;
+              ws.send(JSON.stringify({ type: 'update', content }));
+            }
+          }
+        }) .catch((error) => {
+          console.error(error);
+        }) .finally(() => {
+          const currentTime = new Date().toLocaleTimeString();
+          fs.appendFile('data.txt', `${currentTime}\nQ: ${searchTerm}\nA: ${finalMessage}`, err => {});
+          ws.send(JSON.stringify({ type: 'end' }));
+        });
+        break;
+      case "drawWin":
+        updateLevel(valid, 1, 'draw');
+        break;
+      case "flightWin":
+        updateLevel(valid, data.points, 'flight');
+        break;
+    }
+  });
 });
