@@ -621,33 +621,22 @@ function getCookies(request) {
 
 
 wss.on('connection', async (ws, req) => {
-  console.log(req.session.user);
-  // var sessionID = getCookies(req)["connect.sid"];
-  // if (!(sessionID in sessionHash)) {
-  //   ws.close();
-  //   return;
-  // }
-  // var sid = sessionHash[sessionID];
-  // let sess;
-  // try {
-  //   sess = await new Promise((resolve, reject) => {
-  //     sessionStore.load(sid, function (err, session) {
-  //       if (err || !session) {
-  //         return reject(err || new Error('Session not found'));
-  //       }
-  //       resolve(session);
-  //     });
-  //   });    
-  // } catch (error) {
-  //   console.error('Failed to retrieve session:', error);
-  // }
+  if (!req.session || !req.session.user) {
+    ws.close();
+    return;
+  }
 
-  // ws.send(JSON.stringify({type: 'connected'}));
+  const username = req.session.user;
+  const password = req.session.password;
 
-  // const username = sess.user;
-  // const password = sess.password;
+  const valid = await validUser({'username': username, 'password': password});
 
-  // const valid = await validUser({'username': username, 'password': password});
+  if (!valid) {
+    ws.close();
+    return;
+  }
+
+  ws.send(JSON.stringify({type: 'connected'}));
 
   ws.on('message', async (data) => {
     data = JSON.parse(data);
