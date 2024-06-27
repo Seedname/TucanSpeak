@@ -34,6 +34,7 @@ redisClient.connect().catch(console.error);
 const dev = process.env.NODE_ENV !== 'production'
 
 const uri = `mongodb+srv://${process.env.MONGODB_PASS}@cluster0.fqcesgs.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = "mongodb://localhost:27017/";
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -45,7 +46,7 @@ const client = new MongoClient(uri, {
 
 let db;
 let users;
-const sessionHash = [];
+// const sessionHash = [];
 
 async function connectToMongoDB() {
     try {
@@ -94,7 +95,18 @@ if (dev) {
   });
 }
 
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({
+  server: server,
+  clientTracking: true,
+  verifyClient: (info, done) => {
+    console.log("Parsing session info from request...");
+    sessionParser(info.req, {}, () => {
+      // console.log(info.req);
+      done(info.req.session);
+    })
+  }
+}, () => {});
+
 const API_KEY = process.env.OPENAI_API_KEY;
 const openai = new OpenAI({ apiKey: API_KEY });
 const openaiInstruct = new OpenAIAPI({ apiKey: API_KEY });
@@ -154,6 +166,13 @@ async function hashPassword(password) {
 async function isPasswordCorrect(savedHash, savedSalt, passwordAttempt) {
   const hashed = await deriveKey(passwordAttempt, savedSalt);
   return savedHash == hashed;
+}
+
+
+async function findOne(query) {
+  return await users.find(query).limit(1).next(function(err, doc){
+      return doc;
+  })
 }
 
 async function validUser(content) {
@@ -239,12 +258,12 @@ async function translatePrompts(prompts, targetLanguage) {
 
 async function updatePrompts() {
   try {
-      const prompts = await generatePrompts();
-      const translatedPrompts = await translatePrompts(prompts, 'es');
+    const prompts = await generatePrompts();
+    const translatedPrompts = await translatePrompts(prompts, 'es');
 
-      fs.writeFileSync(path.join(__dirname, 'prompts.json'), JSON.stringify({ prompts, translatedPrompts }));
-      console.log("Prompts updated successfully")
-      nextUpdateTime = Date.now() + (5 * 60 * 1000)
+    fs.writeFileSync(path.join(__dirname, 'prompts.json'), JSON.stringify({ prompts, translatedPrompts }));
+    console.log("Prompts updated successfully")
+    nextUpdateTime = Date.now() + (5 * 60 * 1000)
   } catch (e) {
       console.error('Error updating prompts:', e);
   }
@@ -271,13 +290,13 @@ initializePromptsSchedule();
 
 app.post('/prompts', (req, res) => {
   try {
-      const promptsData = fs.readFileSync(path.join(__dirname, 'prompts.json'));
-      const { prompts, translatedPrompts } = JSON.parse(promptsData);
+    const promptsData = fs.readFileSync(path.join(__dirname, 'prompts.json'));
+    const { prompts, translatedPrompts } = JSON.parse(promptsData);
 
-      res.json({ prompts, translatedPrompts });
+    res.json({ prompts, translatedPrompts });
   } catch (e) {
-      console.error('Error fetching prompts: ', e);
-      res.status(500).json({ error: 'Error fetching prompts'});
+    console.error('Error fetching prompts: ', e);
+    res.status(500).json({ error: 'Error fetching prompts'});
   }
 });
 
@@ -320,8 +339,8 @@ app.post('/login', async (req, res) => {
   if (valid) {
     req.session.user = req.body.username;
     req.session.password = req.body.password;
-    let sessionIdHash = sign(req.sessionID, secret);
-    sessionHash[encodeURIComponent(`s:${sessionIdHash}`)] = req.sessionID;
+    // let sessionIdHash = sign(req.sessionID, secret);
+    // sessionHash[encodeURIComponent(`s:${sessionIdHash}`)] = req.sessionID;
     res.cookie('language', "English", { maxAge: 86400*1000*400 });
     return res.json({ redirectUrl: '/' });
   }
@@ -379,14 +398,15 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  if (!req.session.user) {
+  if (!req.session || !req.session.user) {
     return res.redirect('/login');
   }
 
-  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  if (!valid) {
-    return res.redirect('/login');
-  }
+  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  // if (!valid) {
+  //   return res.redirect('/login');
+  // }
+
   if (valid) {
     let currentTime = new Date().toLocaleDateString('en-US', {
       timeZone: 'America/New_York',
@@ -450,26 +470,35 @@ app.post('/change-language', async (req, res) => {
 });
 
 app.get('/flight', async (req, res) => {
-  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  if (!valid) {
+  if (!req.session || !req.session.user) {
     return res.redirect('/login');
   }
+  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  // if (!valid) {
+  //   return res.redirect('/login');
+  // }
   return res.sendFile(__dirname + '/public/flight.html');
 });
 
 app.get('/draw', async (req, res) => {
-  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  if (!valid) {
+  if (!req.session || !req.session.user) {
     return res.redirect('/login');
   }
+  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  // if (!valid) {
+  //   return res.redirect('/login');
+  // }
   return res.sendFile(__dirname + '/public/draw.html');
 });
 
 app.get('/speak', async (req, res) => {
-  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  if (!valid) {
+  if (!req.session || !req.session.user) {
     return res.redirect('/login');
   }
+  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  // if (!valid) {
+  //   return res.redirect('/login');
+  // }
   return res.sendFile(__dirname + '/public/prompts.html');
 });
 
@@ -510,11 +539,15 @@ async function handleUserInput(userInput) {
 }
 
 app.post('/message', async (req, res) => {
-  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  if (!valid) {
+  if (!req.session || !req.session.user) {
     res.status(500).json({ error: 'An error occurred while processing your request.' });
-    return;
+    return;  
   }
+  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  // if (!valid) {
+  //   res.status(500).json({ error: 'An error occurred while processing your request.' });
+  //   return;
+  // }
 
   const userInput = req.body.message;
   try {
@@ -526,10 +559,13 @@ app.post('/message', async (req, res) => {
 });
 
 app.get('/write', async (req, res) => {
-  const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  if (!valid) {
+  if (!req.session || !req.session.user) {
     return res.redirect('/login');
   }
+  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
+  // if (!valid) {
+  //   return res.redirect('/login');
+  // }
   return res.sendFile(__dirname + '/public/scramble.html');
 });
 
@@ -583,33 +619,35 @@ function getCookies(request) {
   return cookies;
 }
 
+
 wss.on('connection', async (ws, req) => {
-  var sessionID = getCookies(req)["connect.sid"];
-  if (!(sessionID in sessionHash)) {
-    ws.close();
-    return;
-  }
-  var sid = sessionHash[sessionID];
-  let sess;
-  try {
-    sess = await new Promise((resolve, reject) => {
-      sessionStore.load(sid, function (err, session) {
-        if (err || !session) {
-          return reject(err || new Error('Session not found'));
-        }
-        resolve(session);
-      });
-    });    
-  } catch (error) {
-    console.error('Failed to retrieve session:', error);
-  }
+  console.log(req.session.user);
+  // var sessionID = getCookies(req)["connect.sid"];
+  // if (!(sessionID in sessionHash)) {
+  //   ws.close();
+  //   return;
+  // }
+  // var sid = sessionHash[sessionID];
+  // let sess;
+  // try {
+  //   sess = await new Promise((resolve, reject) => {
+  //     sessionStore.load(sid, function (err, session) {
+  //       if (err || !session) {
+  //         return reject(err || new Error('Session not found'));
+  //       }
+  //       resolve(session);
+  //     });
+  //   });    
+  // } catch (error) {
+  //   console.error('Failed to retrieve session:', error);
+  // }
 
-  ws.send(JSON.stringify({type: 'connected'}));
+  // ws.send(JSON.stringify({type: 'connected'}));
 
-  const username = sess.user;
-  const password = sess.password;
+  // const username = sess.user;
+  // const password = sess.password;
 
-  const valid = await validUser({'username': username, 'password': password});
+  // const valid = await validUser({'username': username, 'password': password});
 
   ws.on('message', async (data) => {
     data = JSON.parse(data);
