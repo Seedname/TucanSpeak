@@ -49,6 +49,8 @@ function sendVerificationEmail(email, user, verificationString) {
   );
 }
 
+
+
 const redisClient = createClient({
   socket: {
     host: "localhost",
@@ -85,7 +87,7 @@ async function connectToMongoDB() {
     }
 }
 
-connectToMongoDB();
+await connectToMongoDB();
 
 const app = express();
 
@@ -227,14 +229,6 @@ async function validUser(content) {
     }
   }
   return false;
-}
-
-function sign(val, secret){
-  return val + '.' + crypto
-    .createHmac('sha256', secret)
-    .update(val)
-    .digest('base64')
-    .replace(/=+$/, '');
 }
 
 let nextUpdateTime;
@@ -404,7 +398,7 @@ app.post('/register', async (req, res) => {
       day: '2-digit'
     });
 
-    const verificationString = crypto.randomBytes(128).toString('base64');
+    const verificationString = crypto.randomBytes(128).toString('hex');
 
     await users.insertOne({
       'username': username,
