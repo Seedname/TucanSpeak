@@ -380,7 +380,7 @@ $('.start-button').click(function() {
     $(this).addClass("start-button-pressed");
     $(this).prop('disabled', true); // Disable the button
 
-    let timeLeft = 30; // Initial time in seconds
+    let timeLeft = 60; // Initial time in seconds
 
     // Function to format the time in "TIME: MM:SS" format
     function formatTime(seconds) {
