@@ -425,6 +425,8 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
+  console.log(true);
+
   if (!req.session || !req.session.authenticated) {
     return res.redirect('/login');
   }
@@ -452,7 +454,7 @@ app.get('/', async (req, res) => {
       await users.findOneAndUpdate({_id: valid["_id"]}, {$set:update});
     }
   }
-  return res.sendFile(__dirname + '/public/index.html');
+  return res.sendFile(__dirname + '/public/page.html');
 });
 
 app.post('/', async (req, res) => {
@@ -543,8 +545,9 @@ app.get('/verify', async (req, res) => {
 app.post('/verify', async (req, res) => {
   if (!req.session || !req.session.user || !req.query || !req.query.id || req.session.authenticated === true) {
     res.status(400).send("something went wrong");
+    return;
   }
-
+  
   const user = await users.findOne({
     "username" : req.session.user
   });
@@ -554,7 +557,7 @@ app.post('/verify', async (req, res) => {
     req.session.authenticated = true;
   }
 
-  await users.findOneAndUpdate({"username": req.session.user}, user);
+  await users.findOneAndUpdate({"username": req.session.user}, {$set: user});
   
   return res.status(200).send("verified");
 });
