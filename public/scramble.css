@@ -7,7 +7,7 @@ body {
     background-size: cover;
     background-image: url(./pictures/background.jpg);
     font-family: "Noto Sans", sans-serif;
-    font-weight: bolder;
+    /* font-weight: bolder; */
     margin: 0;
     box-sizing: border-box;
 }
@@ -75,12 +75,12 @@ body {
     color: rgb(255, 255, 255);
     border: 1px solid rgb(132, 80, 64);
 }
+
 .final-button:active {
     background-color: rgb(188, 133, 117);
     color: rgb(255, 255, 255);
     border: 1px solid rgb(132, 80, 64);
 }
-
 
 .top-section { 
     display: flex;
@@ -90,15 +90,12 @@ body {
     margin-bottom: 0;
 }
 
-
 .trackers {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     font-size: 20px;
     font-weight: bold;
-    
-
 }
 
 .trackers>* {
@@ -109,8 +106,6 @@ body {
     width: 150px;
     text-align: center;
     font-size: 25px;
-
-
 }
 
 .time {
@@ -125,8 +120,6 @@ body {
     color: #205003;
 }
 
-
-
 .ai-section {
     margin-left: 10px;
 }
@@ -138,7 +131,6 @@ body {
     background-image: url(./pictures/robo1.png); 
     background-size: contain;
     border: 2px solid rgb(48, 127, 172);
-
 }
 
 .ai-button:hover { 
@@ -163,19 +155,16 @@ body {
     word-wrap: break-word;
     visibility: hidden;
     margin-right: calc(100% - 245px);
-    position: absolute;
-    
+    position: absolute;   
 }
+
 .api-response-show{ 
     visibility: visible;
     padding: 10px;
     flex-basis: auto;
     width: 200px;
     flex-grow: 4;
-
 }
-
-
 
 
 .bottom-section { 
@@ -201,7 +190,6 @@ body {
     border: 1.5px solid #A47E45;
 }
 .input {
-
     width: 700px;
     height: 100px;
     outline: 0;
@@ -212,22 +200,16 @@ body {
 } 
 
 
-
-    input[type="text"]::placeholder {
-        color: #BBB784;
-        font-style: italic;
-    }
-
-
+input[type="text"]::placeholder {
+    color: #BBB784;
+    font-style: italic;
+}
 
 .button {
-
-
     border-radius: 20px; 
     background-color: #E9F2FF;
     color: #4F5F76;
     border: 1px solid #A4B3C8; 
-    font-weight: bold;  
 
 
     margin-right: 15px;
@@ -251,14 +233,12 @@ body {
 .start-button { 
     width: 80px; 
     border-radius: 20px;
-        background-color: #e9fffc;
-        color: #4f766c;
-        border: 1px solid #A4B3C8;
-        font-weight: bold;
-        margin-bottom: 10px;
-        padding: 10px; 
-
-        
+    background-color: #e9fffc;
+    color: #4f766c;
+    border: 1px solid #A4B3C8;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding: 10px;         
 }
 
 .start-button:hover { 

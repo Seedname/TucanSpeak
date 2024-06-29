@@ -460,17 +460,19 @@ function getCookie(name) {
   return null;
 }
 
-language = getCookie('language');
-if (language == "Spanish") {
-  document.querySelectorAll(".menu").item(0).outerHTML = '\
-              <div class="menu"> \
-                  <button class="menu-button">Menú</button> \
-                  <ul class="menu-items"><li><a href="/">Página Principal</a></li> \
-                  <li><a href="/flight">Tucan Volar</a></li> \
-                  <li><a href="/draw">Tucan Dibujar</a></li> \
-                  <li><a href="/speak">Tucan Hablar</a></li> \
-                  <li><a href="/write">Tucan Traducir</a></li> \
-                  <li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li> \
-                  <li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul> \
-              </div>';
-}
+$ (document).ready(function() {
+  let language = getCookie('language');
+  if (language == "Spanish") {
+    document.querySelectorAll(".menu").item(0).outerHTML = '\
+                <div class="menu"> \
+                    <button class="menu-button">Menú</button> \
+                    <ul class="menu-items"><li><a href="/">Página Principal</a></li> \
+                    <li><a href="/flight">Tucan Volar</a></li> \
+                    <li><a href="/draw">Tucan Dibujar</a></li> \
+                    <li><a href="/speak">Tucan Hablar</a></li> \
+                    <li><a href="/write">Tucan Traducir</a></li> \
+                    <li><a href="javascript:void(0);" onclick="return changeLanguage()">Change Language</a></li> \
+                    <li><a href="javascript:void(0);" onclick="return signOut()">Desconectar</a></li></ul> \
+                </div>';
+  }
+});

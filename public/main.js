@@ -149,25 +149,24 @@ document.addEventListener('DOMContentLoaded', () => {
             
             audio.appendChild(audioSource);
             audioContainer.appendChild(audio);
+
+            audio.onplay = function() {
+              talking = true;
+            };
+            
+            audio.onended = function() {
+              talking = false;
+              flydownLock = false;
+              flying = false;
+            };
+
             break;
         default:
             break;
       }
     });
-
-    utterance.onstart = function() {
-      talking = true;
-      talkingCooldown = 1000;
-    };
     
-    utterance.onend = function() {
-      if (!flyDown) {
-        messageBox.value = "";
-      }
-      talking = false;
-      flydownLock = false;
-      flying = false;
-    };
+
   
     window.addEventListener('beforeunload', () => {
       ws.close();
