@@ -502,10 +502,6 @@ app.get('/flight', async (req, res) => {
   if (!req.session || !req.session.authenticated) {
     return res.redirect('/login');
   }
-  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  // if (!valid) {
-  //   return res.redirect('/login');
-  // }
   return res.sendFile(__dirname + '/public/flight.html');
 });
 
@@ -513,10 +509,6 @@ app.get('/draw', async (req, res) => {
   if (!req.session || !req.session.authenticated) {
     return res.redirect('/login');
   }
-  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  // if (!valid) {
-  //   return res.redirect('/login');
-  // }
   return res.sendFile(__dirname + '/public/draw.html');
 });
 
@@ -524,38 +516,31 @@ app.get('/speak', async (req, res) => {
   if (!req.session || !req.session.authenticated) {
     return res.redirect('/login');
   }
-  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  // if (!valid) {
-  //   return res.redirect('/login');
-  // }
   return res.sendFile(__dirname + '/public/prompts.html');
 });
 
 app.get('/verify', async (req, res) => {
-  if (!req.session || !req.session.user) {
-    return res.redirect('/login');
-  }
-  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  // if (!valid) {
-  //   return res.redirect('/login');
-  // }
   return res.sendFile(__dirname + '/public/verify.html');
 });
 
 app.post('/verify', async (req, res) => {
-  if (!req.session || !req.session.user || !req.query || !req.query.id || req.session.authenticated === true) {
+  if (!req.query || !req.query.id) {
     res.status(400).send("something went wrong");
     return;
   }
   
   const user = await users.findOne({
-    "username" : req.session.user
+    "verificationString" : req.query.id,
+    "authenticated": false
   });
 
-  if (req.query.id == user['verificationString']) {
-    user['authenticated'] = true;
-    req.session.authenticated = true;
+  if (!user) {
+    res.status(400).send("something went wrong");
+    return;
   }
+
+  user['authenticated'] = true;
+  req.session.authenticated = true;
 
   await users.findOneAndUpdate({"username": req.session.user}, {$set: user});
   
@@ -603,12 +588,6 @@ app.post('/message', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while processing your request.' });
     return;  
   }
-  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  // if (!valid) {
-  //   res.status(500).json({ error: 'An error occurred while processing your request.' });
-  //   return;
-  // }
-
   const userInput = req.body.message;
   try {
       const response = await handleUserInput(userInput);
@@ -622,10 +601,6 @@ app.get('/write', async (req, res) => {
   if (!req.session || !req.session.authenticated) {
     return res.redirect('/login');
   }
-  // const valid = await validUser({'username': req.session.user, 'password': req.session.password});
-  // if (!valid) {
-  //   return res.redirect('/login');
-  // }
   return res.sendFile(__dirname + '/public/scramble.html');
 });
 
