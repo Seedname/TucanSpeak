@@ -8,6 +8,7 @@ import Prompt from '../models/promptModel.js';
 import dotenv from 'dotenv';
 import { error } from 'console';
 
+
 dotenv.config()
 
 const __filename = fileURLToPath(import.meta.url);
@@ -165,6 +166,7 @@ const generatePrompts = async (rq, rs) => {
       temperature: 0.7,
   });
 
+  const userId = rq;
   const generatedText = response.choices[0].text.trim();
   const generatedPrompts = generatedText
     .split('\n')
@@ -175,10 +177,12 @@ const generatePrompts = async (rq, rs) => {
   const finalPrompts = await translatePrompts(generatedPrompts, targetLanguage)
 
   const newPrompt = new Prompt({
+    userId: userId,
     generatedPrompts: generatedPrompts,
     translatedPrompts: finalPrompts,
     targetLanguage: targetLanguage,
-    nextUpdateTime: Date.now() + (60 * 60 * 1000)
+    nextUpdateTime: Date.now() + (60 * 60 * 1000),
+    createdAt: Date.now()
   });
 
   await newPrompt.save();
@@ -187,8 +191,20 @@ const generatePrompts = async (rq, rs) => {
 
 export const fetchPrompts = async (rq, rs) => {
   try {
+
+    if (!rq.user) {
+      return rs.status(401).json({
+        success: false,
+        message: 'User not athenticated'
+      });
+    }
+
+    const userId = rq.user._id;
     const currentTime = Date.now();
-    const existingPrompts = await Prompt.findOne({}).sort({nextUpdateTime: -1});
+
+    const existingPrompts = await Prompt.findOne({
+      userId: userId
+    }).sort({nextUpdateTime: -1});
     
     if (existingPrompts && existingPrompts.nextUpdateTime > currentTime) {
       return rs.json({ 
@@ -198,8 +214,9 @@ export const fetchPrompts = async (rq, rs) => {
       });
     }
 
-    await Prompt.deleteOne({})
-    const newPrompts = await generatePrompts();
+    await Prompt.deleteMany({userId: userId})
+
+    const newPrompts = await generatePrompts(userId);
     return rs.json({
       success: true,
       prompts: newPrompts.generatedPrompts,
@@ -215,10 +232,22 @@ export const fetchPrompts = async (rq, rs) => {
 
 export const timeRemaining = async (rq, rs) => {
   try {
-    const existingPrompts = await Prompt.findOne({}).sort({ nextUpdateTime: -1 });
+
+    if (!rq.user || ! rq.user._id) {
+      return rs.status(401).json({
+        success: false,
+        message: 'User not athenticated'
+      });
+    }
+
+    const existingPrompts = await Prompt.findOne({
+      userId: rq.user._id
+    }).sort({ nextUpdateTime: -1 });
+
     if (!existingPrompts) {
       return rs.json({timeRemaining: 0});
     }
+
     const timeRemaining = Math.max(0, existingPrompts.nextUpdateTime - Date.now());
     return rs.json({timeRemaining});
   } catch(e) {
@@ -253,4 +282,3 @@ export const synthesizeSpeech = async (rq, rs) => {
     rs.json({success: false, message: "Error synthesizing speech"})
   };
 }
-

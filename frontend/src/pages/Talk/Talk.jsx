@@ -34,6 +34,11 @@ const Talk = () => {
   const [timeRemaining, setTimeRemaining] = useState(null);
   const [showTimer, setShowTimer] = useState(false);
 
+  const [showXPGain, setShowXpGain] = useState(false);
+  const [xpGained, setXpGained] = useState(0);
+  const [questComplete, setQuestComplete] = useState(false);
+  const [questXP, setQuestXP] = useState(0);
+
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -64,26 +69,76 @@ const Talk = () => {
     }
   };
 
-  const handleSuccess = () => {
-    successSoundRef.current.play();
-    setShowSuccess(true);
+  const handleSuccess = async () => {
+    try {
+      successSoundRef.current.play();
+      setShowSuccess(true);
 
-    setTimeout(() => {
-      setShowSuccess(false);
-      const nextIndex = currentIndex + 1;
-      setCurrentIndex(nextIndex);
+      const token = localStorage.getItem('token');
+      const nextIndex = currentIndex + 1
 
-      if (nextIndex >= allPrompts.english.length) {
-        saveProgress(nextIndex, true);
-        setCurrentPrompts(["...", "..."]);
-        setTranscript("...");
-        checkTimeRemaining();
-      } else {
-        saveProgress(nextIndex, false);
-        updateCurrentPrompts(nextIndex);
-        setTranscript("...");
+      const response = await axios.post(`${url}quest/handle-correct-answer`, 
+        {
+          activityType: 'talk'
+        }, 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+
+      const responseTwo = await axios.post(`${url}auth/talk-index`, 
+        {
+        "index": nextIndex
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (responseTwo.data.success) {
+        return ;
       }
-    }, 2000);
+
+      if (response.data.success) {
+        setXpGained(response.data.xpGained);
+        setShowXpGain(true);
+
+        if (response.data.questCompleted) {
+          setQuestComplete(true);
+          setQuestXP(response.data.questXP);
+        }
+
+        setTimeout(() => {
+          setShowXpGain(false);
+          if (response.data.questCompleted) {
+            setQuestComplete(false);
+          }
+        }, 2000)
+      }
+
+      setTimeout(() => {
+        setShowSuccess(false);
+        const nextIndex = currentIndex + 1;
+        setCurrentIndex(nextIndex);
+
+        if (nextIndex >= allPrompts.english.length) {
+          saveProgress(nextIndex, true);
+          setCurrentPrompts(["...", "..."]);
+          setTranscript("...");
+          checkTimeRemaining();
+        } else {
+          saveProgress(nextIndex, false);
+          updateCurrentPrompts(nextIndex);
+          setTranscript("...");
+        }
+      }, 2000);
+    } catch (e) {
+      console.error('Error handling success:', e);
+    }
   };
 
   const handleWrong = () => {
@@ -98,7 +153,12 @@ const Talk = () => {
 
   const checkTimeRemaining = async () => {
     try {
-      const response = await axios.get(`${url}prompt/time-remaining`);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${url}prompt/time-remaining`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       if (response.data && response.data.timeRemaining > 0) {
         setTimeRemaining(response.data.timeRemaining);
         setShowTimer(true);
@@ -197,6 +257,7 @@ const Talk = () => {
     });
 
     try {
+      const token = localStorage.getItem('token');
       const base64Audio = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result.split(',')[1]);
@@ -213,6 +274,7 @@ const Talk = () => {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
           }
         });
 
@@ -253,6 +315,7 @@ const Talk = () => {
 
   const fetchPrompts = async () => {
     try {
+      const token = localStorage.getItem('token');
       const resetAt = localStorage.getItem('resetAt');
       const completedAt = localStorage.getItem('tucanTalkCompletedAt');
       const savedProgess = localStorage.getItem('tucanTalkProgress')
@@ -271,7 +334,11 @@ const Talk = () => {
         }
       }
 
-      const response = await axios.get(`${url}prompt/get`);
+      const response = await axios.get(`${url}prompt/get`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
       if (response.data && response.data.success) {
         setAllPrompts({
@@ -306,6 +373,7 @@ const Talk = () => {
 
   const textToSpeech = async () => {
     try {
+      const token = localStorage.getItem('token');
       setError(null);
       const response = await axios.post(
         `${url}prompt/synthesize-speech`,
@@ -313,7 +381,10 @@ const Talk = () => {
           text: currentPrompts[0],
         },
         {
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
           responseType: "json",
         }
       );
@@ -384,6 +455,20 @@ const Talk = () => {
       {showWrong && (
         <div className="fixed top-[54%] left-[45%] transform -translate-x-[50%] -translate-y-[50%] bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-shake">
           Try Again!
+        </div>
+      )}
+
+      {/* XP Gain Notification */}
+      {showXPGain && (
+        <div className="fixed top-16 right-4 bg-yellow-400 text-black px-3 py-1 rounded-lg animate-bounce">
+          +{xpGained} XP
+        </div>
+      )}
+
+      {/* Quest Complete Notification */}
+      {questComplete && (
+        <div className="fixed top-28 right-4 bg-green-400 text-black px-3 py-1 rounded-lg animate-bounce">
+          Daily Quest Complete! +{questXP} XP
         </div>
       )}
 

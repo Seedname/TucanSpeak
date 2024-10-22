@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import { assets } from './src/assets/assets'
+
 export default {
     darkMode: ["class"],
     content: [

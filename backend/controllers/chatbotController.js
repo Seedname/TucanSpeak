@@ -8,7 +8,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// const system = fs.readFileSync('/system_message.txt', 'utf-8');
+const system = fs.readFileSync('/system_message.txt', 'utf-8');
 const additionalContext = "Be creative with your responses.";
 
 export const generateTTS = async (text) => {

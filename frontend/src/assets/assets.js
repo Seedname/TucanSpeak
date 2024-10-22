@@ -5,6 +5,8 @@ import no_image from "../assets/No_Image_Available.jpg"
 import tablet from "../assets/tablet.png"
 import toucan_profile from "../assets/toucan_profile.png"
 import user_profile from "../assets/user_profile.png"
+import score from "../assets/score.jpg";
+import toucan from "../assets/toucan.png";
 
 
 export const assets = {
@@ -15,4 +17,6 @@ export const assets = {
   tablet,
   toucan_profile,
   user_profile,
+  score,
+  toucan
 }

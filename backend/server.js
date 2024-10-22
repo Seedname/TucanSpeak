@@ -4,9 +4,11 @@ import cors from "cors"
 import { fileURLToPath } from 'url';
 import promptRouter from './routes/promptRoute.js'
 import authRouter from "./routes/authRoute.js";
+import drawRouter from "./routes/drawRoute.js"
 import path from "path"
 import mongoose from "mongoose"
 import dotenv from "dotenv";
+import questRouter from "./routes/questRoute.js";
 
 dotenv.config()
 
@@ -35,7 +37,9 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true}));
 
 //endpoints
 app.use("/prompt", promptRouter)
+app.use("/translate", drawRouter)
 app.use('/auth', authRouter)
+app.use('/quest', questRouter)
 
 app.get("/", (rq, rs)=>{
   rs.send("Server is Working")

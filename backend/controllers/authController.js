@@ -1,4 +1,3 @@
-import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 import crypto from "crypto"
 import jwt from 'jsonwebtoken';

@@ -175,7 +175,7 @@ const ToucanAnimation = () => {
           if (keys['d'] || keys['ArrowRight']) x += speed;
 
           flying = true;
-          x = p.constrain(x, window.innerWidth/4, 3*window.innerWidth/4);
+          x = p.constrain(x, 0, window.innerWidth/2);
           y = p.constrain(y, 200, window.innerHeight-0.22*window.innerHeight-p.height/2);
           camera.moveTo(x, y);
 
