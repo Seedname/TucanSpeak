@@ -108,7 +108,7 @@ const AIDisplay = () => {
   };
 
   return (
-    <div className="bg-white w-2/3 flex flex-col items-center h-screen">
+    <div className="w-2/3 flex flex-col items-center h-screen">
       <LevelBadge />
       <ToucanAnimation />
       <div className="flex flex-col flex-grow w-2/3 p-4 overflow-y-auto space-y-4" id="messageArea">
@@ -121,13 +121,14 @@ const AIDisplay = () => {
           </div>
         ))}
       </div>
-      <div className="w-2/3 flex items-center p-4 bg-gray-100">
+      <div className="w-2/3 flex items-center p-4">
         <input
           className="flex-1 bg-slate-50 rounded-full px-6 py-3 ml-2 border border-gray-300"
           id="chatbox"
           type="text"
           placeholder="Ask Me Anything..."
           value={userInput}
+          // onFocus={perchBird}
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={handleKeyPress}
         />

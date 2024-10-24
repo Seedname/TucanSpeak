@@ -74,28 +74,17 @@ const Talk = () => {
       successSoundRef.current.play();
       setShowSuccess(true);
 
-      const token = localStorage.getItem('token');
       const nextIndex = currentIndex + 1
 
       const response = await axios.post(`${url}api/quest/handle-correct-answer`, 
         {
           activityType: 'talk'
-        }, 
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
         }
       );
 
       const responseTwo = await axios.post(`${url}auth/talk-index`, 
         {
         "index": nextIndex
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
         }
       );
 
@@ -153,12 +142,7 @@ const Talk = () => {
 
   const checkTimeRemaining = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${url}prompt/time-remaining`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await axios.get(`${url}prompt/time-remaining`);
       if (response.data && response.data.timeRemaining > 0) {
         setTimeRemaining(response.data.timeRemaining);
         setShowTimer(true);
@@ -257,7 +241,6 @@ const Talk = () => {
     });
 
     try {
-      const token = localStorage.getItem('token');
       const base64Audio = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result.split(',')[1]);
@@ -270,12 +253,6 @@ const Talk = () => {
         {
           audioData: base64Audio,
           originalPrompt: currentPrompts[0],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          }
         });
 
         if (response.data?.success) {
@@ -315,7 +292,6 @@ const Talk = () => {
 
   const fetchPrompts = async () => {
     try {
-      const token = localStorage.getItem('token');
       const resetAt = localStorage.getItem('resetAt');
       const completedAt = localStorage.getItem('tucanTalkCompletedAt');
       const savedProgess = localStorage.getItem('tucanTalkProgress')
@@ -334,11 +310,7 @@ const Talk = () => {
         }
       }
 
-      const response = await axios.get(`${url}prompt/get`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await axios.get(`${url}prompt/get`);
 
       if (response.data && response.data.success) {
         setAllPrompts({
@@ -373,19 +345,11 @@ const Talk = () => {
 
   const textToSpeech = async () => {
     try {
-      const token = localStorage.getItem('token');
       setError(null);
       const response = await axios.post(
         `${url}prompt/synthesize-speech`,
         {
           text: currentPrompts[0],
-        },
-        {
-          headers: { 
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          responseType: "json",
         }
       );
 

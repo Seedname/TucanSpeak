@@ -8,7 +8,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help adventurers learn either English or Spanish.";
+const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help adventurers learn either English or Spanish. Do not use emojis in your response.";
 const additionalContext = "Be creative with your responses.";
 
 export const streamChatbotResponse = (req, res) => {
@@ -36,7 +36,7 @@ export const streamChatbotResponse = (req, res) => {
       try {
         const ttsResponse = await openai.audio.speech.create({
           model: 'tts-1',
-          voice: 'alloy',
+          voice: 'nova',
           input: task.message,
           response_format: "opus"
         });

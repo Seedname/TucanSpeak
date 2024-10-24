@@ -5,5 +5,5 @@ const Draw = () => {
     <div>Draw</div>
   )
 }
-
+  
 export default Draw
