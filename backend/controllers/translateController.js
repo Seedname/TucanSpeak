@@ -27,33 +27,4 @@ export const handleUserInput = async (req, res) => {
     console.error('Error with OpenAI:', error);
     throw new Error('Failed to get a response from the assistant.');
   }
-};
-
-export const handleUserInputStreaming = async (userInput) => {
-
-  try {
-    // Create a message with the user input
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userInput["body"]["message"] }
-      ],
-      model: "gpt-4o",
-      stream: true
-    });
-
-    // Initialize response
-    let fullResponse = '';
-
-    // Process the stream
-    for await (const chunk of completion) {
-      const content = chunk.choices[0]?.delta?.content || '';
-      fullResponse += content;
-    }
-
-    return fullResponse;
-  } catch (error) {
-    console.error('Error with OpenAI:', error);
-    throw new Error('Failed to get a response from the assistant.');
-  }
-};
+}

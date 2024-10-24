@@ -14,13 +14,7 @@ const LevelBadge = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${url}auth/user-stats`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
+        const response = await axios.get(`${url}api/quest/user-stats`);
         if (response.data.success) {
           setUserData({
             level: response.data.level,
@@ -29,7 +23,7 @@ const LevelBadge = () => {
           });
         }
       } catch (e) {
-        console.error('Error fetching user stats:', e)
+        // console.error('Error fetching user stats:', e)
       }
     };
 

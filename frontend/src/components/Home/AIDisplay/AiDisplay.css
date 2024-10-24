@@ -1,0 +1,22 @@
+.message-bubble {
+  max-width: 70%;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+}
+
+.user-message {
+  background-color: #e1ffc7;
+  align-self: flex-end;
+}
+
+.ai-message {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+}
+  
+#messageArea {
+  flex-grow: 2;
+  overflow-y: auto;
+}

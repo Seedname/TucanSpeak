@@ -1,26 +1,34 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 
-const auth = async (rq, rs, next) => {
-  try {
-    const token = rq.header('Authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      return rs.status(401).json({ success: false, message: 'No authentication token, access denied' });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
-      return rs.status(401).json({ success: false, message: 'User not found' });
-    }
-
-    rq.user = user;
-    next();
-  } catch (error) {
-    rs.status(401).json({ success: false, message: 'Token is invalid' });
+const auth = async (req, res, next) => {
+  const token = req?.cookies?.token;
+  if (!token) {
+    return res.status(403).json({ success: false });
   }
+
+  if (req.user) {
+    return next();
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(403).json({ success: false });
+  }
+
+  if (decoded?.id) {
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(403).json({ success: false });
+    }
+    req.user = user;
+    return next();
+  }
+
+  return res.status(403).json({ success: false });
 };
+
 
 export default auth;

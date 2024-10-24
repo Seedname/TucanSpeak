@@ -77,7 +77,7 @@ const Talk = () => {
       const token = localStorage.getItem('token');
       const nextIndex = currentIndex + 1
 
-      const response = await axios.post(`${url}quest/handle-correct-answer`, 
+      const response = await axios.post(`${url}api/quest/handle-correct-answer`, 
         {
           activityType: 'talk'
         }, 

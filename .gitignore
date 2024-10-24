@@ -1,3 +1,5 @@
 
 /backend/node_modules
 /.idea
+Dockerfile
+backend/.env

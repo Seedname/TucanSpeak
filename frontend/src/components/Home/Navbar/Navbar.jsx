@@ -13,7 +13,7 @@ import { AppContext } from "../../../context/AppContext.jsx";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const {url, setToken} = useContext(AppContext)
+  const {url} = useContext(AppContext)
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -25,8 +25,7 @@ const Navbar = () => {
   };
 
   const logOut = async () => {
-    localStorage.removeItem("token");
-    setToken(null);
+    await axios.post("/auth/logout");
     navigate('/');
   }
 

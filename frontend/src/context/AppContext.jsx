@@ -6,12 +6,9 @@ export const AppContext = createContext(null);
 const AppContextProvider = (props) => {
   
   const url = "http://localhost:4000/"
-  const [token, setToken] = useState(localStorage.getItem('token'))
 
   const contextValue = {
-    url,
-    token,
-    setToken
+    url
   }
   return (
     <AppContext.Provider value={contextValue}>

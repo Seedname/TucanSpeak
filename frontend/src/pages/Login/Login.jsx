@@ -2,17 +2,17 @@ import { useState, useContext, useEffect } from 'react'
 import { AppContext } from '../../context/AppContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getCookie } from '../../helper/helper'
 
 const Login = () => {
 
-  const {url, setToken} = useContext(AppContext)
+  const { url } = useContext(AppContext)
   const [currState, setCurrState] = useState("Login");
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    if (getCookie('token')) {
       navigate('/home', {replace: true});
     }
   }, [navigate])
@@ -31,39 +31,23 @@ const Login = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault()
-    let newUrl = url;
-    if(currState==="Login") {
-      newUrl += "auth/login"
-      try {
-        const response = await axios.post(newUrl, data);
-        if (response.data.token) {
-          setToken(response.data.token);
-          localStorage.setItem("token", response.data.token);
-          const from = location.state?.from?.pathname || '/home';
-          navigate(from, {replace: true});
-          navigate("/home");
-        } else {
-          alert(response.data.message)
-        }
-      } catch (e) {
-        if (e.response && e.response.status === 400 ) {
-          alert(e.response.data.message);
-        } else {
-          alert("An error occured. Please try again.");
-        }
+    if(currState === "Login") {
+      const response = await axios.post(`${url}auth/login`, data);
+      if (response?.data?.success) {
+        const from = location.state?.from?.pathname ?? '/home';
+        navigate(from, {replace: true});
+        navigate("/home");
+      } else {
+        alert(response.data.message);
       }
+      return;
+    } 
+
+    const response = await axios.post(`${url}auth/register`, data);
+    if (response?.data?.success) {
+      navigate('/verify-wait', {state: {email: data.email }, replace: true});
     } else {
-      newUrl += "auth/register"
-      try {
-        const response = await axios.post(newUrl, data);
-        if (response.data.success) {
-          navigate('/verify-wait', {state: {email: data.email }, replace: true});
-        } else {
-          alert(response.data.message);
-        }
-      } catch (e) {
-        alert('Registration failed. Please try again.')
-      }
+      alert(response.data.message);
     }
   }
 

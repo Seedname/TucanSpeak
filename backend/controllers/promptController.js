@@ -8,14 +8,13 @@ import Prompt from '../models/promptModel.js';
 import dotenv from 'dotenv';
 import { error } from 'console';
 
-
 dotenv.config()
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const openai = new OpenAIAPI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 const translate = new TranslationServiceClient();
@@ -23,17 +22,17 @@ const tts = new TextToSpeechClient();
 const speechClient = new SpeechClient();
 
 
-export const recognizeSpeech = async (rq, rs) => {
-  if (!rq.body.audioData) {
-    return rs.status(400).json({success: false, error: 'Audio data is required' });
+export const recognizeSpeech = async (req, res) => {
+  if (!req.body.audioData) {
+    return res.status(400).json({success: false, error: 'Audio data is required' });
   }
 
   try {
     let audioBuffer
     try {
-      audioBuffer = Buffer.from(rq.body.audioData, 'base64');
+      audioBuffer = Buffer.from(req.body.audioData, 'base64');
     } catch (e) {
-      return rs.status(400).json({
+      return res.status(400).json({
         success: false,
         error: 'Invalid audio data format. Must be base64 encoded'
       });
@@ -57,7 +56,7 @@ export const recognizeSpeech = async (rq, rs) => {
     const [response] = await speechClient.recognize(request);
 
     if (!response.results || response.results.length === 0) {
-      return rs.status(422).json({
+      return res.status(422).json({
         success: false,
         error: 'No speech could be recognized in the audio'
       });
@@ -68,13 +67,13 @@ export const recognizeSpeech = async (rq, rs) => {
       .join('\n');
 
     let similarity = 0;
-    if (rq.body.originalPrompt) {
-      const originalPrompt = rq.body.originalPrompt.toLowerCase().replace(/[^\w\s]/g, '');
+    if (req.body.originalPrompt) {
+      const originalPrompt = req.body.originalPrompt.toLowerCase().replace(/[^\w\s]/g, '');
       const transcriptText = transcription.toLowerCase().replace(/[^\w\s]/g, '');
       similarity = calculateSimilarity(originalPrompt, transcriptText);
     }
 
-    rs.json({
+    res.json({
       success: true,
       transcript: transcription,
       similarity: similarity,
@@ -85,12 +84,12 @@ export const recognizeSpeech = async (rq, rs) => {
     console.error('Speech recognition error:', error);
 
     if (e.code === 4) {
-      rs.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Invalid audio format or corrupted audio data'
       });
     }
-    rs.status(500).json({
+    res.status(500).json({
       success: false,
       error: 'Error processing speech recognition'
     });
@@ -158,7 +157,7 @@ const translatePrompts = async (prompts, targetLanguage) => {
   }
 }
 
-const generatePrompts = async (rq, rs) => {
+const generatePrompts = async (req, res) => {
   const response = await openai.completions.create({
       model: 'gpt-3.5-turbo-instruct',
       prompt: 'Generate a list of ten basic english sentences the progressively get more difficult. Do not number the prompts. They should not contain numbers. Each sentence must be at maximum equal to 68 characters in length and no less then 50 characters.',
@@ -166,7 +165,7 @@ const generatePrompts = async (rq, rs) => {
       temperature: 0.7,
   });
 
-  const userId = rq;
+  const userId = req;
   const generatedText = response.choices[0].text.trim();
   const generatedPrompts = generatedText
     .split('\n')
@@ -189,17 +188,17 @@ const generatePrompts = async (rq, rs) => {
   return newPrompt;
 };
 
-export const fetchPrompts = async (rq, rs) => {
+export const fetchPrompts = async (req, res) => {
   try {
 
-    if (!rq.user) {
-      return rs.status(401).json({
+    if (!req.user) {
+      return res.status(401).json({
         success: false,
         message: 'User not athenticated'
       });
     }
 
-    const userId = rq.user._id;
+    const userId = req.user._id;
     const currentTime = Date.now();
 
     const existingPrompts = await Prompt.findOne({
@@ -207,7 +206,7 @@ export const fetchPrompts = async (rq, rs) => {
     }).sort({nextUpdateTime: -1});
     
     if (existingPrompts && existingPrompts.nextUpdateTime > currentTime) {
-      return rs.json({ 
+      return res.json({ 
         success: true, 
         prompts: existingPrompts.generatedPrompts, translatedPrompts: existingPrompts.translatedPrompts,
         nextUpdateTime: existingPrompts.nextUpdateTime
@@ -217,7 +216,7 @@ export const fetchPrompts = async (rq, rs) => {
     await Prompt.deleteMany({userId: userId})
 
     const newPrompts = await generatePrompts(userId);
-    return rs.json({
+    return res.json({
       success: true,
       prompts: newPrompts.generatedPrompts,
       translatedPrompts: newPrompts.translatedPrompts,
@@ -225,34 +224,34 @@ export const fetchPrompts = async (rq, rs) => {
     });
   } catch (e) {
     console.log(e);
-    return rs.status(500).json({ success: false, message: 'Error generating or translating prompts' });
+    return res.status(500).json({ success: false, message: 'Error generating or translating prompts' });
   }
 
 };
 
-export const timeRemaining = async (rq, rs) => {
+export const timeRemaining = async (req, res) => {
   try {
 
-    if (!rq.user || ! rq.user._id) {
-      return rs.status(401).json({
+    if (!req.user || ! req.user._id) {
+      return res.status(401).json({
         success: false,
         message: 'User not athenticated'
       });
     }
 
     const existingPrompts = await Prompt.findOne({
-      userId: rq.user._id
+      userId: req.user._id
     }).sort({ nextUpdateTime: -1 });
 
     if (!existingPrompts) {
-      return rs.json({timeRemaining: 0});
+      return res.json({timeRemaining: 0});
     }
 
     const timeRemaining = Math.max(0, existingPrompts.nextUpdateTime - Date.now());
-    return rs.json({timeRemaining});
+    return res.json({timeRemaining});
   } catch(e) {
     console.log(e);
-    return rs.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Error fetching time remaining'
     });
@@ -260,11 +259,11 @@ export const timeRemaining = async (rq, rs) => {
 };
 
 
-export const synthesizeSpeech = async (rq, rs) => {
-  const { text } = rq.body;
+export const synthesizeSpeech = async (req, res) => {
+  const { text } = req.body;
 
   if(!text) {
-    return rs.status(400).json({error: 'Text Missing'});
+    return res.status(400).json({error: 'Text Missing'});
   }
 
   const request = {
@@ -276,9 +275,9 @@ export const synthesizeSpeech = async (rq, rs) => {
   try {
     const [response] = await tts.synthesizeSpeech(request);
     const audioContent = response.audioContent.toString('base64');
-    rs.json({audioContent});
+    res.json({audioContent});
   } catch (e) {
     console.log(e);
-    rs.json({success: false, message: "Error synthesizing speech"})
+    res.json({success: false, message: "Error synthesizing speech"})
   };
 }

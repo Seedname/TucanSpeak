@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
+import { useNavigate } from "react-router-dom";
 import {Clock} from 'lucide-react';
 import axios from "axios"
 import { AppContext } from '../../../context/AppContext';
@@ -16,6 +17,8 @@ const DailyQuest = () => {
   const [quests, setQuests] = useState([]);
   const [resetTime, setResetTime] = useState(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchQuests();
 
@@ -25,11 +28,7 @@ const DailyQuest = () => {
 
   const fetchQuests = async () => {
     try {
-      const response = await axios.get(`${url}quest/daily-quest`, {
-        headers : {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const response = await axios.get(`${url}api/quest/daily-quest`);
       if (response.data.success) {
         setQuests(response.data.quests);
 
