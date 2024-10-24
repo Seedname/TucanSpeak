@@ -1,0 +1,50 @@
+.menu {
+    padding: 10px;
+    position: relative;
+    display: inline-block;
+}
+
+.menu-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+.menu-button:hover {
+    background-color: #2e5a2f;
+}
+
+.menu-items {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+    padding: 0;
+    width: 170px; 
+}
+
+ul {
+    list-style-type: none;
+}
+    
+.menu-items li {    
+    width: 100%; 
+}
+
+.menu-items li a {
+    display: block;
+    text-decoration: none;
+    color: black;
+    padding: 10px;
+}
+
+.menu-items li a:hover {
+    background-color: #ddd;
+}
+
+
+.menu:hover .menu-items {
+    display: block;
+}

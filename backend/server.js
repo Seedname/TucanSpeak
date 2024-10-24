@@ -27,6 +27,8 @@ app.use(cors({
   credentials: true
 }));
 
+const dev = process.env.NODE_ENV !== 'production';
+
 const connectDB = async () => {
   await mongoose.connect(process.env.MONGODB_URL)
   .then(()=>console.log("Database Connected"));
@@ -36,11 +38,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.use('/draw', express.static(path.join(__dirname, '../frontend/public/Draw')));
+
+app.get('/draw', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/public/Draw', 'draw.html'));
+});
+
 
 app.use(express.json())
 
-app.use(bodyParser.json({limit: '10mb'}));
-app.use(bodyParser.urlencoded({ limit: '10mb', extended: true}));
+app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyParser.urlencoded({ limit: '100mb', extended: true}));
 
 app.use(cookieParser());
 

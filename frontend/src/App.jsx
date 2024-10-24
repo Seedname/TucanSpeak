@@ -1,9 +1,8 @@
 import React from 'react'
-import { Route, Router, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import Login from './pages/Login/Login'
 import Home from './pages/Home/Home'
 import Flight from './pages/Flight/Flight'
-import Draw from './pages/Draw/Draw'
 import Talk from './pages/Talk/Talk'
 import Translate from './pages/Translate/Translate'
 import VerifyWait from './pages/VerifyWait/VerifyWait'
@@ -23,7 +22,7 @@ const App = () => {
             </ProtectedRoute>
           }/>
         <Route path='/flight' element={<Flight/>} />
-        <Route path='/draw' element={<Draw/>} />
+        {/* We remove the /draw route from here */}
         <Route path='/talk' element={<Talk/>} />
         <Route path='/translate' element={<Translate/>} />
       </Routes>

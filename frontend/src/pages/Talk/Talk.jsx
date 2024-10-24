@@ -14,10 +14,9 @@ const Talk = () => {
   ]);
   const [transcript, setTranscript] = useState("...");
   const [currentIndex, setCurrentIndex] = useState(() => {
-    const savedProgess = localStorage.getItem('tucanTalkProgress');
-    if (savedProgess) {
-      const {index} = JSON.parse(savedProgess);
-      return index;
+    const currentIndex = localStorage.getItem('tucanTalkProgress');
+    if (currentIndex != undefined) {
+      return currentIndex;
     }
     return 0;
   });
@@ -46,7 +45,7 @@ const Talk = () => {
   const streamRef = useRef(null);
 
   const saveProgress = (index, isCompleted = false) => {
-    localStorage.setItem('tucanTalkProgress', JSON.stringify({ index }));
+    localStorage.setItem('tucanTalkProgress', index);
 
     if (isCompleted) {
       const timestamp = Date.now();
@@ -73,62 +72,31 @@ const Talk = () => {
     try {
       successSoundRef.current.play();
       setShowSuccess(true);
-
-      const nextIndex = currentIndex + 1
-
-      const response = await axios.post(`${url}api/quest/handle-correct-answer`, 
-        {
-          activityType: 'talk'
-        }
-      );
-
-      const responseTwo = await axios.post(`${url}auth/talk-index`, 
-        {
-        "index": nextIndex
-        }
-      );
-
-      if (responseTwo.data.success) {
-        return ;
+  
+      const nextIndex = currentIndex + 1;
+  
+      const response = await axios.post(`${url}api/quest/handle-correct-answer`, {
+        activityType: 'talk'
+      });
+  
+      setShowSuccess(false);
+      setCurrentIndex(nextIndex);
+      localStorage.setItem("tucanTalkProgress", nextIndex);
+      if (nextIndex >= allPrompts.english.length) {
+        saveProgress(nextIndex, true);
+        setCurrentPrompts(["...", "..."]);
+        setTranscript("...");
+        checkTimeRemaining();
+      } else {
+        saveProgress(nextIndex, false);
+        updateCurrentPrompts(nextIndex);
+        setTranscript("...");
       }
-
-      if (response.data.success) {
-        setXpGained(response.data.xpGained);
-        setShowXpGain(true);
-
-        if (response.data.questCompleted) {
-          setQuestComplete(true);
-          setQuestXP(response.data.questXP);
-        }
-
-        setTimeout(() => {
-          setShowXpGain(false);
-          if (response.data.questCompleted) {
-            setQuestComplete(false);
-          }
-        }, 2000)
-      }
-
-      setTimeout(() => {
-        setShowSuccess(false);
-        const nextIndex = currentIndex + 1;
-        setCurrentIndex(nextIndex);
-
-        if (nextIndex >= allPrompts.english.length) {
-          saveProgress(nextIndex, true);
-          setCurrentPrompts(["...", "..."]);
-          setTranscript("...");
-          checkTimeRemaining();
-        } else {
-          saveProgress(nextIndex, false);
-          updateCurrentPrompts(nextIndex);
-          setTranscript("...");
-        }
-      }, 2000);
     } catch (e) {
       console.error('Error handling success:', e);
     }
   };
+  
 
   const handleWrong = () => {
     wrongSoundRef.current.play();
@@ -142,7 +110,7 @@ const Talk = () => {
 
   const checkTimeRemaining = async () => {
     try {
-      const response = await axios.get(`${url}prompt/time-remaining`);
+      const response = await axios.get(`${url}api/prompt/time-remaining`);
       if (response.data && response.data.timeRemaining > 0) {
         setTimeRemaining(response.data.timeRemaining);
         setShowTimer(true);
@@ -235,11 +203,11 @@ const Talk = () => {
       console.error("No audio data recorded");
       return;
     }
-
+  
     const audioBlob = new Blob(audioChunksRef.current, {
       type: "audio/webm;codecs=opus",
     });
-
+  
     try {
       const base64Audio = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -247,29 +215,28 @@ const Talk = () => {
         reader.onerror = reject;
         reader.readAsDataURL(audioBlob);
       });
-
-      const response = await axios.post(
-        `${url}prompt/recognize-speech`,
-        {
-          audioData: base64Audio,
-          originalPrompt: currentPrompts[0],
-        });
-
-        if (response.data?.success) {
-          setTranscript(response.data.transcript || 'No transcript recieved');
-          if (response.data.similarity >= 84) {
-            handleSuccess();
-          } else {
-            handleWrong()
-          }
+  
+      const response = await axios.post(`${url}api/prompt/recognize-speech`, {
+        audioData: base64Audio,
+        originalPrompt: currentPrompts[0],
+      });
+  
+      if (response.data?.success) {
+        setTranscript(response.data.transcript || 'No transcript received');
+        if (response.data.similarity >= 84) {
+          handleSuccess();
         } else {
-          setError('Failed to process speech recognition');
+          handleWrong();
         }
+      } else {
+        setError('Failed to process speech recognition');
+      }
     } catch (e) {
       setError('Error processing speech');
       console.error('Error processing audio:', e);
     }
   };
+  
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
@@ -294,7 +261,7 @@ const Talk = () => {
     try {
       const resetAt = localStorage.getItem('resetAt');
       const completedAt = localStorage.getItem('tucanTalkCompletedAt');
-      const savedProgess = localStorage.getItem('tucanTalkProgress')
+      const currentIndex = localStorage.getItem('tucanTalkProgress')
 
       if (resetAt) {
         const remainingTime = parseInt(resetAt, 10) - Date.now()
@@ -310,7 +277,7 @@ const Talk = () => {
         }
       }
 
-      const response = await axios.get(`${url}prompt/get`);
+      const response = await axios.get(`${url}api/prompt/get`);
 
       if (response.data && response.data.success) {
         setAllPrompts({
@@ -318,9 +285,8 @@ const Talk = () => {
           translated: response.data.translatedPrompts,
         });
 
-        if (savedProgess && !completedAt) {
-          const {index} = JSON.parse(savedProgess);
-          const validIndex = Math.min(index, response.data.prompts.length - 1);
+        if (currentIndex != undefined && currentIndex >= 0 && !completedAt) {
+          const validIndex = Math.min(currentIndex, response.data.prompts.length - 1);
           setCurrentIndex(validIndex);
           setCurrentPrompts([
             response.data.prompts[validIndex],
@@ -347,7 +313,7 @@ const Talk = () => {
     try {
       setError(null);
       const response = await axios.post(
-        `${url}prompt/synthesize-speech`,
+        `${url}api/prompt/synthesize-speech`,
         {
           text: currentPrompts[0],
         }

@@ -26,6 +26,7 @@ const Navbar = () => {
 
   const logOut = async () => {
     await axios.post("/auth/logout");
+    localStorage.removeItem("messages");
     navigate('/');
   }
 

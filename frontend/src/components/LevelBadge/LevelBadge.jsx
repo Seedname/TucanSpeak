@@ -30,30 +30,39 @@ const LevelBadge = () => {
     fetchUserData();
   }, [])
 
+  
   const progress = (userData.xp / userData.requiredXP) * 100;
 
-
   return (
-    <div className='absolute top-[75%] right-[4%] flex items-center bg-gray-900 rounded-lg p-2 shadow-lg'>
+    <div className='fixed top-[5%] left-1/2 transform -translate-x-1/2 flex items-center bg-white rounded-lg p-2 shadow-lg'>
       <div className='relative w-12 h-12 flex items-center justify-center'>
-        <div className='absolute w-full h-full rounded-full border-4 border-gray-700 '/>
-        <div 
-        className='absolute w-full h-full rounded-full border-4 border-blue-500' 
-        style={{
-          clipPath: `polygon(0 0, 100% 0, 100% 100%, 0 100%)`,
-          transform: `rotate(${progress * 3.6}deg)`
-        }}
-        />
-          <span className='text-xl font-bold text-white'>{userData.level}</span>
+        {/* Background circle */}
+        <div className='absolute w-full h-full rounded-full border-4 border-gray-700'></div>
+  
+        {/* Progress circle using conic-gradient */}
+        <div
+          className='absolute w-full h-full rounded-full'
+          style={{
+            background: `conic-gradient(green ${progress * 3.6}deg, transparent 0deg)`,
+          }}
+        ></div>
+  
+        {/* Level text */}
+        <span className='absolute text-xl font-bold text-gray-800'>
+          {userData.level}
+        </span>
+      </div>
+      
+      {/* Level progress information */}
+      <div className='ml-2'>
+        <div className='text-xs text-black'>Level Progress</div>
+        <div className='text-sm text-black'>
+          {userData.xp} / {userData.requiredXP} XP
         </div>
-        <div className='ml-2'>
-          <div className='text-xs text-gray-400'>Level Progress</div>
-          <div className='text-sm text-white'>
-            {userData.xp} / {userData.requiredXP} XP
-          </div>
       </div>
     </div>
   );
+  
 };
 
 export default LevelBadge;

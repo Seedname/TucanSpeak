@@ -101,7 +101,6 @@ export const login = async (req, res) => {
   }
 };
 
-
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;

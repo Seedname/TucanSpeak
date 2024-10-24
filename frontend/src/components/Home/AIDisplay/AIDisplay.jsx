@@ -1,9 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import ToucanAnimation from "../../Toucan/Toucan";
-import { AppContext } from '../../../context/AppContext';
+import { AppContext } from "../../../context/AppContext";
 import { PaperAirplaneIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import LevelBadge from "../../LevelBadge/LevelBadge";
-import "./AIDisplay.css"; 
+import "./AIDisplay.css";
 
 const AIDisplay = () => {
   const { url } = useContext(AppContext);
@@ -14,30 +14,56 @@ const AIDisplay = () => {
 
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
+  const messageEndRef = useRef(null);
+
+  useEffect(() => {
+    const storedMessages = localStorage.getItem("messages");
+    if (storedMessages) {
+      setMessages(JSON.parse(storedMessages));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("messages", JSON.stringify(messages));
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const formatMessage = (message) => {
+    let formattedMessage = message
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+
+    return formattedMessage;
+  };
 
   const promptAi = () => {
     if (eventSource) {
       eventSource.close();
     }
 
-    setMessages(prev => [...prev, { type: "user", content: userInput }]);
+    setMessages((prev) => [...prev, { type: "user", content: userInput }]);
     setUserInput("");
 
-    eventSource = new EventSource(`${url}api/chatbot/stream?message=${encodeURIComponent(userInput)}`);
+    eventSource = new EventSource(
+      `${url}api/chatbot/stream?message=${encodeURIComponent(userInput)}`
+    );
     let audioChunks = [];
     let currentMessage = "";
 
     eventSource.onmessage = async (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "text") {
-        console.log("Received from server:", event.data);
         currentMessage += data.content;
-        
-        setMessages(prev => {
-          if (prev.length > 0 && prev[prev.length - 1].type === "ai" && prev.length > 1) {
+
+        setMessages((prev) => {
+          if (
+            prev.length > 0 &&
+            prev[prev.length - 1].type === "ai" &&
+            prev.length > 1
+          ) {
             prev[prev.length - 1].content = currentMessage;
           } else {
-            prev = [...prev, { type: 'ai', content: currentMessage }];
+            prev = [...prev, { type: "ai", content: currentMessage }];
           }
           return [...prev];
         });
@@ -52,7 +78,7 @@ const AIDisplay = () => {
 
         audioChunks.push(bytes.buffer);
       } else if (data.type === "partialEnd") {
-        const audioBlob = new Blob(audioChunks, { type: "audio/ogg" }); // Ensure correct MIME type
+        const audioBlob = new Blob(audioChunks, { type: "audio/ogg" });
         const audioUrl = URL.createObjectURL(audioBlob);
         audioQueue.push(audioUrl);
         audioChunks = [];
@@ -72,7 +98,7 @@ const AIDisplay = () => {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       promptAi();
     }
   };
@@ -111,15 +137,20 @@ const AIDisplay = () => {
     <div className="w-2/3 flex flex-col items-center h-screen">
       <LevelBadge />
       <ToucanAnimation />
-      <div className="flex flex-col flex-grow w-2/3 p-4 overflow-y-auto space-y-4" id="messageArea">
+      <div
+        className="flex flex-col flex-grow w-2/3 p-4 overflow-y-auto space-y-4"
+        id="messageArea"
+      >
         {messages.map((message, index) => (
-          <div 
+          <div
             key={index}
-            className={`message-bubble ${message.type === 'user' ? 'user-message' : 'ai-message'}`}
-          >
-            {message.content}
-          </div>
+            className={`message-bubble ${
+              message.type === "user" ? "user-message" : "ai-message"
+            }`}
+            dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
+          />
         ))}
+        <div ref={messageEndRef} />
       </div>
       <div className="w-2/3 flex items-center p-4">
         <input
@@ -128,7 +159,6 @@ const AIDisplay = () => {
           type="text"
           placeholder="Ask Me Anything..."
           value={userInput}
-          // onFocus={perchBird}
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={handleKeyPress}
         />

@@ -1,16 +1,21 @@
 import React, {useEffect, useRef, useState} from 'react'
 import p5 from 'p5';
 
+var talking = false;
+var flyDown = false;
+
+export const setTalking = (state) => {
+  talking = state;
+};
+
 const ToucanAnimation = () => {
   const canvasRef = useRef(null);
   const [p5Instance, setP5Instance] = useState(null);
-
+  
   useEffect(() => {
     const sketch = (p) => {
       let toucan, camera, canvas, sc, flying, x, y, keys, speed;
-      let flyDown = false;
       let flydownLock = false;
-      let talking = false;
       let talkingCooldown = 0;
       let speechQueue = [];
 
@@ -130,6 +135,7 @@ const ToucanAnimation = () => {
         }
       }
 
+      let sizes = 300;
       p.preload = () => {
         const toucanBody = p.loadImage('/toucan/body.png');
         const toucanTail = p.loadImage('/toucan/tail.png');
@@ -141,6 +147,7 @@ const ToucanAnimation = () => {
         const rightClaw = p.loadImage('/toucan/claw_right.png');
 
         const size = 300;
+        sizes = size;
         sc = size/450;
 
         toucan = new Toucan(
@@ -157,7 +164,7 @@ const ToucanAnimation = () => {
         canvas.position(0, 0);
         canvas.style('z-index', '0');
 
-        camera = new Mover(window.innerWidth/2-p.width/2, window.innerHeight/3-p.height/2);
+        camera = new Mover(window.innerWidth/2, window.innerHeight/3);
         flying = true;
         x = window.innerWidth/2;
         y = window.innerHeight/3;
@@ -169,22 +176,21 @@ const ToucanAnimation = () => {
         p.clear();
 
         if (!flyDown) {
-          if (keys['w'] || keys['ArrowUp']) y -= speed;
-          if (keys['a'] || keys['ArrowLeft']) x -= speed;
-          if (keys['s'] || keys['ArrowDown']) y += speed;
-          if (keys['d'] || keys['ArrowRight']) x += speed;
+          // if (keys['w'] || keys['ArrowUp']) y -= speed;
+          // if (keys['a'] || keys['ArrowLeft']) x -= speed;
+          // if (keys['s'] || keys['ArrowDown']) y += speed;
+          // if (keys['d'] || keys['ArrowRight']) x += speed;
 
           flying = true;
-          x = p.constrain(x, 0, window.innerWidth/2);
-          y = p.constrain(y, 200, window.innerHeight-0.22*window.innerHeight-p.height/2);
-          camera.moveTo(x, y);
-
-          if (p.frameCount % 300 === 0) {
-            x += p.random(-window.innerWidth/8, window.innerWidth/8);
-            y = p.random(500, 3*window.innerHeight/4);
-          }
+          // x = p.constrain(x, 0, window.innerWidth/2);
+          // y = p.constrain(y, 200, window.innerHeight-0.22*window.innerHeight-p.height/2);
+          // camera.moveTo(window.innerWidth-2*p.width, window.innerHeight-p.height);
+          // if (p.frameCount % 300 === 0) {
+          //   x += p.random(-window.innerWidth/8, window.innerWidth/8);
+          //   y = p.random(500, 3*window.innerHeight/4);
+          // }
         } else {
-          camera.moveTo(window.innerHeight/2, 0.8*window.innerHeight-p.height/4);
+          // camera.moveTo(window.innerHeight/2, 0.8*window.innerHeight-p.height/4);
           camera.vel.x = 0.1;
           if (camera.vel.mag() < 1 && camera.pos.dist(camera.target) < 10) {
             flying = fasle;
