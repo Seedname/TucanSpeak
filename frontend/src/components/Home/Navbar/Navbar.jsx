@@ -10,10 +10,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AppContext } from "../../../context/AppContext.jsx";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const {url} = useContext(AppContext)
+
+  const {t} = useTranslation();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -40,7 +43,7 @@ const Navbar = () => {
           onClick={toggleDropdown}
           className="flex items-center w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer relative"
         >
-          Games
+          {t('GamesHead')}
           <ArrowUpIcon
             className={`ml-auto h-5 w-5 transform transition-transform duration-300 ${
               isDropdownOpen ? "rotate-180" : ""
@@ -62,7 +65,7 @@ const Navbar = () => {
             }`}
           >
             <ChevronDoubleUpIcon className="h-5 w-5 mr-2" />
-            TuCan Fly
+            {t('TucanFly')}
           </li>
           <li
             onClick={() => navigate("/draw")}
@@ -71,7 +74,7 @@ const Navbar = () => {
             }`}
           >
             <PencilIcon className="h-5 w-5 mr-2" />
-            TuCan Draw
+            {t('TucanDraw')}
           </li>
           <li
             onClick={() => navigate("/talk")}
@@ -80,7 +83,7 @@ const Navbar = () => {
             }`}
           >
             <SpeakerWaveIcon className="h-5 w-5 mr-2" />
-            TuCan Talk
+            {t('TucanTalk')}
           </li>
           <li
             onClick={() => navigate("/translate")}
@@ -89,15 +92,15 @@ const Navbar = () => {
             }`}
           >
             <LanguageIcon className="h-5 w-5 mr-2" />
-            TuCan Translate
+            {t('TucanTranslate')}
           </li>
         </ul>
         <li className="mb-[130%]"></li>
         <li className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer">
-          Cambiar Idioma
+        {t('ChangeLanguage')}
         </li>
         <li className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer" onClick={logOut}>
-          Log Out
+        {t('LogOut')}
         </li>
       </ul>
     </div>

@@ -3,9 +3,11 @@ import ToucanAnimation from "../../Toucan/Toucan";
 import { AppContext } from "../../../context/AppContext";
 import { PaperAirplaneIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import LevelBadge from "../../LevelBadge/LevelBadge";
-import "./AIDisplay.css";
+import "./AIDisplay.css"; 
+import { useTranslation } from "react-i18next";
 
 const AIDisplay = () => {
+  const {t} = useTranslation()
   const { url } = useContext(AppContext);
 
   let eventSource = null;
@@ -135,6 +137,15 @@ const AIDisplay = () => {
 
   return (
     <div className="w-2/3 flex flex-col items-center h-screen">
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[75px] -top-56"/>
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[175px] -top-40"/>
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[275px] -top-52"/>
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[375px] -top-40"/>
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[475px] -top-52"/>
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[575px] -top-40"/>
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[675px] -top-52"/>
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[775px] -top-40"/>
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[875px] -top-56"/>
       <LevelBadge />
       <ToucanAnimation />
       <div
@@ -157,7 +168,7 @@ const AIDisplay = () => {
           className="flex-1 bg-slate-50 rounded-full px-6 py-3 ml-2 border border-gray-300"
           id="chatbox"
           type="text"
-          placeholder="Ask Me Anything..."
+          placeholder={t("AiChat")}
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={handleKeyPress}

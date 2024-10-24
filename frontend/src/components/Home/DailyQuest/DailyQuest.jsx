@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {Clock} from 'lucide-react';
 import axios from "axios"
 import { AppContext } from '../../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 
 const QUEST_REWARDS = {
   talk: 50,
@@ -16,8 +17,7 @@ const DailyQuest = () => {
 
   const [quests, setQuests] = useState([]);
   const [resetTime, setResetTime] = useState(null);
-
-  const navigate = useNavigate();
+  const {t} = useTranslation();
 
   useEffect(() => {
     fetchQuests();
@@ -53,7 +53,7 @@ const DailyQuest = () => {
     const now = new Date();
     const diff = resetTime - now;
 
-    if (diff <= 0) return 'Resetting soon...';
+    if (diff <= 0) return t("ResettingSoon");
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000*60));
@@ -61,23 +61,23 @@ const DailyQuest = () => {
   };
 
   const questTypeToDisplay = {
-    'flight': 'TuCan Flight',
-    'draw': 'TuCan Draw',
-    'talk': 'TuCan Talk',
-    'translate': 'TuCan Translate'
+    'flight': t("TucanFly"),
+    'draw': t("TucanDraw"),
+    'talk': t("TucanTalk"),
+    'translate': t("TucanTranslate")
   };
 
   const questDescriptions = {
-    'flight': 'Numbers',
-    'draw': 'Objects',
-    'talk': 'Speaking',
-    'translate': 'Sentence'
+    'flight': t("Numbers"),
+    'draw': t("Objects"),
+    'talk': t("Speaking"),
+    'translate': t("Sentence")
   };
 
   return (
     <div className='bg-white w-1/5 p-3'>
       <div className='border-2 rounded-md p-2'>
-        <h1 className='text-lg font-semibold mb-3'>Daily Quest</h1>
+        <h1 className='text-lg font-semibold mb-3'>{t("DailyQuest")}</h1>
 
         <ul className='space-y-4'>
           {quests.map((quest) => (
@@ -113,7 +113,7 @@ const DailyQuest = () => {
           <div className='flex items-center justify-between text-sm text-gray-600'>
             <div className='flex items-center gap-1'>
               <Clock size={16} />
-              <span>Resets in:</span>
+              <span>{t("ResetsIn")}</span>
             </div>
             <span className='font-medium'>{getTimeUnitReset()}</span>
           </div>
