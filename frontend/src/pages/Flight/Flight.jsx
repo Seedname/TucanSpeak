@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useContext } from 'react';
 import axios from "axios";
 import p5 from 'p5';
 import { AppContext } from "../../context/AppContext";
+import BackButton from "../../components/BackButton/BackButton";
 
 const ToucanGame = () => {
   const gameRef = useRef(null);
@@ -644,7 +645,11 @@ const ToucanGame = () => {
     };
   }, []);
 
-  return <div ref={gameRef} style={{width: '100%', height: '100vh'}}/>
+  return (
+    <div ref={gameRef} style={{width: '100%', height: '100vh'}}>
+      <BackButton />
+    </div>
+  );
 };
 
 export default ToucanGame;

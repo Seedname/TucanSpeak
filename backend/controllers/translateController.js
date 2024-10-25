@@ -28,3 +28,16 @@ export const handleUserInput = async (req, res) => {
     throw new Error('Failed to get a response from the assistant.');
   }
 }
+
+export const changeLanguage = async (req, res) => {
+  let languagePreference = req.user.languagePreference === "en" ? "sp" : "en";
+  req.user.languagePreference = languagePreference;
+  await req.user.save();
+  res.cookie('languagePreference', languagePreference, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict', 
+    maxAge: 36000000, 
+  });
+  return res.status(200).json({language: languagePreference});
+};

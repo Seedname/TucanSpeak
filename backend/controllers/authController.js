@@ -53,10 +53,11 @@ export const register = async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
-      verificationToken
+      verificationToken,
+      languagePreference: "en"
     });
 
-    await user.save()
+    await user.save();
 
     sendVerificationEmail(fullName, email, verificationToken);
 
@@ -91,8 +92,22 @@ export const login = async (req, res) => {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict', 
-      maxAge: 3600000, 
+      maxAge: 36000000, 
     });
+
+    if (token?.id) {
+      const user = await User.findById(token.id);
+      if (!user) {
+        return res.status(403).json({ success: false, message: "User does not exist"});
+      }
+
+      res.cookie('languagePreference', user.languagePreference, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict', 
+        maxAge: 36000000, 
+      });
+    }
 
     res.status(200).json({ success: true });
   } catch (e) {
@@ -153,6 +168,12 @@ export const checkAuthentication = async (req, res) => {
 
 export const logout = async (req, res) => {
   res.clearCookie('token', {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+
+  res.clearCookie('languagePreference', {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict'

@@ -189,6 +189,7 @@ const ToucanAnimation = () => {
           //   x += p.random(-window.innerWidth/8, window.innerWidth/8);
           //   y = p.random(500, 3*window.innerHeight/4);
           // }
+          camera.moveTo(window.innerWidth-2*p.width, window.innerHeight-p.height);
         } else {
           // camera.moveTo(window.innerHeight/2, 0.8*window.innerHeight-p.height/4);
           camera.vel.x = 0.1;
