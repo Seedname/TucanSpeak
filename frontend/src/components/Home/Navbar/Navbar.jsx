@@ -16,12 +16,16 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const {url} = useContext(AppContext)
 
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
-    
   };
+
+  const changeLanguage = async () => {
+    const response = await axios.post(`${url}api/translate/change-language`);
+    i18n.changeLanguage(response.data.language);
+  }
 
   const closeDropdown = () => {
     setIsDropdownOpen(false);
@@ -68,7 +72,7 @@ const Navbar = () => {
             {t('TucanFly')}
           </li>
           <li
-            onClick={() => navigate("/draw")}
+            onClick={() => window.location.href = "https://tucanspeak.org/draw"}
             className={`flex items-center w-[85%] px-4 py-[10px] border-2 rounded-lg bg-white hover:bg-green-100 ${
               isDropdownOpen ? "cursor-pointer" : "cursor-default"
             }`}
@@ -96,8 +100,10 @@ const Navbar = () => {
           </li>
         </ul>
         <li className="mb-[130%]"></li>
-        <li className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer">
-        {t('ChangeLanguage')}
+        <li className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer"
+          onClick={changeLanguage}
+        >
+            {t('ChangeLanguage')}
         </li>
         <li className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer" onClick={logOut}>
         {t('LogOut')}

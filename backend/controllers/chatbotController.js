@@ -11,6 +11,7 @@ const openai = new OpenAI({
 const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help adventurers learn either English or Spanish. Do not use emojis in your response.";
 const additionalContext = "Be creative with your responses.";
 
+
 export const streamChatbotResponse = (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -18,7 +19,7 @@ export const streamChatbotResponse = (req, res) => {
   res.flushHeaders();
 
   let playerLevel = `The user is currently at level ${req.user.level}. Adjust your responses accordingly. `;
-  let languagePreference = "";
+  let languagePreference = "The users language preference is " + (req?.user?.languagePreference ?? "en") + ". Speak to them in this language but give them lessons in the opposite language";
   let searchTerm = req?.query?.message ?? "The user did not input anything.";
 
   const conversation = [

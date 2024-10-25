@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
     progress: {type: Number, default: 0},
     target: {type: Number, required: true},
     lastResetAt: {type: Date, default: Date.now()}
-  }]
+  }],
+  languagePreference: String
 });
 
 userSchema.methods.getRequiredXP = function() {
