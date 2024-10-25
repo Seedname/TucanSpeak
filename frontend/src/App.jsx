@@ -7,7 +7,7 @@ import Talk from './pages/Talk/Talk'
 import Translate from './pages/Translate/Translate'
 import VerifyWait from './pages/VerifyWait/VerifyWait'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
-import { getCookie } from './helper/helper'
+import { getCookie } from './utils/helper'
 import { useTranslation } from "react-i18next";
 
 const App = () => {
@@ -31,7 +31,6 @@ const App = () => {
             </ProtectedRoute>
           }/>
         <Route path='/flight' element={<Flight/>} />
-        {/* We remove the /draw route from here */}
         <Route path='/talk' element={<Talk/>} />
         <Route path='/translate' element={<Translate/>} />
       </Routes>

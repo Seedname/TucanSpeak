@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useContext } from 'react'
 import { AppContext } from '../../context/AppContext';
 import axios from 'axios';
+import { useTranslation } from "react-i18next";
 
 const LevelBadge = () => {
   const [userData, setUserData] = useState({
@@ -10,6 +11,7 @@ const LevelBadge = () => {
   });
 
   const {url} = useContext(AppContext);
+  const {t} = useTranslation()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -55,7 +57,7 @@ const LevelBadge = () => {
       
       {/* Level progress information */}
       <div className='ml-2'>
-        <div className='text-xs text-black'>Level Progress</div>
+        <div className='text-xs text-black'>{t("ProgressBar")}</div>
         <div className='text-sm text-black'>
           {userData.xp} / {userData.requiredXP} XP
         </div>

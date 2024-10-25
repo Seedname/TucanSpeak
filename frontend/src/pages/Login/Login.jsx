@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react'
 import { AppContext } from '../../context/AppContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { getCookie } from '../../helper/helper'
+import { getCookie } from '../../utils/helper'
 
 const Login = () => {
 

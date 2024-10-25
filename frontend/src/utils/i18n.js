@@ -21,7 +21,8 @@ const resources = {
       DailyQuest: "Daily Quest",
       ResetsIn: "Resets in...",
       ResettingSoon: "Resetting soon...",
-      AiChat: "Ask Me Anything..."
+      AiChat: "Ask Me Anything...",
+      ProgressBar: "Level Progress"
     }
   },
   sp: {
@@ -40,7 +41,8 @@ const resources = {
       DailyQuest: "Misión Diaria",
       ResetsIn: "Reinicia en",
       ResettingSoon: "Reiniciando pronto...",
-      AiChat: "Pregúntame cualquier cosa..."
+      AiChat: "Pregúntame cualquier cosa...",
+      ProgressBar: "Progresso de Nivel"
     }
   }
 };
