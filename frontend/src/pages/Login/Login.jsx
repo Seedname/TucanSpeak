@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react'
 import { AppContext } from '../../context/AppContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { getCookie } from '../../utils/helper'
+import { getCookie, setCookie } from '../../utils/helper' // Make sure setCookie is imported
 
 const Login = () => {
 
@@ -24,30 +24,46 @@ const Login = () => {
   })
 
   const onChangeHandler = (event) => {
-    const fullName = event.target.name
+    const name = event.target.name // Fixed: was 'fullName', should be 'name'
     const value = event.target.value
-    setData(data=>({...data, [fullName]:value}))
+    setData(data=>({...data, [name]:value}))
   }
 
   const onSubmit = async (event) => {
     event.preventDefault()
-    if(currState === "Login") {
-      const response = await axios.post(`${url}auth/login`, data);
-      if (response?.data?.success) {
-        const from = location.state?.from?.pathname ?? '/home';
-        navigate(from, {replace: true});
-        navigate("/home");
-      } else {
-        alert(response.data.message);
-      }
-      return;
-    } 
+    
+    try {
+      if(currState === "Login") {
+        const response = await axios.post(`${url}auth/login`, data);
+        
+        if (response?.data?.success) {
+          // CRITICAL: Store the token from the response
+          if (response.data.token) {
+            console.log(response.data);
+            setCookie('token', response.data.token, 7); // Store token for 7 days
+          }
+          
+          // Navigate only once to the intended destination
+          const from = location.state?.from?.pathname || '/home';
+          navigate(from, {replace: true});
+          
+        } else {
+          alert(response.data.message || 'Login failed');
+        }
+        return;
+      } 
 
-    const response = await axios.post(`${url}auth/register`, data);
-    if (response?.data?.success) {
-      navigate('/verify-wait', {state: {email: data.email }, replace: true});
-    } else {
-      alert(response.data.message);
+      // Registration flow
+      const response = await axios.post(`${url}auth/register`, data);
+      if (response?.data?.success) {
+        navigate('/verify-wait', {state: {email: data.email }, replace: true});
+      } else {
+        alert(response.data.message || 'Registration failed');
+      }
+      
+    } catch (error) {
+      console.error('Authentication error:', error);
+      alert('Network error. Please try again.');
     }
   }
 

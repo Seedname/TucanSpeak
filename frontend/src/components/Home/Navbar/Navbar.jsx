@@ -32,8 +32,9 @@ const Navbar = () => {
   };
 
   const logOut = async () => {
-    await axios.post("/auth/logout");
+    await axios.post(`${url}auth/logout`);
     localStorage.removeItem("messages");
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     navigate('/');
   }
 

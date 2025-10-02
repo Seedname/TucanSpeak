@@ -2,7 +2,16 @@ import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 
 const auth = async (req, res, next) => {
-  const token = req?.cookies?.token;
+  let token = req?.cookies?.token;
+
+  if (!token) {
+    // Check Authorization header
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
+  }
+
   if (!token) {
     return res.status(403).json({ success: false });
   }

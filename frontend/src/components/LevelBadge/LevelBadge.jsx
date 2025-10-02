@@ -2,6 +2,7 @@ import React, {useState, useEffect, useContext } from 'react'
 import { AppContext } from '../../context/AppContext';
 import axios from 'axios';
 import { useTranslation } from "react-i18next";
+import { getCookie } from '../../utils/helper'
 
 const LevelBadge = () => {
   const [userData, setUserData] = useState({
@@ -16,7 +17,11 @@ const LevelBadge = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(`${url}api/quest/user-stats`);
+        const response = await axios.get(`${url}api/quest/user-stats`, {
+          headers: {
+            Authorization: `Bearer ${getCookie('token')}`,
+          }
+        })
         if (response.data.success) {
           setUserData({
             level: response.data.level,

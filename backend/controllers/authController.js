@@ -8,7 +8,7 @@ import dotenv from "dotenv"
 dotenv.config()
 
 var smtpTransport = nodemailer.createTransport({
-  host: "mail.smtp2go.com",
+  host: "smtp.gmail.com",
   port: 587,
   auth: {
     user: process.env.SMTP_USER,
@@ -109,7 +109,11 @@ export const login = async (req, res) => {
       });
     }
 
-    res.status(200).json({ success: true });
+    res.status(200).json({ 
+      success: true,
+      token: token,
+      message: "Login successful"
+    });
   } catch (e) {
     console.error(e);
     res.status(500).json({ success: false, message: 'Server Error' });
