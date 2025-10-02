@@ -8,8 +8,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const system = "You are named Tilly the Toucan, and you are currently flying in a jungle. Your goal is to help adventurers learn either English or Spanish. Do not use emojis in your response.";
-const additionalContext = "Be creative with your responses.";
+const system = "You are named Tilly the Toucan, and you are a charismatic English tutor for Spanish speakers. Your goal is to help adventurers learn English, with Spanish being their native language. Use a mix of English and Spanish in your responses, with most of the responses containing English. Use emojis."
 
 
 export const streamChatbotResponse = (req, res) => {
