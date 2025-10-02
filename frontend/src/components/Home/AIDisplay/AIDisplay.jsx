@@ -5,6 +5,8 @@ import { PaperAirplaneIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import LevelBadge from "../../LevelBadge/LevelBadge";
 import "./AIDisplay.css"; 
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { getCookie } from "../../../utils/helper";
 
 const AIDisplay = () => {
   const {t} = useTranslation()
@@ -13,6 +15,9 @@ const AIDisplay = () => {
   let eventSource = null;
   let audioQueue = [];
   let isPlaying = false;
+
+  let currentMessage = "";
+  let audioChunks = [];
 
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
@@ -38,24 +43,53 @@ const AIDisplay = () => {
     return formattedMessage;
   };
 
-  const promptAi = () => {
-    if (eventSource) {
-      eventSource.close();
+  const promptAi = async () => {
+    // if (eventSource) {
+    //   eventSource.close();
+    // }
+
+    const token = getCookie('token');
+    if (!token) {
+      console.error('No token found!');
+      return;
     }
 
     setMessages((prev) => [...prev, { type: "user", content: userInput }]);
     setUserInput("");
 
-    eventSource = new EventSource(
-      `${url}api/chatbot/stream?message=${encodeURIComponent(userInput)}`
-    );
-    let audioChunks = [];
-    let currentMessage = "";
+    const res = await fetch(`${url}api/chatbot/stream?message=${encodeURIComponent(userInput)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    eventSource.onmessage = async (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "text") {
-        currentMessage += data.content;
+    if (!res.ok || !res.body) {
+      console.error('Failed to initiate chatbot stream');
+      return;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, {stream: true});
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop();
+
+      for (const part of parts) {
+        if (part.startsWith("data:")) {
+          const payload = JSON.parse(part.slice(5).trim());
+          handleServerEvent(payload);
+        }
+      }
+    }
+  };
+
+  const handleServerEvent = (data) => {
+    if (data.type === "text") {
+      currentMessage += data.content;
 
         setMessages((prev) => {
           if (
@@ -69,8 +103,8 @@ const AIDisplay = () => {
           }
           return [...prev];
         });
-      } else if (data.type === "audio") {
-        const binaryString = atob(data.chunk);
+    } else if (data.type === "audio") {
+      const binaryString = atob(data.chunk);
         const len = binaryString.length;
         const bytes = new Uint8Array(len);
 
@@ -79,8 +113,8 @@ const AIDisplay = () => {
         }
 
         audioChunks.push(bytes.buffer);
-      } else if (data.type === "partialEnd") {
-        const audioBlob = new Blob(audioChunks, { type: "audio/ogg" });
+    } else if (data.type === "partialEnd") {
+      const audioBlob = new Blob(audioChunks, { type: "audio/ogg" });
         const audioUrl = URL.createObjectURL(audioBlob);
         audioQueue.push(audioUrl);
         audioChunks = [];
@@ -88,16 +122,8 @@ const AIDisplay = () => {
         if (!isPlaying) {
           playNextAudio();
         }
-      } else if (data.type === "end") {
-        eventSource.close();
-      }
-    };
-
-    eventSource.onerror = (err) => {
-      console.error("EventSource failed:", err);
-      eventSource.close();
-    };
-  };
+    }
+  }
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {

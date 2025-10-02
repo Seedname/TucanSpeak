@@ -3,6 +3,7 @@ import { assets } from '../../assets/assets';
 import axios from 'axios';
 import { AppContext } from '../../context/AppContext';
 import BackButton from "../../components/BackButton/BackButton";
+import { getCookie } from '../../utils/helper';
 
 const lvl1 = {
   "Greetings and Introductions": {
@@ -127,11 +128,17 @@ export default function Translate() {
   }, [isRunning, timeLeft]);
 
   const handleXpAndQuest = async () => {
+
+    const token = getCookie('token');
+
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.post(`${url}api/quest/handle-correct-answer`, { 
           activityType: 'translate' 
-        });
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+      });
 
       if (response.data.success) {
         setXpGained(response.data.xpGained);
@@ -170,6 +177,9 @@ export default function Translate() {
   };
 
   const handleSubmit = async () => {
+
+    const token = getCookie('token');
+
     if (!isRunning) {
       setApiResponse("Please start the game first!");
       return;
@@ -181,6 +191,10 @@ export default function Translate() {
     try {
       const response = await axios.post(`${url}api/translate/message`, {
          message: apiRequestMessage,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
       });
       const data = response.data;
       

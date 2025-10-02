@@ -17,6 +17,8 @@ export const streamChatbotResponse = (req, res) => {
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders();
 
+  
+
   let playerLevel = `The user is currently at level ${req.user.level}. Adjust your responses accordingly. `;
   let languagePreference = "The users language preference is " + (req?.user?.languagePreference ?? "en") + ". Speak to them in this language but give them lessons in the opposite language";
   let searchTerm = req?.query?.message ?? "The user did not input anything.";

@@ -4,6 +4,7 @@ import {Clock} from 'lucide-react';
 import axios from "axios"
 import { AppContext } from '../../../context/AppContext';
 import { useTranslation } from 'react-i18next';
+import { getCookie } from '../../../utils/helper';
 
 const QUEST_REWARDS = {
   talk: 50,
@@ -27,8 +28,20 @@ const DailyQuest = () => {
   }, [])
 
   const fetchQuests = async () => {
+
+    const token = getCookie('token');
+    
+    if (!token) {
+      console.error('No token found!');
+      return;
+    }
+
     try {
-      const response = await axios.get(`${url}api/quest/daily-quest`);
+      const response = await axios.get(`${url}api/quest/daily-quest`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       if (response.data.success) {
         setQuests(response.data.quests);
 
