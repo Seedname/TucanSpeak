@@ -39,7 +39,6 @@ const Login = () => {
         if (response?.data?.success) {
           // CRITICAL: Store the token from the response
           if (response.data.token) {
-            console.log(response.data);
             setCookie('token', response.data.token, 7); // Store token for 7 days
           }
           

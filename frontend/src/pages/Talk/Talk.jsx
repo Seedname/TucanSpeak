@@ -4,6 +4,7 @@ import { assets } from "../../assets/assets";
 import { SpeakerWaveIcon, MicrophoneIcon } from "@heroicons/react/24/solid";
 import BackButton from "../../components/BackButton/BackButton";
 import { AppContext } from "../../context/AppContext";
+import { getCookie } from "../../utils/helper";
 
 const Talk = () => {
   const { url } = useContext(AppContext);
@@ -77,6 +78,10 @@ const Talk = () => {
   
       const response = await axios.post(`${url}api/quest/handle-correct-answer`, {
         activityType: 'talk'
+      }, {
+        headers: {
+          Authorization: `Bearer ${getCookie('token')}`,
+        }
       });
   
       setShowSuccess(false);
@@ -110,7 +115,11 @@ const Talk = () => {
 
   const checkTimeRemaining = async () => {
     try {
-      const response = await axios.get(`${url}api/prompt/time-remaining`);
+      const response = await axios.get(`${url}api/prompt/time-remaining`,{
+        headers: {
+          Authorization: `Bearer ${getCookie('token')}`,
+        }
+      });
       if (response.data && response.data.timeRemaining > 0) {
         setTimeRemaining(response.data.timeRemaining);
         setShowTimer(true);
@@ -219,11 +228,15 @@ const Talk = () => {
       const response = await axios.post(`${url}api/prompt/recognize-speech`, {
         audioData: base64Audio,
         originalPrompt: currentPrompts[0],
+      },{
+        headers: {
+          Authorization: `Bearer ${getCookie('token')}`,
+        }
       });
   
       if (response.data?.success) {
         setTranscript(response.data.transcript || 'No transcript received');
-        if (response.data.similarity >= 84) {
+        if (response.data.similarity >= 80) {
           handleSuccess();
         } else {
           handleWrong();
@@ -277,7 +290,11 @@ const Talk = () => {
         }
       }
 
-      const response = await axios.get(`${url}api/prompt/get`);
+      const response = await axios.get(`${url}api/prompt/get`,{
+        headers: {
+          Authorization: `Bearer ${getCookie('token')}`,
+        }
+      });
 
       if (response.data && response.data.success) {
         setAllPrompts({
@@ -316,7 +333,11 @@ const Talk = () => {
         `${url}api/prompt/synthesize-speech`,
         {
           text: currentPrompts[0],
-        }
+        }, {
+          headers: {
+            Authorization: `Bearer ${getCookie('token')}`,
+          }
+      }
       );
 
       if (response.data && response.data.audioContent) {

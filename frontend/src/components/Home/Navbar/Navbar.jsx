@@ -11,21 +11,26 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AppContext } from "../../../context/AppContext.jsx";
 import { useTranslation } from "react-i18next";
+import { getCookie } from "../../../utils/helper.js";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const {url} = useContext(AppContext)
+  const { url } = useContext(AppContext);
 
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const changeLanguage = async () => {
-    const response = await axios.post(`${url}api/translate/change-language`);
+    const response = await axios.post(`${url}api/translate/change-language`, {}, {
+      headers: {
+        Authorization: `Bearer ${getCookie("token")}`,
+      }
+    });
     i18n.changeLanguage(response.data.language);
-  }
+  };
 
   const closeDropdown = () => {
     setIsDropdownOpen(false);
@@ -35,8 +40,8 @@ const Navbar = () => {
     await axios.post(`${url}auth/logout`);
     localStorage.removeItem("messages");
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    navigate('/');
-  }
+    navigate("/");
+  };
 
   const navigate = useNavigate();
 
@@ -48,7 +53,7 @@ const Navbar = () => {
           onClick={toggleDropdown}
           className="flex items-center w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer relative"
         >
-          {t('GamesHead')}
+          {t("GamesHead")}
           <ArrowUpIcon
             className={`ml-auto h-5 w-5 transform transition-transform duration-300 ${
               isDropdownOpen ? "rotate-180" : ""
@@ -70,16 +75,18 @@ const Navbar = () => {
             }`}
           >
             <ChevronDoubleUpIcon className="h-5 w-5 mr-2" />
-            {t('TucanFly')}
+            {t("TucanFly")}
           </li>
           <li
-            onClick={() => window.location.href = "https://tucanspeak.org/draw"}
+            onClick={() =>
+              (window.location.href = "https://tucanspeak.org/draw")
+            }
             className={`flex items-center w-[85%] px-4 py-[10px] border-2 rounded-lg bg-white hover:bg-green-100 ${
               isDropdownOpen ? "cursor-pointer" : "cursor-default"
             }`}
           >
             <PencilIcon className="h-5 w-5 mr-2" />
-            {t('TucanDraw')}
+            {t("TucanDraw")}
           </li>
           <li
             onClick={() => navigate("/talk")}
@@ -88,7 +95,7 @@ const Navbar = () => {
             }`}
           >
             <SpeakerWaveIcon className="h-5 w-5 mr-2" />
-            {t('TucanTalk')}
+            {t("TucanTalk")}
           </li>
           <li
             onClick={() => navigate("/translate")}
@@ -97,17 +104,21 @@ const Navbar = () => {
             }`}
           >
             <LanguageIcon className="h-5 w-5 mr-2" />
-            {t('TucanTranslate')}
+            {t("TucanTranslate")}
           </li>
         </ul>
         <li className="mb-[130%]"></li>
-        <li className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer"
+        <li
+          className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer"
           onClick={changeLanguage}
         >
-            {t('ChangeLanguage')}
+          {t("ChangeLanguage")}
         </li>
-        <li className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer" onClick={logOut}>
-        {t('LogOut')}
+        <li
+          className="w-[85%] px-4 py-[10px] border-2 rounded-lg hover:bg-green-100 cursor-pointer"
+          onClick={logOut}
+        >
+          {t("LogOut")}
         </li>
       </ul>
     </div>

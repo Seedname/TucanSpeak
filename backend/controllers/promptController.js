@@ -100,26 +100,35 @@ const editDistance = (s1, s2) => {
 
 const translatePrompts = async (prompts, targetLanguage) => {
   try {
-    const [translations] = await translate.translateText({
-      parent: `projects/${process.env.GOOGLE_CLOUD_CONSOLE_PROJECT_ID}`,
+    const projectId = process.env.GOOGLE_CLOUD_CONSOLE_PROJECT_ID;
+
+    const request = {
+      parent: `projects/${projectId}/locations/global`,
       contents: prompts,
       mimeType: 'text/plain',
       sourceLanguageCode: 'en',
       targetLanguageCode: targetLanguage,
-    });
+    };
 
-    if (!Array.isArray(translations.translations)) {
+    const [response] = await translate.translateText(request);
+    
+    console.log('Full response:', JSON.stringify(response, null, 2));
+
+    // Check if translations exist
+    if (!response || !response.translations || !Array.isArray(response.translations)) {
+      console.error('Invalid response format:', response);
       throw new Error('Translations are not in expected format.');
     }
 
-    const translatedPrompts = translations.translations.map(
+    const translatedPrompts = response.translations.map(
       (translation) => translation.translatedText
     );
-
+    
     return translatedPrompts;
   } catch (e) {
-    console.log('Error translating prompts: ', e);
-    return prompts;
+    console.error('Error translating prompts:', e);
+    console.error('Error details:', e.message);
+    return prompts; // Fallback to original English prompts
   }
 };
 

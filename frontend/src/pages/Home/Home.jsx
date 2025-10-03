@@ -3,17 +3,13 @@ import Navbar from '../../components/Home/Navbar/Navbar.jsx'
 import AIDisplay from '../../components/Home/AIDisplay/AIDisplay.jsx'
 import DailyQuest from '../../components/Home/DailyQuest/DailyQuest.jsx'
 import { useNavigate } from 'react-router-dom'
-import { getCookie } from '../../utils/helper'
+import { getCookie, getCookieExp } from '../../utils/helper'
 
 const Home = () => {
 
   const navigate = useNavigate();
+  const token = getCookie('token')
 
-  useEffect(() => {
-      if (!getCookie('token')) {
-        navigate('/', {replace: true});
-      }
-    }, [navigate])
 
   return (
     <div className='flex flex-col h-screen'>

@@ -3,6 +3,7 @@ import axios from "axios";
 import p5 from 'p5';
 import { AppContext } from "../../context/AppContext";
 import BackButton from "../../components/BackButton/BackButton";
+import { getCookie } from '../../utils/helper';
 
 const ToucanGame = () => {
   const gameRef = useRef(null);
@@ -373,7 +374,7 @@ const ToucanGame = () => {
           // if (language == "Spanish") {
               // text(`¡Correcto!\n+${Math.floor(Math.log2(randomNums[randomIndex]+1))}XP`, p.width/3.3, p.height/2.5-50, p.width/2.5, 100);
           // } else {
-              p.text(`Correct!\n+4XP`, p.width/3.3, p.height/2.5-50, p.width/2.5, 100);
+              p.text(`Correct!\n+5XP`, p.width/3.3, p.height/2.5-50, p.width/2.5, 100);
           // }
       }
   
@@ -543,6 +544,10 @@ const ToucanGame = () => {
       function sendWin() {
         axios.post(`${url}api/quest/handle-correct-answer`, {
           activityType: "flight"
+        }, {
+          headers: {
+            Authorization: `Bearer ${getCookie('token')}`,
+          }
         });
       }
 

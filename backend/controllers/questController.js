@@ -9,8 +9,8 @@ const QUEST_REWARDS = {
 
 const ACTIVITY_XP = {
   talk: 5,
-  draw: 3,
-  flight: 4,
+  draw: 5,
+  flight: 5,
   translate: 5
 };
 
