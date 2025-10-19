@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getCookie } from "../../../utils/helper";
 import { init } from "i18next";
+import { assets } from "../../../assets/assets";
 
 const AIDisplay = () => {
   const {t} = useTranslation()
@@ -174,11 +175,10 @@ const AIDisplay = () => {
 
   };
 
-
   return (
     // main container for the chat
-    <div className="w-2/3 flex flex-col items-center h-screen">
-      {/* <img src="/vine.png" className="w-80 fixed scale-50 left-[75px] -top-56"/>
+    <div className="w-2/3 flex flex-col items-center bg-green-50 h-screen">
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[75px] -top-56"/>
       <img src="/vine.png" className="w-80 fixed scale-50 left-[175px] -top-40"/>
       <img src="/vine.png" className="w-80 fixed scale-50 left-[275px] -top-52"/>
       <img src="/vine.png" className="w-80 fixed scale-50 left-[375px] -top-40"/>
@@ -186,15 +186,14 @@ const AIDisplay = () => {
       <img src="/vine.png" className="w-80 fixed scale-50 left-[575px] -top-40"/>
       <img src="/vine.png" className="w-80 fixed scale-50 left-[675px] -top-52"/>
       <img src="/vine.png" className="w-80 fixed scale-50 left-[775px] -top-40"/>
-      <img src="/vine.png" className="w-80 fixed scale-50 left-[875px] -top-56"/> */}
+      <img src="/vine.png" className="w-80 fixed scale-50 left-[875px] -top-56"/>
+
       <LevelBadge />
       <ToucanAnimation />
       <div
         className="flex flex-col flex-grow w-2/3 p-4 overflow-y-auto space-y-4"
         id="messageArea"
       >
-        
-
         {messages.map((message, index) => (
           <div
             key={index}

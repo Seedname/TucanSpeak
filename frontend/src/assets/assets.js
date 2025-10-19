@@ -7,6 +7,8 @@ import toucan_profile from "../assets/toucan_profile.png"
 import user_profile from "../assets/user_profile.png"
 import score from "../assets/score.jpg";
 import toucan from "../assets/toucan.png";
+import jungle from "../assets/jungle.png";
+import jungle2 from "../assets/jungle2.png";
 
 
 export const assets = {
@@ -18,5 +20,7 @@ export const assets = {
   toucan_profile,
   user_profile,
   score,
-  toucan
+  toucan,
+  jungle,
+  jungle2
 }

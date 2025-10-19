@@ -88,8 +88,8 @@ const DailyQuest = () => {
   };
 
   return (
-    <div className='bg-white w-1/5 p-3'>
-      <div className='border-2 rounded-md p-2'>
+    <div className='bg-green-50 w-1/5 p-3'>
+      <div className='border-2 bg-white rounded-md p-2'>
         <h1 className='text-lg font-semibold mb-3'>{t("DailyQuest")}</h1>
 
         <ul className='space-y-4'>

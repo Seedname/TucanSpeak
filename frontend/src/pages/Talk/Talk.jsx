@@ -385,6 +385,7 @@ const Talk = () => {
           }}
         >
           {/* Progress */}
+          {/* <h1>{currentIndex}/{allPrompts.english.length}</h1> */}
         </div>
       </div>
 

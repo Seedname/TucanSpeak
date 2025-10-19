@@ -135,7 +135,7 @@ const translatePrompts = async (prompts, targetLanguage) => {
 const generatePrompts = async (req, res) => {
   const response = await openai.completions.create({
     model: 'gpt-3.5-turbo-instruct',
-    prompt: 'Generate a list of ten basic english sentences the progressively get more difficult. Do not number the prompts. They should not contain numbers. Each sentence must be at maximum equal to 68 characters in length and no less then 50 characters.',
+    prompt: 'Generate exactly 10 English sentences that progressively increase in difficulty. Requirements: Each sentence must be between 50-68 characters (count actual characters, not placeholder text). Do not include numbers in the sentences. Do not number the list. Output only the sentences, one per line, with no explanations or character counts.',
     max_tokens: 250,
     temperature: 0.7,
   });

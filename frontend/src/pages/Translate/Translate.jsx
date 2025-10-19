@@ -216,7 +216,7 @@ export default function Translate() {
   };
 
   return (
-    <div className="h-screen bg-cover bg-gray-500" style={{ backgroundImage: "url(./pictures/background.jpg)" }}>
+    <div className="h-screen bg-cover bg-gray-500" style={{ backgroundImage: `url(${assets.jungle})` }}>
       <BackButton />
       {/* Xp Gained */}
       {showXpGain && (
