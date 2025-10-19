@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import { getCookie, getCookieExp } from './utils/helper'
 import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
+import Draw from './pages/Draw/Draw'
 
 const App = () => {
   const {t, i18n} = useTranslation();
@@ -51,6 +52,7 @@ const App = () => {
         <Route path='/flight' element={<Flight/>} />
         <Route path='/talk' element={<Talk/>} />
         <Route path='/translate' element={<Translate/>} />
+        <Route path='/draw' element={<Draw/>}></Route>
       </Routes>
     </div>
   )

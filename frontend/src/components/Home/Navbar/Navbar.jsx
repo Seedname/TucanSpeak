@@ -78,8 +78,7 @@ const Navbar = () => {
             {t("TucanFly")}
           </li>
           <li
-            onClick={() =>
-              (window.location.href = "https://tucanspeak.org/draw")
+            onClick={() => navigate("/draw")
             }
             className={`flex items-center w-[85%] px-4 py-[10px] border-2 rounded-lg bg-white hover:bg-green-100 ${
               isDropdownOpen ? "cursor-pointer" : "cursor-default"

@@ -8,6 +8,7 @@ import authRouter from "./routes/authRoute.js";
 import translateRouter from "./routes/translateRoute.js"
 import questRouter from "./routes/questRoute.js";
 import chatbotRouter from "./routes/chatbotRoute.js";
+import drawRouter from "./routes/drawRoute.js";
 
 import path from "path"
 import mongoose from "mongoose"
@@ -62,6 +63,7 @@ app.use("/api/prompt", promptRouter);
 app.use("/api/translate", translateRouter);
 app.use('/api/quest', questRouter);
 app.use('/api/chatbot', chatbotRouter);
+app.use('api/draw', drawRouter);
 
 
 app.get('*', (req, res) => {
