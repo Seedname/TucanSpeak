@@ -7,6 +7,7 @@ import "./AIDisplay.css";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getCookie } from "../../../utils/helper";
+import { init } from "i18next";
 
 const AIDisplay = () => {
   const {t} = useTranslation()
@@ -18,12 +19,20 @@ const AIDisplay = () => {
 
   let currentMessage = "";
   let audioChunks = [];
+  
+  const initalMessage = {
+    type: "ai", 
+    content: "¡Hola! 😄 I'm Tilly, your friendly English tutor! Let's start your English adventure today. 🌟"
+  }
 
   const [userInput, setUserInput] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([initalMessage]);
   const messageEndRef = useRef(null);
 
+  
+
   useEffect(() => {
+    console.log("Current messages:", messages); 
     const storedMessages = localStorage.getItem("messages");
     if (storedMessages) {
       setMessages(JSON.parse(storedMessages));
@@ -56,6 +65,8 @@ const AIDisplay = () => {
 
     setMessages((prev) => [...prev, { type: "user", content: userInput }]);
     setUserInput("");
+
+    console.log(token)
 
     const res = await fetch(`${url}api/chatbot/stream?message=${encodeURIComponent(userInput)}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -159,9 +170,13 @@ const AIDisplay = () => {
       isPlaying = false;
       playNextAudio();
     }
+
+
   };
 
+
   return (
+    // main container for the chat
     <div className="w-2/3 flex flex-col items-center h-screen">
       {/* <img src="/vine.png" className="w-80 fixed scale-50 left-[75px] -top-56"/>
       <img src="/vine.png" className="w-80 fixed scale-50 left-[175px] -top-40"/>
@@ -178,6 +193,8 @@ const AIDisplay = () => {
         className="flex flex-col flex-grow w-2/3 p-4 overflow-y-auto space-y-4"
         id="messageArea"
       >
+        
+
         {messages.map((message, index) => (
           <div
             key={index}
@@ -189,6 +206,8 @@ const AIDisplay = () => {
         ))}
         <div ref={messageEndRef} />
       </div>
+
+ 
       <div className="w-2/3 flex items-center p-4">
         <input
           className="flex-1 bg-slate-50 rounded-full px-6 py-3 ml-2 border border-gray-300"
