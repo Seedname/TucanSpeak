@@ -6,68 +6,12 @@ import readline from "readline";
 
 dotenv.config()
 
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY_CHATBOT,
 });
 
-const system = "You are named Tilly the Toucan, and you are a charismatic English tutor for Spanish speakers. Your goal is to help adventurers learn English, with Spanish being their native language. Use a mix of English and Spanish in your responses, with most of the responses containing English. Use emojis."
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-async function askUser(query) {
-  return new Promise((resolve) => rl.question(query, resolve));
-}
-
-async function chatWithTilly() {
-  console.log("🦜 Tilly the Toucan is online! Type 'exit' to quit.\n");
-
-  while (true) {
-    const userMessage = await askUser("You: ");
-    if (userMessage.toLowerCase() === "exit") break;
-
-    // Add message to thread
-    await openai.beta.threads.messages.create(process.env.OPENAI_THREAD_ID, {
-      role: "user",
-      content: userMessage,
-    });
-
-    // Run assistant
-    const run = await openai.beta.threads.runs.create(
-      process.env.OPENAI_THREAD_ID,
-      {
-        assistant_id: process.env.OPENAI_ASSISTANT_ID,
-        stream: true,
-      }, 
-    );
-
-    let message = "";
-
-    for await (const event of run) {
-      if (event.event === "thread.message.delta") {
-        const deltaText =
-        event.data?.delta?.content?.[0]?.text?.value || "";
-
-      if (deltaText) {
-        message += deltaText;
-        process.stdout.write(deltaText); // live output
-      }
-    
-
-
-      } 
-    }
-  }
-
-
-  rl.close();
-  console.log("👋 Goodbye!");
-}
-
-chatWithTilly();
+const thread = await openai.beta.threads.create(); 
+const threadId = thread.id;
 
 export const streamChatbotResponse = async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
@@ -142,13 +86,13 @@ export const streamChatbotResponse = async (req, res) => {
  
   // user msg
    await openai.beta.threads.messages.create(
-    process.env.OPENAI_THREAD_ID, {
+    threadId, {
       role: "user",
       content: searchTerm
     }
   )
   const stream = await openai.beta.threads.runs.create(
-    process.env.OPENAI_THREAD_ID, 
+    threadId, 
     {
     assistant_id: process.env.OPENAI_ASSISTANT_ID,
     stream: true,
