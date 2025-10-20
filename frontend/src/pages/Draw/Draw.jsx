@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import BackButton from "../../components/BackButton/BackButton";
 import { assets } from '../../assets/assets.js';
+import axios from "axios";
+
 
 const Draw = () => {
     const canvasRef = useRef(null);
@@ -27,32 +29,44 @@ const Draw = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        ctx = canvas.getContext('2d');
+        ctx = canvas.getContext('2d'); 
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+      
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.lineWidth = 3;
         ctx.strokeStyle = '#000000';
 
+        // when user draws on the screen
         const handleMouseDown = (e) => {
+          // find where the mouse is 
+            
             setIsDrawing(true);
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
+            
+            // begin drawing path and moves the cursor there
             ctx.beginPath();
             ctx.moveTo(x, y);
         };
 
         const handleMouseMove = (e) => {
+
             if (!isDrawing) return;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
+            // pen tool
             if (currentTool === 0) {
                 ctx.strokeStyle = '#000000';
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.lineTo(x, y);
                 ctx.stroke();
+
+            // eraser tool
             } else if (currentTool === 1) {
                 ctx.globalCompositeOperation = 'destination-out';
                 ctx.lineWidth = 15;
@@ -63,6 +77,7 @@ const Draw = () => {
         };
 
         const handleMouseUp = () => {
+  
             setIsDrawing(false);
             ctx.closePath();
         };
@@ -88,6 +103,16 @@ const Draw = () => {
         }
     };
 
+    const getCanvasImage = () => {
+      const canvas = canvasRef.current;
+
+      const ctx = canvas.getContext('2d');
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      return imageData;
+      
+    };
+
     const startRound = () => {
         setWord('Draw something!');
         setLabel('Round started');
@@ -98,10 +123,11 @@ const Draw = () => {
         if (bucket.length == 0) { // if bucket is empty, reset it
           bucket = JSON.parse(JSON.stringify(label));
         }
-
         setLabel(label);
+        setInterval(getCanvasImage, 1000);
     
     };
+
 
     return (
       <div className="w-auto h-screen overflow-hidden bg-cover flex flex-col items-center justify-center relative" style={{ backgroundImage: `url(${assets.jungle})` }}>
