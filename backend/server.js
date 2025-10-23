@@ -48,8 +48,8 @@ app.get('/draw', (req, res) => {
 
 app.use(express.json())
 
-app.use(bodyParser.json({limit: '100mb'}));
-app.use(bodyParser.urlencoded({ limit: '100mb', extended: true}));
+app.use(bodyParser.json({limit: '500mb'}));
+app.use(bodyParser.urlencoded({ limit: '500mb', extended: true}));
 
 app.use(cookieParser());
 
@@ -63,7 +63,7 @@ app.use("/api/prompt", promptRouter);
 app.use("/api/translate", translateRouter);
 app.use('/api/quest', questRouter);
 app.use('/api/chatbot', chatbotRouter);
-app.use('api/draw', drawRouter);
+app.use('/api/draw', drawRouter);
 
 
 app.get('*', (req, res) => {

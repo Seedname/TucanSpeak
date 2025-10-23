@@ -1,9 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useContext } from "react";
 import BackButton from "../../components/BackButton/BackButton";
 import { assets } from "../../assets/assets.js";
 import { PaintBrushIcon } from "@heroicons/react/24/solid";
 import { EraserIcon } from "lucide-react";
 import axios from "axios";
+import { AppContext } from "../../context/AppContext.jsx";
+import { getCookie } from "../../utils/helper.js";
 
 
 const Draw = () => {
@@ -13,6 +15,7 @@ const Draw = () => {
   const [roundStart, setRoundStart] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
   const intervalRef = useRef(null);
+  const { url } = useContext(AppContext);
   let [bucket, setBucket] = useState([
     "Bucket",
     "Computer",
@@ -78,13 +81,7 @@ const Draw = () => {
         ctx.stroke();
         ctx.lineWidth = 3;
       }
-    };
-
-        const handleMouseUp = () => {
-  
-            setIsDrawing(false);
-            ctx.closePath();
-        };
+    }; 
     const handleMouseUp = () => {
       setIsDrawing(false);
       ctx.closePath();
@@ -111,15 +108,23 @@ const Draw = () => {
         }
     };
 
-    const getCanvasImage = () => {
-      const canvas = canvasRef.current;
+  const getCanvasImage = async () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
 
-      const ctx = canvas.getContext('2d');
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    // Get the image data from the original canvas
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const base64Image = canvas.toDataURL("image/png");
 
-      return imageData;
-      
-    };
+
+    const response = await axios.post(`${url}api/draw/tucan-draw`, {
+      image: base64Image 
+    }, {
+      headers: {
+        Authorization: `Bearer ${getCookie('token')}`,
+      }
+    });
+  };
 
   const startRound = () => {
     setRoundStart(true);
@@ -146,6 +151,7 @@ const Draw = () => {
     }
 
     setLabel(label);
+    setInterval(getCanvasImage, 1000);
   };
 
   const endRound = () => {
