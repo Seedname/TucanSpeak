@@ -4,10 +4,18 @@ import async from 'async';
 import fs from 'fs';
 import { type } from 'os';
 import sharp from 'sharp';
-// import * as tf from '@tensorflow/tfjs-node';
-import ml5 from 'ml5';
+import * as tf from '@tensorflow/tfjs-node';
+import path from 'path';
 
-const classifier = await ml5.imageClassifier('../aimodels/drawModel.json');
+import { fileURLToPath } from 'url';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const modelPath = 'file://' + path.resolve(__dirname, '../aimodels/drawModel.json');
+const model = await tf.loadLayersModel(modelPath);
+
+
 export const tucanDraw = async (req, res) => {
   const imageData = req.body.image;
   const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
@@ -18,7 +26,15 @@ export const tucanDraw = async (req, res) => {
   .removeAlpha()     
   .toFormat('png')    
   .toBuffer();
-  
+
+  const imageTensor = tf.node.decodeImage(resizedBuffer, 3)
+  .expandDims(0);
+
+  console.log(model.summary());
+
+  // const predictions = await model.predict(imageTensor).data();
+  // console.log(predictions)
+
 
   // Here, you can process the resizedBuffer as needed
   res.json({ message: 'Image received and processed successfully' });
