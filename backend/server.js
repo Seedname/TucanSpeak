@@ -23,7 +23,7 @@ const app = express()
 const port = 4000
 
 app.use(cors({
-  origin: ["https://tucanspeak.netlify.app", "http://localhost:5173"],,
+  origin: ["https://tucanspeak.netlify.app", "http://localhost:5173"],
   methods: ['GET', 'POST'],
   credentials: true
 }));
