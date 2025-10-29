@@ -23,10 +23,12 @@ const app = express()
 const port = 4000
 
 app.use(cors({
-  origin: true,
+  origin: ["https://tucanspeak.netlify.app", "http://localhost:5173"],,
   methods: ['GET', 'POST'],
   credentials: true
 }));
+
+app.options("*", cors());
 
 const dev = process.env.NODE_ENV !== 'production';
 
