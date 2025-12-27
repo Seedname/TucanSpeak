@@ -5,7 +5,8 @@ export const AppContext = createContext(null);
 
 const AppContextProvider = (props) => {
   
-  const url = "http://localhost:4000/"
+  // const url = "http://localhost:4000/"
+  const url = "https://tucanspeak.onrender.com/"
 
   const contextValue = {
     url

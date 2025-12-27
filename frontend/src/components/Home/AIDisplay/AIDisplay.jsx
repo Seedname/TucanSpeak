@@ -3,7 +3,7 @@ import ToucanAnimation from "../../Toucan/Toucan";
 import { AppContext } from "../../../context/AppContext";
 import { PaperAirplaneIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import LevelBadge from "../../LevelBadge/LevelBadge";
-import "./AIDisplay.css"; 
+import "./AiDisplay.css"; 
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { getCookie } from "../../../utils/helper";
