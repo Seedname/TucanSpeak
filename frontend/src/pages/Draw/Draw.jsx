@@ -14,7 +14,9 @@ const Draw = () => {
   const [label, setLabel] = useState("");
   const [roundStart, setRoundStart] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
-  const intervalRef = useRef(null);
+  const predictionIntervalRef = useRef(null);
+  const countdownIntervalRef = useRef(null);
+
   const { url } = useContext(AppContext);
   let [bucket, setBucket] = useState(
     [
@@ -115,48 +117,51 @@ const Draw = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const ctx = canvas.getContext("2d"); // get fresh context!
+      // if canvas is blank .....
+      const ctx = canvas.getContext("2d");
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const isBlank = !imageData.data.some((channel) => channel !== 0);
+
+      if (isBlank) {
+        console.log("Canvas is blank, skipping prediction");
+        return;
+      }
+
       const base64Image = canvas.toDataURL("image/png");
 
-      const response = await axios.post(
-        `${url}api/draw/tucan-draw`,
-        { image: base64Image, challenge_word: label },
-        { headers: { Authorization: `Bearer ${getCookie("token")}` } }
-      );
-      const {predictedLabel, correct} = response.data;
-      setPrediction(predictedLabel);
-      setIsCorrect(correct);
-      console.log("Prediction response:", response.data);
-      if (correct) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+      try {
+        const response = await axios.post(
+          `${url}api/draw/tucan-draw`,
+          { image: base64Image, challenge_word: label },
+          { headers: { Authorization: `Bearer ${getCookie("token")}` } }
+        );
+
+        const { predictedLabel, correct } = response.data;
+        setPrediction(predictedLabel);
+        setIsCorrect(correct);
+        console.log("Prediction response:", response.data);
+        if (correct) {
+          console.log("Correct prediction! Ending round.");
+  
+          clearInterval(predictionIntervalRef.current);
+          clearInterval(countdownIntervalRef.current);
+          predictionIntervalRef.current = null;
+          countdownIntervalRef.current = null;
         }
+      } catch (error) {
+        console.error(
+          "Error sending canvas image:",
+          error.response?.data || error.message
+        );
+      }
     };
 
-  // const getCanvasImage = async () => {
-  //   const canvas = canvasRef.current;
-  //   const ctx = canvas.getContext("2d");
-
-  //   // Get the image data from the original canvas
-  //   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  //   const base64Image = canvas.toDataURL("image/png");
-
-  //   if (label){
-  //   const response = await axios.post(`${url}api/draw/tucan-draw`, {
-  //     image: base64Image, 
-  //     challenge_word: label
-  //   }, {
-  //     headers: {
-  //       Authorization: `Bearer ${getCookie('token')}`,
-  //     }
-  //   });
-  // }
-  // };
 
   const startRound = () => {
     setRoundStart(true);
+    clearScreen();
     setTimeLeft(60);
-    setLabel("Round started");
+    // setLabel("Round started");
     let spanish = [
       "Balde",
       "Computadora",
@@ -177,24 +182,15 @@ const Draw = () => {
     setLabel(selected);
 
     setBucket((prev) => prev.filter((_, i) => i !== index));
-    // let index = Math.floor(Math.random() * bucket.length); // random index from the word bucket
-    // let label = bucket.splice(index, 1).join(""); // removes that word from bucket to avoid repetition
-    // if (bucket.length == 0) {
-    //   // if bucket is empty, reset it
-    //   bucket = JSON.parse(JSON.stringify(label));
-    // }
-
-    // setLabel(label);
-    // console.log("selected word:", label);
-    // setInterval(getCanvasImage, 1000);
   };
 
   const endRound = () => {
     // stop timer
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
     }
+    clearScreen();
     setRoundStart(false);
     setLabel("");
     setTimeLeft(0);
@@ -204,50 +200,50 @@ const Draw = () => {
  useEffect(() => {
    if (!label) return;
    // whenever label changes, restart interval
-   if (intervalRef.current) {
-     clearInterval(intervalRef.current);
+   if (predictionIntervalRef.current) {
+     clearInterval(predictionIntervalRef.current);
    }
-   intervalRef.current = setInterval(getCanvasImage, 1000);
+   predictionIntervalRef.current = setInterval(getCanvasImage, 1000);
 
    return () => {
-    clearInterval(intervalRef.current);
-    intervalRef.current = null;
+    clearInterval(predictionIntervalRef.current);
+    predictionIntervalRef.current = null;
    };
   }, [label]);
 
  
-  // // countdown effect: when a round starts, run a 1s interval and decrement timeLeft
-  // useEffect(() => {
-  //   if (!roundStart) return;
+  // countdown effect: when a round starts, run a 1s interval and decrement timeLeft
+  useEffect(() => {
+    if (!roundStart) return;
 
-  //   // ensure any previous interval is cleared
-  //   if (intervalRef.current) {
-  //     clearInterval(intervalRef.current);
-  //     intervalRef.current = null;
-  //   }
+    // ensure any previous interval is cleared
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
 
-  //   intervalRef.current = setInterval(() => {
-  //     setTimeLeft((prev) => {
-  //       if (prev <= 1) {
-  //         // time's up
-  //         clearInterval(intervalRef.current);
-  //         intervalRef.current = null;
-  //         setRoundStart(false);
-  //         setLabel("");
-  //         return 0;
-  //       }
-  //       return prev - 1;
-  //     });
-  //   }, 1000);
+    countdownIntervalRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          // time's up
+          clearInterval(countdownIntervalRef.current);
+          countdownIntervalRef.current = null;
+          setRoundStart(false);
+          setLabel("");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-  //   // cleanup on unmount or when roundStart changes
-  //   return () => {
-  //     if (intervalRef.current) {
-  //       clearInterval(intervalRef.current);
-  //       intervalRef.current = null;
-  //     }
-  //   };
-  // }, [roundStart]);
+    // cleanup on unmount or when roundStart changes
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+    };
+  }, [roundStart]);
 
   const formatTime = (seconds) => {
     const s = Math.max(0, seconds || 0);
@@ -262,6 +258,7 @@ const Draw = () => {
 
   return (
     <div className="w-auto h-screen overflow-hidden bg-green-300 flex flex-col items-center justify-center relative">
+      
       <div
         width={800}
         height={50}

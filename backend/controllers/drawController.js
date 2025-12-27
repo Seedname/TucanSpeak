@@ -36,6 +36,7 @@ export const tucanDraw = async (req, res) => {
   const predictions = await model.predict(imageTensor).data();
   const maxIndex = predictions.indexOf(Math.max(...predictions));
   const predictedLabel = labels[maxIndex];
+  console.log("Predicted label:", predictedLabel, predictedLabel.toLowerCase() === challenge_word.toLowerCase());
   res.json({
      predicted: predictedLabel, 
      challenge: challenge_word, 
