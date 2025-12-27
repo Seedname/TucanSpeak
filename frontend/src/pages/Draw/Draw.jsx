@@ -16,20 +16,23 @@ const Draw = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const intervalRef = useRef(null);
   const { url } = useContext(AppContext);
-  let [bucket, setBucket] = useState([
-    "Bucket",
-    "Computer",
-    "Door",
-    "Eye",
-    "Light Bulb",
-    "Mountain",
-    "Scissors",
-    "Rainbow",
-    "Sun",
-    "Tree",
-  ]);
+  let [bucket, setBucket] = useState(
+    [
+      "Bucket",
+      "Laptop",
+      "Door",
+      "Eye",
+      "Lightbulb",
+      "Mountain",
+      "Rainbow",
+      "Scissors",
+      "Sun",
+      "Tree",
+    ]);
 
   const [currentTool, setCurrentTool] = useState(0);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [prediction, setPrediction] = useState("");
   let ctx = null;
 
   useEffect(() => {
@@ -108,23 +111,47 @@ const Draw = () => {
         }
     };
 
-  const getCanvasImage = async () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const getCanvasImage = async () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    // Get the image data from the original canvas
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const base64Image = canvas.toDataURL("image/png");
+      const ctx = canvas.getContext("2d"); // get fresh context!
+      const base64Image = canvas.toDataURL("image/png");
 
+      const response = await axios.post(
+        `${url}api/draw/tucan-draw`,
+        { image: base64Image, challenge_word: label },
+        { headers: { Authorization: `Bearer ${getCookie("token")}` } }
+      );
+      const {predictedLabel, correct} = response.data;
+      setPrediction(predictedLabel);
+      setIsCorrect(correct);
+      console.log("Prediction response:", response.data);
+      if (correct) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        }
+    };
 
-    const response = await axios.post(`${url}api/draw/tucan-draw`, {
-      image: base64Image 
-    }, {
-      headers: {
-        Authorization: `Bearer ${getCookie('token')}`,
-      }
-    });
-  };
+  // const getCanvasImage = async () => {
+  //   const canvas = canvasRef.current;
+  //   const ctx = canvas.getContext("2d");
+
+  //   // Get the image data from the original canvas
+  //   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  //   const base64Image = canvas.toDataURL("image/png");
+
+  //   if (label){
+  //   const response = await axios.post(`${url}api/draw/tucan-draw`, {
+  //     image: base64Image, 
+  //     challenge_word: label
+  //   }, {
+  //     headers: {
+  //       Authorization: `Bearer ${getCookie('token')}`,
+  //     }
+  //   });
+  // }
+  // };
 
   const startRound = () => {
     setRoundStart(true);
@@ -143,15 +170,23 @@ const Draw = () => {
       "Árbol",
     ];
 
-    let index = Math.floor(Math.random() * bucket.length); // random index from the word bucket
-    let label = bucket.splice(index, 1).join(""); // removes that word from bucket to avoid repetition
-    if (bucket.length == 0) {
-      // if bucket is empty, reset it
-      bucket = JSON.parse(JSON.stringify(label));
-    }
+    const index = Math.floor(Math.random() * bucket.length);
+    const selected = bucket[index];
 
-    setLabel(label);
-    setInterval(getCanvasImage, 1000);
+    console.log("selected word:", selected);
+    setLabel(selected);
+
+    setBucket((prev) => prev.filter((_, i) => i !== index));
+    // let index = Math.floor(Math.random() * bucket.length); // random index from the word bucket
+    // let label = bucket.splice(index, 1).join(""); // removes that word from bucket to avoid repetition
+    // if (bucket.length == 0) {
+    //   // if bucket is empty, reset it
+    //   bucket = JSON.parse(JSON.stringify(label));
+    // }
+
+    // setLabel(label);
+    // console.log("selected word:", label);
+    // setInterval(getCanvasImage, 1000);
   };
 
   const endRound = () => {
@@ -165,38 +200,54 @@ const Draw = () => {
     setTimeLeft(0);
   };
 
-  // countdown effect: when a round starts, run a 1s interval and decrement timeLeft
-  useEffect(() => {
-    if (!roundStart) return;
 
-    // ensure any previous interval is cleared
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
+ useEffect(() => {
+   if (!label) return;
+   // whenever label changes, restart interval
+   if (intervalRef.current) {
+     clearInterval(intervalRef.current);
+   }
+   intervalRef.current = setInterval(getCanvasImage, 1000);
 
-    intervalRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          // time's up
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-          setRoundStart(false);
-          setLabel("");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+   return () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+   };
+  }, [label]);
 
-    // cleanup on unmount or when roundStart changes
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [roundStart]);
+ 
+  // // countdown effect: when a round starts, run a 1s interval and decrement timeLeft
+  // useEffect(() => {
+  //   if (!roundStart) return;
+
+  //   // ensure any previous interval is cleared
+  //   if (intervalRef.current) {
+  //     clearInterval(intervalRef.current);
+  //     intervalRef.current = null;
+  //   }
+
+  //   intervalRef.current = setInterval(() => {
+  //     setTimeLeft((prev) => {
+  //       if (prev <= 1) {
+  //         // time's up
+  //         clearInterval(intervalRef.current);
+  //         intervalRef.current = null;
+  //         setRoundStart(false);
+  //         setLabel("");
+  //         return 0;
+  //       }
+  //       return prev - 1;
+  //     });
+  //   }, 1000);
+
+  //   // cleanup on unmount or when roundStart changes
+  //   return () => {
+  //     if (intervalRef.current) {
+  //       clearInterval(intervalRef.current);
+  //       intervalRef.current = null;
+  //     }
+  //   };
+  // }, [roundStart]);
 
   const formatTime = (seconds) => {
     const s = Math.max(0, seconds || 0);
@@ -223,12 +274,14 @@ const Draw = () => {
           {roundStart ? `Time: ${formatTime(timeLeft)}` : ""}
         </span>
       </div>
+
       <canvas
         ref={canvasRef}
         width={700}
         height={500}
         className="border-2 border-gray-400 border-t-transparent bg-white cursor-crosshair"
       />
+     
 
       <BackButton />
 
