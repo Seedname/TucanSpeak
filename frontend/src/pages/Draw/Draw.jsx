@@ -258,7 +258,6 @@ const Draw = () => {
 
   return (
     <div className="w-auto h-screen overflow-hidden bg-green-300 flex flex-col items-center justify-center relative">
-      
       <div
         width={800}
         height={50}
@@ -278,9 +277,17 @@ const Draw = () => {
         height={500}
         className="border-2 border-gray-400 border-t-transparent bg-white cursor-crosshair"
       />
-     
-
       <BackButton />
+
+      {/* Prediction Indicator */}
+      {roundStart && (
+        <div className="text-white border-2 border-t-transparent border-gray-400 bg-black w-[705px] h-12 tracking-wide font-bold text-xl px-4 py-2 flex items-center justify-between">
+          <span>Model Prediction: {prediction || "Analyzing..."}</span>
+          {isCorrect && (
+            <span className="text-green-400 animate-pulse"> Correct!</span>
+          )}
+        </div>
+      )}
 
       <div
         id="button-container"
@@ -304,6 +311,7 @@ const Draw = () => {
           className="p-2 bg-gray-200 rounded hover:bg-gray-300"
           onClick={clearScreen}
         >
+          {" "}
           Clear
         </button>
       </div>
