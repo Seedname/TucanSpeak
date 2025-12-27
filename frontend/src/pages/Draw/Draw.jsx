@@ -36,7 +36,7 @@ const Draw = () => {
   const [isCorrect, setIsCorrect] = useState(false);
   const [prediction, setPrediction] = useState("");
   let ctx = null;
-
+  
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -124,6 +124,7 @@ const Draw = () => {
 
       if (isBlank) {
         console.log("Canvas is blank, skipping prediction");
+        setPrediction("");
         return;
       }
 
@@ -136,8 +137,8 @@ const Draw = () => {
           { headers: { Authorization: `Bearer ${getCookie("token")}` } }
         );
 
-        const { predictedLabel, correct } = response.data;
-        setPrediction(predictedLabel);
+        const { predicted, challenge, correct } = response.data;
+        setPrediction(predicted);
         setIsCorrect(correct);
         console.log("Prediction response:", response.data);
         if (correct) {
@@ -284,7 +285,7 @@ const Draw = () => {
         <div className="text-white border-2 border-t-transparent border-gray-400 bg-black w-[705px] h-12 tracking-wide font-bold text-xl px-4 py-2 flex items-center justify-between">
           <span>Model Prediction: {prediction || "Analyzing..."}</span>
           {isCorrect && (
-            <span className="text-green-400 animate-pulse"> Correct!</span>
+            <span className="text-green-400 animate-pulse">Correct!</span>
           )}
         </div>
       )}
