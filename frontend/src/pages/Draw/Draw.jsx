@@ -16,14 +16,16 @@ const Draw = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const predictionIntervalRef = useRef(null);
   const countdownIntervalRef = useRef(null);
-  const [showXpGain, setShowXpGain] = useState(false);
-  const [xpGained, setXpGained] = useState(0);
   const [wordsCorrect, setWordsCorrect] = useState(0);
   const successSoundRef = useRef(
     new Audio('/sound/Prodigy Sounds_ Correct.mp3')
   );
   const [showEndScreen, setShowEndScreen] = useState(false);
   // const [finalScore, setFinalScore] = useState(0);
+  const [showXpGain, setShowXpGain] = useState(false);
+  const [xpGained, setXpGained] = useState(0);
+  const [questComplete, setQuestComplete] = useState(null);
+  const [questXp, setQuestXP] = useState(0);
 
   const { url } = useContext(AppContext);
 
@@ -116,61 +118,61 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
     };
   }, [isDrawing, currentTool]);
 
-    const clearScreen = () => {
-        const canvas = canvasRef.current;
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            setPrediction("");
-        }
-    };
-
-    const getCanvasImage = async () => {
-      // setPrediction("");
+  const clearScreen = () => {
       const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      // if canvas is blank .....
-      const ctx = canvas.getContext("2d");
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const isBlank = !imageData.data.some((channel) => channel !== 0);
-
-      if (isBlank) {
-        console.log("Canvas is blank, skipping prediction");
-        return;
+      if (canvas) {
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          setPrediction("");
       }
+  };
 
-      const base64Image = canvas.toDataURL("image/png");
+  const getCanvasImage = async () => {
+    // setPrediction("");
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-      try {
-        const response = await axios.post(
-          `${url}api/draw/tucan-draw`,
-          { image: base64Image, challenge_word: label },
-          { headers: { Authorization: `Bearer ${getCookie("token")}` } }
-        );
+    // if canvas is blank .....
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const isBlank = !imageData.data.some((channel) => channel !== 0);
 
-        const { predicted, challenge, correct } = response.data;
-        setPrediction(predicted);
-        setIsCorrect(correct);
-        console.log("Prediction response:", response.data);
-        if (correct) {
-          console.log("Correct prediction!");
-          successSoundRef.current.play();
-          selectWord();
-          setWordsCorrect((prev) => prev + 1);
-          console.log("Words correct:", wordsCorrect);
-          // clearInterval(predictionIntervalRef.current);
-          // clearInterval(countdownIntervalRef.current);
-          // predictionIntervalRef.current = null;
-          // countdownIntervalRef.current = null;
-        }
-      } catch (error) {
-        console.error(
-          "Error sending canvas image:",
-          error.response?.data || error.message
-        );
+    if (isBlank) {
+      console.log("Canvas is blank, skipping prediction");
+      return;
+    }
+
+    const base64Image = canvas.toDataURL("image/png");
+
+    try {
+      const response = await axios.post(
+        `${url}api/draw/tucan-draw`,
+        { image: base64Image, challenge_word: label },
+        { headers: { Authorization: `Bearer ${getCookie("token")}` } }
+      );
+
+      const { predicted, challenge, correct } = response.data;
+      setPrediction(predicted);
+      setIsCorrect(correct);
+      console.log("Prediction response:", response.data);
+      if (correct) {
+        console.log("Correct prediction!");
+        successSoundRef.current.play();
+        selectWord();
+        setWordsCorrect((prev) => prev + 1);
+        console.log("Words correct:", wordsCorrect);
+        // clearInterval(predictionIntervalRef.current);
+        // clearInterval(countdownIntervalRef.current);
+        // predictionIntervalRef.current = null;
+        // countdownIntervalRef.current = null;
       }
-    };
+    } catch (error) {
+      console.error(
+        "Error sending canvas image:",
+        error.response?.data || error.message
+      );
+    }
+  };
 
   const selectWord = () => {
     clearScreen();
@@ -191,6 +193,7 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
   const startRound = () => {
     setRoundStart(true);
     selectWord();
+    setWordsCorrect(0);
     setTimeLeft(60);
     // setLabel("Round started");
     let spanish = [
@@ -216,8 +219,11 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
       countdownIntervalRef.current = null;
       predictionIntervalRef.current = null;
     }
-     const score = wordsCorrect; 
-     console.log("Final score:", score);
+     if (wordsCorrect >= 4) {
+      handleXpAndQuest();
+      console.log("EXP gained:", xpGained);
+      
+    } 
      // setFinalScore(score);
      setShowEndScreen(true);
 
@@ -228,6 +234,47 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
     //  setWordsCorrect(0);
      setBucket([...ORIGINAL_BUCKET]);
   };
+
+  const handleXpAndQuest = async () => {
+
+     const token = getCookie("token");
+
+     try {
+       const response = await axios.post(
+         `${url}api/quest/handle-correct-answer`,
+         {
+           activityType: "draw",
+         },
+         {
+           headers: {
+             Authorization: `Bearer ${token}`,
+           },
+         }
+       );
+
+       if (response.data.success) {
+        console.log("XP and quest response:", response.data);
+         setXpGained(response.data.xpGained);
+         setShowXpGain(true);
+
+         if (response.data.questCompleted) {
+           setQuestComplete(true);
+           setQuestXP(response.data.questXP);
+         }
+
+         setTimeout(() => {
+           setShowXpGain(false);
+           if (response.data.questCompleted) {
+             setQuestComplete(false);
+           }
+         }, 2000);
+       }
+     } catch (e) {
+       console.error("Error handling XP:", e);
+     }
+
+
+  }
 
 
  useEffect(() => {
@@ -331,8 +378,8 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
       )}
 
       {/* Words Correct Counter */}
-      <div className="absolute top-4 right-4">
-        <div className="relative bg-white text-blue-600 px-6 py-4 rounded-full shadow-xl border-2 border-blue-200">
+      <div className="absolute top-2 right-5">
+        <div className="relative bg-white text-blue-600 px-4 py-3 rounded-full shadow-xl border-2 border-blue-200">
           <div className="text-xs font-semibold text-center">Words Correct</div>
           <div className="text-3xl font-bold text-center">{wordsCorrect}</div>
         </div>
