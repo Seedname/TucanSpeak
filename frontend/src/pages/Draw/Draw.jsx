@@ -16,26 +16,35 @@ const Draw = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const predictionIntervalRef = useRef(null);
   const countdownIntervalRef = useRef(null);
+  const [showXpGain, setShowXpGain] = useState(false);
+  const [xpGained, setXpGained] = useState(0);
+  const [wordsCorrect, setWordsCorrect] = useState(0);
+  const successSoundRef = useRef(
+    new Audio('/sound/Prodigy Sounds_ Correct.mp3')
+  );
 
   const { url } = useContext(AppContext);
-  let [bucket, setBucket] = useState(
-    [
-      "Bucket",
-      "Laptop",
-      "Door",
-      "Eye",
-      "Lightbulb",
-      "Mountain",
-      "Rainbow",
-      "Scissors",
-      "Sun",
-      "Tree",
-    ]);
+
+  const ORIGINAL_BUCKET = [
+  "Bucket",
+  "Laptop",
+  "Door",
+  "Eye",
+  "Lightbulb",
+  "Mountain",
+  "Rainbow",
+  "Scissors",
+  "Sun",
+  "Tree",
+];
+
+const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
 
   const [currentTool, setCurrentTool] = useState(0);
   const [isCorrect, setIsCorrect] = useState(false);
   const [prediction, setPrediction] = useState("");
   let ctx = null;
+  
   
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -110,10 +119,12 @@ const Draw = () => {
         if (canvas) {
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            setPrediction("");
         }
     };
 
     const getCanvasImage = async () => {
+      // setPrediction("");
       const canvas = canvasRef.current;
       if (!canvas) return;
 
@@ -124,7 +135,6 @@ const Draw = () => {
 
       if (isBlank) {
         console.log("Canvas is blank, skipping prediction");
-        setPrediction("");
         return;
       }
 
@@ -142,12 +152,15 @@ const Draw = () => {
         setIsCorrect(correct);
         console.log("Prediction response:", response.data);
         if (correct) {
-          console.log("Correct prediction! Ending round.");
-  
-          clearInterval(predictionIntervalRef.current);
-          clearInterval(countdownIntervalRef.current);
-          predictionIntervalRef.current = null;
-          countdownIntervalRef.current = null;
+          console.log("Correct prediction!");
+          successSoundRef.current.play();
+          selectWord();
+          setWordsCorrect((prev) => prev + 1);
+          console.log("Words correct:", wordsCorrect);
+          // clearInterval(predictionIntervalRef.current);
+          // clearInterval(countdownIntervalRef.current);
+          // predictionIntervalRef.current = null;
+          // countdownIntervalRef.current = null;
         }
       } catch (error) {
         console.error(
@@ -157,10 +170,25 @@ const Draw = () => {
       }
     };
 
+  const selectWord = () => {
+    clearScreen();
+
+    setBucket((prev) => {
+      const activeBucket = prev.length === 0 ? [...ORIGINAL_BUCKET] : prev;
+
+      const index = Math.floor(Math.random() * activeBucket.length);
+      const selected = activeBucket[index];
+
+      console.log("selected word:", selected);
+      setLabel(selected);
+
+      return activeBucket.filter((_, i) => i !== index);
+    });
+  }
 
   const startRound = () => {
     setRoundStart(true);
-    clearScreen();
+    selectWord();
     setTimeLeft(60);
     // setLabel("Round started");
     let spanish = [
@@ -175,26 +203,23 @@ const Draw = () => {
       "Sol",
       "Árbol",
     ];
-
-    const index = Math.floor(Math.random() * bucket.length);
-    const selected = bucket[index];
-
-    console.log("selected word:", selected);
-    setLabel(selected);
-
-    setBucket((prev) => prev.filter((_, i) => i !== index));
+    
   };
 
   const endRound = () => {
     // stop timer
     if (countdownIntervalRef.current) {
       clearInterval(countdownIntervalRef.current);
+      clearInterval(predictionIntervalRef.current);
       countdownIntervalRef.current = null;
+      predictionIntervalRef.current = null;
     }
     clearScreen();
     setRoundStart(false);
     setLabel("");
     setTimeLeft(0);
+    setWordsCorrect(0);
+    setBucket([...ORIGINAL_BUCKET])
   };
 
 
@@ -280,6 +305,13 @@ const Draw = () => {
       />
       <BackButton />
 
+      {/* Xp Gained */}
+      {showXpGain && (
+        <div className="fixed top-24 right-4 bg-yellow-400 text-black px-3 py-1 rounded-lg animate-bounce">
+          +{xpGained} XP
+        </div>
+      )}
+
       {/* Prediction Indicator */}
       {roundStart && (
         <div className="text-white border-2 border-t-transparent border-gray-400 bg-black w-[705px] h-12 tracking-wide font-bold text-xl px-4 py-2 flex items-center justify-between">
@@ -289,6 +321,16 @@ const Draw = () => {
           )}
         </div>
       )}
+
+      {/* Words Correct Counter */}
+      <div className="absolute top-4 right-4">
+        <div className="relative bg-white text-blue-600 px-6 py-4 rounded-full shadow-xl border-2 border-blue-200">
+        
+
+          <div className="text-xs font-semibold text-center">Words Correct</div>
+          <div className="text-3xl font-bold text-center">{wordsCorrect}</div>
+        </div>
+      </div>
 
       <div
         id="button-container"
