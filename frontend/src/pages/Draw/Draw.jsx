@@ -22,6 +22,8 @@ const Draw = () => {
   const successSoundRef = useRef(
     new Audio('/sound/Prodigy Sounds_ Correct.mp3')
   );
+  const [showEndScreen, setShowEndScreen] = useState(false);
+  // const [finalScore, setFinalScore] = useState(0);
 
   const { url } = useContext(AppContext);
 
@@ -214,12 +216,17 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
       countdownIntervalRef.current = null;
       predictionIntervalRef.current = null;
     }
-    clearScreen();
-    setRoundStart(false);
-    setLabel("");
-    setTimeLeft(0);
-    setWordsCorrect(0);
-    setBucket([...ORIGINAL_BUCKET])
+     const score = wordsCorrect; 
+     console.log("Final score:", score);
+     // setFinalScore(score);
+     setShowEndScreen(true);
+
+     clearScreen();
+     setRoundStart(false);
+     setLabel("");
+     setTimeLeft(0);
+    //  setWordsCorrect(0);
+     setBucket([...ORIGINAL_BUCKET]);
   };
 
 
@@ -252,10 +259,11 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
       setTimeLeft((prev) => {
         if (prev <= 1) {
           // time's up
-          clearInterval(countdownIntervalRef.current);
-          countdownIntervalRef.current = null;
-          setRoundStart(false);
-          setLabel("");
+          // clearInterval(countdownIntervalRef.current);
+          // countdownIntervalRef.current = null;
+          // setRoundStart(false);
+          // setLabel("");
+          endRound();
           return 0;
         }
         return prev - 1;
@@ -325,12 +333,40 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
       {/* Words Correct Counter */}
       <div className="absolute top-4 right-4">
         <div className="relative bg-white text-blue-600 px-6 py-4 rounded-full shadow-xl border-2 border-blue-200">
-        
-
           <div className="text-xs font-semibold text-center">Words Correct</div>
           <div className="text-3xl font-bold text-center">{wordsCorrect}</div>
         </div>
       </div>
+
+      {/* End Screen Overlay */}
+      {showEndScreen && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-12 text-center shadow-2xl max-w-md">
+            <h2 className="text-5xl font-bold text-white mb-4">
+              Round Complete!
+            </h2>
+            <div className="bg-white rounded-xl p-6 mb-6">
+              <p className="text-gray-600 text-xl mb-2">Total Words Correct</p>
+              <p className="text-6xl font-bold text-blue-600">{wordsCorrect}</p>
+            </div>
+            <p className="text-2xl text-white font-semibold mb-6">
+              {wordsCorrect >= 8
+                ? "Outstanding! 🐣"
+                : wordsCorrect >= 5
+                ? "Great Job! ⭐"
+                : wordsCorrect >= 3
+                ? "Good Effort! 🌴"
+                : "Keep Practicing! 💪"}
+            </p>
+            <button
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold text-xl hover:bg-gray-100 transition"
+              onClick={() => setShowEndScreen(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <div
         id="button-container"
