@@ -15,6 +15,22 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Handle Google Cloud credentials
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  try {
+    // Check if it's a JSON string (production) or a file path (local)
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS.trim().startsWith('{')) {
+      // It's a JSON string - write it to a temp file
+      const credPath = path.join(__dirname, 'temp-credentials.json');
+      fs.writeFileSync(credPath, process.env.GOOGLE_APPLICATION_CREDENTIALS);
+      process.env.GOOGLE_APPLICATION_CREDENTIALS = credPath;
+    }
+    // else it's already a file path, leave it as is
+  } catch (error) {
+    console.error('Error setting up Google credentials:', error);
+  }
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
