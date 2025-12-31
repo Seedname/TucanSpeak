@@ -158,6 +158,7 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
       if (correct) {
         console.log("Correct prediction!");
         successSoundRef.current.play();
+        handleXpAndQuest();
         selectWord();
         setWordsCorrect((prev) => prev + 1);
         console.log("Words correct:", wordsCorrect);
@@ -219,11 +220,11 @@ const [bucket, setBucket] = useState(ORIGINAL_BUCKET);
       countdownIntervalRef.current = null;
       predictionIntervalRef.current = null;
     }
-     if (wordsCorrect >= 4) {
-      handleXpAndQuest();
-      console.log("EXP gained:", xpGained);
+    //  if (wordsCorrect >= 1) {
+    //   handleXpAndQuest();
+    //   console.log("EXP gained:", xpGained);
       
-    } 
+    // } 
      // setFinalScore(score);
      setShowEndScreen(true);
 

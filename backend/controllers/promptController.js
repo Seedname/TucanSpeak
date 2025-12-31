@@ -42,7 +42,7 @@ export const recognizeSpeech = async (req, res) => {
     });
 
     fs.unlinkSync(tempFilePath);
-    const transcription = String(response);
+    const transcription = String(response).trim();
     let similarity = 0;
     if (req.body.originalPrompt) {
       const originalPrompt = String(req.body.originalPrompt).toLowerCase().replace(/[^\w\s]/g, '');
